@@ -9,6 +9,7 @@ A collection of Omnigraph graph starters plus packaged agent skills. Each starte
 ## Tooling
 
 - `omnigraph` CLI runs against an `omnigraph-server` instance (canonical runtime path). `init` and `load` are one-time setup ops that write directly to storage.
+- Skills under `skills/` follow the [Agent Skills specification](https://agentskills.io/specification): each skill has `SKILL.md` with `name` + `description` frontmatter and optional `references/` one level deep.
 - `omnigraph query lint --schema ./schema.pg --query ./queries/<file>.gq` validates queries against the schema — run after any edit.
 - Comments in `.pg` files use `//` not `#`.
 - Reference: [ModernRelay/omnigraph](https://github.com/ModernRelay/omnigraph).

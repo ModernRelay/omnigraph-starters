@@ -1,6 +1,11 @@
 ---
 name: omnigraph-intel-bootstrap
 description: Bootstrap a new Omnigraph-based SPIKE industry intelligence graph from scratch. Use this skill whenever a user wants to set up a new SPIKE graph — either with the existing AI industry demo data or for a new domain (biotech, fintech, crypto, geopolitics, macroeconomics, SaaS, climate tech, etc.). The flow presents a demo-vs-custom decision, then for custom setups elicits domain scope + actors + cadence + sources via structured multi-select (AskUserQuestion), adapts schema and enums for the target domain, runs initial web research to generate real seed content, and executes init + load. Apply aggressively when the user says any of: "set up Omnigraph", "bootstrap a new graph", "create a new SPIKE starter", "I want to track X industry", "initialize intel for Y", "new graph for Z domain", "start a new context graph", or similar phrasing. This skill takes a user from zero to a populated, queryable graph.
+license: MIT (see LICENSE at repo root)
+metadata:
+  author: ModernRelay
+  version: "0.1.0"
+  repository: https://github.com/ModernRelay/omnigraph-starters
 ---
 
 # SPIKE Starter Bootstrap
@@ -49,13 +54,11 @@ Six phases, in order. Don't skip ahead — each phase's output feeds the next.
 
 Ask the user which domain they want to track. Use AskUserQuestion with these examples as options:
 
-- Biotech / therapeutics
-- Fintech / financial services
+- Biotech
+- Fintech
+- Manufacturing
 - Crypto / web3
-- Geopolitics / policy
-- Macroeconomics
-- SaaS / enterprise software
-- Climate tech / energy transition
+- Geopolitics
 - Other (user specifies)
 
 Then narrow:
