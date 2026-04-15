@@ -17,9 +17,10 @@ For schema **design** principles (identity, types, edges, constraints) see [`omn
 
 ### Bootstrap a local RustFS-backed Omnigraph
 
-For a zero-setup local environment (RustFS S3, bucket, server, fixture repo):
+**Requires Docker.** RustFS runs in a container — install [Docker](https://docs.docker.com/get-docker/) and verify first:
 
 ```bash
+docker version >/dev/null 2>&1 || { echo "Install Docker first: https://docs.docker.com/get-docker/"; exit 1; }
 curl -fsSL https://raw.githubusercontent.com/ModernRelay/omnigraph/main/scripts/local-rustfs-bootstrap.sh | bash
 ```
 

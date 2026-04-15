@@ -25,7 +25,10 @@ This skill captures the operational rules for working with a locally deployed Om
 
 ### Bootstrap a local RustFS + Omnigraph in one command
 
+**Requires Docker.** RustFS runs in a container — install [Docker](https://docs.docker.com/get-docker/) and verify before running the bootstrap:
+
 ```bash
+docker version >/dev/null 2>&1 || { echo "Install Docker first: https://docs.docker.com/get-docker/"; exit 1; }
 curl -fsSL https://raw.githubusercontent.com/ModernRelay/omnigraph/main/scripts/local-rustfs-bootstrap.sh | bash
 ```
 

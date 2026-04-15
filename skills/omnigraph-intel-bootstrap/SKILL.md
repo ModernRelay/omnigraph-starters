@@ -17,8 +17,9 @@ This skill takes a user from zero to a populated, queryable SPIKE graph. Two pat
 
 **Prerequisites:**
 
-1. RustFS running on `127.0.0.1:9000`. If not, bootstrap with:
+1. RustFS running on `127.0.0.1:9000`. If not, bootstrap with (**requires Docker** — install from https://docs.docker.com/get-docker/):
    ```bash
+   docker version >/dev/null 2>&1 || { echo "Install Docker first: https://docs.docker.com/get-docker/"; exit 1; }
    curl -fsSL https://raw.githubusercontent.com/ModernRelay/omnigraph/main/scripts/local-rustfs-bootstrap.sh | bash
    ```
    The bootstrap installs `omnigraph` and `omnigraph-server` binaries under `<workdir>/.omnigraph-rustfs-demo/bin/` — **not on PATH by default**. Either add it to PATH or invoke binaries by absolute path.

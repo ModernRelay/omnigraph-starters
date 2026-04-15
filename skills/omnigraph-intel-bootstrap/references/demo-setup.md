@@ -12,9 +12,10 @@ RustFS must be running locally on `127.0.0.1:9000`. Verify with:
 curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:9000/
 ```
 
-If you get `000` (no connection), bootstrap RustFS:
+If you get `000` (no connection), bootstrap RustFS. **Requires Docker** ([install](https://docs.docker.com/get-docker/)):
 
 ```bash
+docker version >/dev/null 2>&1 || { echo "Install Docker first: https://docs.docker.com/get-docker/"; exit 1; }
 curl -fsSL https://raw.githubusercontent.com/ModernRelay/omnigraph/main/scripts/local-rustfs-bootstrap.sh | bash
 ```
 
