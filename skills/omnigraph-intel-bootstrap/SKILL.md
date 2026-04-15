@@ -25,7 +25,7 @@ This skill takes a user from zero to a populated, queryable SPIKE graph. Two pat
    ```bash
    git clone https://github.com/ModernRelay/omnigraph-starters.git
    ```
-   The `industry-intel/` folder inside the clone holds the schema, queries, and seed used by both paths below. All commands below run from inside that folder — record the absolute path before proceeding so subsequent `cd` commands work.
+   Record the absolute path to the clone — the **Demo** path runs from `<clone>/industry-intel/`, the **Custom** path runs from `<clone>/` (repo root) so it can copy `industry-intel/` as a template.
 
 ## Step 1: Ask the user which path
 
@@ -111,11 +111,12 @@ Write this to `<slug>/setup-notes.md` in the new starter folder. Confirming now 
 
 ### Phase 5 — Adapt the schema
 
-Copy `industry-intel/` as a template into `<slug>/`, then adapt:
+From the **repo root** (`<clone>/`), copy `industry-intel/` as a template into `<slug>/`:
 
 ```bash
+cd <clone>          # repo root, parent of industry-intel/
 cp -r industry-intel <slug>
-# rename references in omnigraph.yaml, remove the old seed.jsonl
+rm <slug>/seed.jsonl    # regenerated in Phase 6
 ```
 
 Update in `<slug>/schema.pg`:
@@ -156,9 +157,10 @@ Use web research to build real seed content. **Do not fabricate signals or dates
 4. For each pattern, identify the Elements, Companies, Experts mentioned
 5. Write `<slug>/seed.md` (tabular, human-readable) — **present this to the user for review before generating JSONL**
 6. Generate `<slug>/seed.jsonl` from the confirmed seed.md
-7. Init, load, then start the server:
+7. From `<clone>/<slug>/`, init, load, then start the server:
 
 ```bash
+cd <clone>/<slug>
 set -a && source ./.env.omni && set +a
 omnigraph init --schema ./schema.pg s3://omnigraph-local/repos/<slug>
 omnigraph load --data ./seed.jsonl --mode overwrite s3://omnigraph-local/repos/<slug>
