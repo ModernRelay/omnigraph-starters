@@ -6,7 +6,8 @@ Opinionated, ready-to-run graph starters built on [Omnigraph](https://github.com
 
 | Starter | Status | Description |
 |---------|--------|-------------|
-| [`industry-intel/`](./industry-intel) | ✅ ready | AI/ML industry intelligence graph |
+| [`industry-intel/`](./industry-intel) | ✅ ready | AI/ML industry intelligence graph (SPIKE) |
+| [`gtm-intel/`](./gtm-intel) | ✅ ready | Workload-centric GTM intelligence graph — accounts, products, usage, investors, spend, and Parallel Task API → Omnigraph enrichment with full provenance |
 | `company-context/` | 🚧 planned | Internal decisions, traces, actors, artifacts |
 | `biomed-research/` | 🚧 planned | Biotech & medical research tracking |
 | `competitor-intel/` | 🚧 planned | Competitor launches, pricing, positioning |

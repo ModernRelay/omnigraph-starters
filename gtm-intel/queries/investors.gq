@@ -1,0 +1,29 @@
+// Investor reads
+
+query get_investor($slug: String) {
+    match {
+        $inv: Investor { slug: $slug }
+    }
+    return { $inv.slug, $inv.name, $inv.thesis }
+}
+
+query investor_portfolio($slug: String) {
+    match {
+        $inv: Investor { slug: $slug }
+        $inv investsIn $a
+    }
+    return { $a.slug, $a.name, $a.status, $a.domain }
+    order { $a.name }
+}
+
+// Who invests in both of these accounts?
+
+query shared_investors($account_a: String, $account_b: String) {
+    match {
+        $a: Account { slug: $account_a }
+        $b: Account { slug: $account_b }
+        $inv investsIn $a
+        $inv investsIn $b
+    }
+    return { $inv.slug, $inv.name, $inv.thesis }
+}

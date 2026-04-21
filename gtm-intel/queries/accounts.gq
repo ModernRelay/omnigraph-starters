@@ -1,0 +1,63 @@
+// Account reads
+
+query get_account($slug: String) {
+    match {
+        $a: Account { slug: $slug }
+    }
+    return {
+        $a.slug, $a.name, $a.domain, $a.status, $a.hq, $a.foundedYear
+    }
+}
+
+query accounts_by_status($status: String) {
+    match {
+        $a: Account { status: $status }
+    }
+    return { $a.slug, $a.name, $a.domain, $a.hq }
+    order { $a.name }
+}
+
+query search_accounts($q: String) {
+    match {
+        $a: Account
+        search($a.name, $q)
+    }
+    return { $a.slug, $a.name, $a.status }
+}
+
+// Account → Product → Workload → SpendEstimate — the canonical traversal
+
+query account_workload($slug: String)
+    @description("What this account builds, what it runs as, how much it likely spends")
+{
+    match {
+        $a: Account { slug: $slug }
+        $a buildsProduct $p
+        $p drivesWorkload $w
+        $w ofKind $cat
+        $w estimatedBy $e
+    }
+    return {
+        $p.name, $p.kind,
+        $cat.name, $w.hardwareProfile,
+        $e.annualUSD, $e.method, $e.confidence
+    }
+}
+
+query account_investors($slug: String) {
+    match {
+        $a: Account { slug: $slug }
+        $inv investsIn $a
+    }
+    return { $inv.slug, $inv.name, $inv.thesis }
+    order { $inv.name }
+}
+
+query account_signals($slug: String) {
+    match {
+        $a: Account { slug: $slug }
+        $a observedTechSignal $s
+    }
+    return { $s.slug, $s.kind, $s.title, $s.observedAt, $s.url }
+    order { $s.observedAt desc }
+}

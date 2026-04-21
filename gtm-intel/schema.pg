@@ -1,0 +1,160 @@
+// GTM Intel: Modal × Parallel Starter — Omnigraph Schema
+// Workload-centric GTM intelligence graph with provenance-tracked Claims
+
+
+// ──────────────────────────────────────────────
+// Core entities
+// ──────────────────────────────────────────────
+
+node Account {
+    slug: String @key
+    name: String @index
+    domain: String? @unique
+    status: enum(customer, opportunity, prospect, cold) @index
+    hq: String?
+    foundedYear: I32?
+    createdAt: DateTime
+    updatedAt: DateTime
+}
+
+node Product {
+    slug: String @key
+    name: String @index
+    kind: enum(foundation-model, coding-agent, consumer-agent, vertical-saas, robotics, video-gen, image-gen, music-gen, infra, research-tool, other) @index
+    description: String?
+    launchedAt: Date?
+    createdAt: DateTime
+    updatedAt: DateTime
+}
+
+node Workload {
+    slug: String @key
+    name: String @index
+    hardwareProfile: String?
+    concurrencyClass: enum(low, medium, high, very-high)?
+    durationClass: enum(short, medium, long, continuous)?
+    createdAt: DateTime
+    updatedAt: DateTime
+}
+
+// Workload kind lives as a reference node so that "same kind of workload"
+// is a shared-node match in queries rather than a cross-variable comparison.
+node WorkloadCategory {
+    slug: String @key
+    name: String @index
+    description: String?
+}
+
+node SpendEstimate {
+    slug: String @key
+    annualUSD: I64 @index
+    method: enum(bottoms-up, headcount-derived, self-reported) @index
+    validFrom: Date
+    validTo: Date?
+    confidence: enum(high, medium, low)
+    notes: String?
+    createdAt: DateTime
+}
+
+node Investor {
+    slug: String @key
+    name: String @index
+    thesis: enum(infra, apps, frontier, vertical, generalist, angel)?
+    createdAt: DateTime
+    updatedAt: DateTime
+}
+
+node FundingRound {
+    slug: String @key
+    stage: enum(pre-seed, seed, series-a, series-b, series-c, series-d, growth, pre-ipo) @index
+    amountUSD: I64?
+    closedOn: Date @index
+    valuationUSD: I64?
+    createdAt: DateTime
+}
+
+node TechSignal {
+    slug: String @key
+    kind: enum(funding, hiring, launch, model-release, blog, github-activity, outage, leadership-change, partnership) @index
+    title: String
+    text: String?
+    url: String?
+    observedAt: DateTime @index
+    createdAt: DateTime
+}
+
+
+// ──────────────────────────────────────────────
+// Provenance layer (Parallel Task API output shape)
+// ──────────────────────────────────────────────
+
+node ResearchRun {
+    slug: String @key
+    taskId: String @unique
+    processor: enum(lite, base, core, pro, ultra)
+    promptVersion: String @index
+    schemaVersion: String @index
+    ranAt: DateTime @index
+    costUSD: F64?
+    createdAt: DateTime
+}
+
+node Claim {
+    slug: String @key
+    predicate: String @index
+    value: String
+    valueType: enum(string, number, boolean, date, currency)?
+    confidence: enum(high, medium, low) @index
+    reasoning: String?
+    validFrom: Date?
+    validTo: Date?
+    assertedAt: DateTime @index
+    createdAt: DateTime
+}
+
+node Source {
+    slug: String @key
+    url: String @unique
+    title: String?
+    publisher: String?
+    publishedAt: Date?
+    createdAt: DateTime
+}
+
+
+// ──────────────────────────────────────────────
+// Account shape: what they build → what it runs as → what it costs
+// ──────────────────────────────────────────────
+
+edge BuildsProduct:   Account  -> Product
+edge DrivesWorkload:  Product  -> Workload
+edge OfKind:          Workload -> WorkloadCategory
+edge EstimatedBy:     Workload -> SpendEstimate
+
+
+// ──────────────────────────────────────────────
+// Capital graph
+// ──────────────────────────────────────────────
+
+edge RaisedRound:     Account  -> FundingRound
+edge LedRound:        Investor -> FundingRound
+edge InvestsIn:       Investor -> Account
+
+
+// ──────────────────────────────────────────────
+// Event stream (Monitor API hook)
+// ──────────────────────────────────────────────
+
+edge ObservedTechSignal: Account     -> TechSignal
+edge TriggeredBy:        ResearchRun -> TechSignal
+
+
+// ──────────────────────────────────────────────
+// Claim lineage (Task API output → graph)
+// ──────────────────────────────────────────────
+
+edge AssertedClaim:    ResearchRun -> Claim
+edge AboutAccount:     Claim       -> Account
+edge AboutProduct:     Claim       -> Product
+edge GroundedInSource: Claim       -> Source
+edge Supersedes:       Claim       -> Claim

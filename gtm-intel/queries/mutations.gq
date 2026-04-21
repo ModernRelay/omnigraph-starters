@@ -1,0 +1,137 @@
+// ──────────────────────────────────────────────
+// Node mutations
+// ──────────────────────────────────────────────
+
+query add_account($slug: String, $name: String, $domain: String, $status: String, $createdAt: DateTime, $updatedAt: DateTime) {
+    insert Account {
+        slug: $slug, name: $name, domain: $domain, status: $status,
+        createdAt: $createdAt, updatedAt: $updatedAt
+    }
+}
+
+query add_product($slug: String, $name: String, $kind: String, $createdAt: DateTime, $updatedAt: DateTime) {
+    insert Product {
+        slug: $slug, name: $name, kind: $kind,
+        createdAt: $createdAt, updatedAt: $updatedAt
+    }
+}
+
+query add_workload($slug: String, $name: String, $createdAt: DateTime, $updatedAt: DateTime) {
+    insert Workload {
+        slug: $slug, name: $name,
+        createdAt: $createdAt, updatedAt: $updatedAt
+    }
+}
+
+query add_workload_category($slug: String, $name: String, $description: String) {
+    insert WorkloadCategory {
+        slug: $slug, name: $name, description: $description
+    }
+}
+
+query add_spend_estimate($slug: String, $annualUSD: I64, $method: String, $validFrom: Date, $confidence: String, $createdAt: DateTime) {
+    insert SpendEstimate {
+        slug: $slug, annualUSD: $annualUSD, method: $method,
+        validFrom: $validFrom, confidence: $confidence, createdAt: $createdAt
+    }
+}
+
+query add_investor($slug: String, $name: String, $createdAt: DateTime, $updatedAt: DateTime) {
+    insert Investor {
+        slug: $slug, name: $name,
+        createdAt: $createdAt, updatedAt: $updatedAt
+    }
+}
+
+query add_funding_round($slug: String, $stage: String, $closedOn: Date, $createdAt: DateTime) {
+    insert FundingRound {
+        slug: $slug, stage: $stage, closedOn: $closedOn, createdAt: $createdAt
+    }
+}
+
+query add_tech_signal($slug: String, $kind: String, $title: String, $observedAt: DateTime, $createdAt: DateTime) {
+    insert TechSignal {
+        slug: $slug, kind: $kind, title: $title,
+        observedAt: $observedAt, createdAt: $createdAt
+    }
+}
+
+query add_research_run($slug: String, $taskId: String, $processor: String, $promptVersion: String, $schemaVersion: String, $ranAt: DateTime, $createdAt: DateTime) {
+    insert ResearchRun {
+        slug: $slug, taskId: $taskId, processor: $processor,
+        promptVersion: $promptVersion, schemaVersion: $schemaVersion,
+        ranAt: $ranAt, createdAt: $createdAt
+    }
+}
+
+query add_claim($slug: String, $predicate: String, $value: String, $confidence: String, $assertedAt: DateTime, $createdAt: DateTime) {
+    insert Claim {
+        slug: $slug, predicate: $predicate, value: $value,
+        confidence: $confidence, assertedAt: $assertedAt, createdAt: $createdAt
+    }
+}
+
+query add_source($slug: String, $url: String, $createdAt: DateTime) {
+    insert Source { slug: $slug, url: $url, createdAt: $createdAt }
+}
+
+
+// ──────────────────────────────────────────────
+// Edge mutations
+// ──────────────────────────────────────────────
+
+query link_builds_product($account: String, $product: String) {
+    insert BuildsProduct { from: $account, to: $product }
+}
+
+query link_drives_workload($product: String, $workload: String) {
+    insert DrivesWorkload { from: $product, to: $workload }
+}
+
+query link_of_kind($workload: String, $category: String) {
+    insert OfKind { from: $workload, to: $category }
+}
+
+query link_estimated_by($workload: String, $estimate: String) {
+    insert EstimatedBy { from: $workload, to: $estimate }
+}
+
+query link_invests_in($investor: String, $account: String) {
+    insert InvestsIn { from: $investor, to: $account }
+}
+
+query link_raised_round($account: String, $round: String) {
+    insert RaisedRound { from: $account, to: $round }
+}
+
+query link_led_round($investor: String, $round: String) {
+    insert LedRound { from: $investor, to: $round }
+}
+
+query link_observed_signal($account: String, $signal: String) {
+    insert ObservedTechSignal { from: $account, to: $signal }
+}
+
+query link_triggered_by($run: String, $signal: String) {
+    insert TriggeredBy { from: $run, to: $signal }
+}
+
+query link_asserted_claim($run: String, $claim: String) {
+    insert AssertedClaim { from: $run, to: $claim }
+}
+
+query link_about_account($claim: String, $account: String) {
+    insert AboutAccount { from: $claim, to: $account }
+}
+
+query link_about_product($claim: String, $product: String) {
+    insert AboutProduct { from: $claim, to: $product }
+}
+
+query link_grounded_in($claim: String, $source: String) {
+    insert GroundedInSource { from: $claim, to: $source }
+}
+
+query link_supersedes($newer: String, $older: String) {
+    insert Supersedes { from: $newer, to: $older }
+}
