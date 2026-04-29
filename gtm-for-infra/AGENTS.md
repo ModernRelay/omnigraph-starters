@@ -123,16 +123,19 @@ Returns old and new asserted values for `headcount` on Cognition, joined via the
 Use the CLI path first. It supports OAuth login, so the user does not need to paste an API key into the shell.
 
 ```bash
-command -v parallel-cli || curl -fsSL https://parallel.ai/install.sh | bash
+if ! command -v parallel-cli >/dev/null 2>&1; then
+  pipx install "parallel-web-tools[cli]"
+  pipx ensurepath
+fi
 parallel-cli auth || parallel-cli login
 ```
 
-If the install script is unavailable, offer the pipx fallback:
+If `pipx` is unavailable, ask the user to install it through their system package manager. As a last resort, point them to the official Parallel installer but do not pipe it directly into a shell; download it first so they can inspect it:
 
 ```bash
-pipx install "parallel-web-tools[cli]"
-pipx ensurepath
-parallel-cli login
+curl -fsSLo /tmp/parallel-install.sh https://parallel.ai/install.sh
+less /tmp/parallel-install.sh
+bash /tmp/parallel-install.sh
 ```
 
 Run the enrichment non-blocking, then show the returned monitoring URL to the user:

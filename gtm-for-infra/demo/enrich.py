@@ -113,6 +113,13 @@ def now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def display_path(path: Path) -> str:
+    try:
+        return str(path.resolve().relative_to(Path.cwd().resolve()))
+    except ValueError:
+        return str(path)
+
+
 def build_task_spec() -> dict[str, Any]:
     return {
         "input_schema": INPUT_SCHEMA,
@@ -287,14 +294,11 @@ def main() -> int:
     client = Parallel(api_key=api_key)
     args.out.mkdir(parents=True, exist_ok=True)
 
-    run_slug = f"run-{datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')}"
+    batch_slug = f"run-{datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')}"
     ran_at = now_iso()
 
     patch: list[dict[str, Any]] = []
-
-    # We create one ResearchRun node per batch — conceptually this is the
-    # "one prompt version ran across these accounts" anchor.
-    first_task_id: str | None = None
+    successful_runs = 0
 
     for slug in args.accounts:
         if slug not in DEMO_ACCOUNTS:
@@ -308,21 +312,21 @@ def main() -> int:
             print(f"  failed: {exc}", file=sys.stderr)
             continue
 
-        first_task_id = first_task_id or res["run_id"]
+        account_part = slug.removeprefix("acct-")
+        run_slug = f"{batch_slug}-{account_part}"
+        patch.append(emit_research_run(run_slug, res["run_id"], ran_at))
         patch.extend(
             patches_for_account(
                 slug, run_slug, res["output"], res["basis"], ran_at
             )
         )
+        successful_runs += 1
 
-    if first_task_id is None:
+    if successful_runs == 0:
         print("No successful runs", file=sys.stderr)
         return 2
 
-    # Prepend the ResearchRun node so Claim.AssertedClaim edges resolve.
-    patch.insert(0, emit_research_run(run_slug, first_task_id, ran_at))
-
-    out_file = args.out / f"claims-{run_slug}.jsonl"
+    out_file = args.out / f"claims-{batch_slug}.jsonl"
     with out_file.open("w") as f:
         for row in patch:
             f.write(json.dumps(row) + "\n")
@@ -331,7 +335,7 @@ def main() -> int:
     print()
     print("Load with:")
     print(
-        f"  omnigraph load --data {out_file.relative_to(Path.cwd())} "
+        f"  omnigraph load --data {display_path(out_file)} "
         f"--mode merge /tmp/gtm-for-infra/repo"
     )
     return 0

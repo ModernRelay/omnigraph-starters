@@ -43,7 +43,7 @@ query lookalikes_for_customer($customer: String)
     @description("Prospects sharing an investor + workload category with one named customer")
 {
     match {
-        $cust: Account { slug: $customer }
+        $cust: Account { slug: $customer, status: "customer" }
         $cust buildsProduct $cp
         $cp drivesWorkload $cw
         $cw ofKind $cat

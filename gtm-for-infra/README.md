@@ -125,7 +125,7 @@ What an account actually runs: products, workloads, categories, spend estimates.
 
 ### `top-spend <category>`
 
-Top spenders in a given workload category (`wlc-sandbox`, `wlc-inference`, …). Useful for pricing model calibration and outbound prioritization within a wedge.
+Top workload spend rows in a given workload category (`wlc-sandbox`, `wlc-inference`, …). Useful for pricing model calibration and outbound prioritization within a wedge. If an account has multiple workloads in the same category, it can appear more than once.
 
 ### `claim-drift <slug> <predicate>`
 

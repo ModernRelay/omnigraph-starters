@@ -7,16 +7,19 @@ The default live demo uses `parallel-cli` because it supports browser/OAuth logi
 Run these commands from the `gtm-for-infra/` starter root.
 
 ```bash
-command -v parallel-cli || curl -fsSL https://parallel.ai/install.sh | bash
+if ! command -v parallel-cli >/dev/null 2>&1; then
+  pipx install "parallel-web-tools[cli]"
+  pipx ensurepath
+fi
 parallel-cli auth || parallel-cli login
 ```
 
-If the installer is not available in your environment:
+If `pipx` is unavailable, install it through your system package manager. As a last resort, use the official Parallel installer only after downloading and inspecting it:
 
 ```bash
-pipx install "parallel-web-tools[cli]"
-pipx ensurepath
-parallel-cli login
+curl -fsSLo /tmp/parallel-install.sh https://parallel.ai/install.sh
+less /tmp/parallel-install.sh
+bash /tmp/parallel-install.sh
 ```
 
 ## Run the enrichment

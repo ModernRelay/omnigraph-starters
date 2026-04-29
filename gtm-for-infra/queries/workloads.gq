@@ -22,10 +22,10 @@ query workloads_by_category($category: String)
     order { $w.name }
 }
 
-// Top accounts by estimated annual spend for a workload category
+// Top workload spend rows for a workload category
 
 query top_spend_by_category($category: String)
-    @description("Ranked accounts by bottoms-up annual spend on a given workload category")
+    @description("Ranked workload spend rows for a given workload category")
 {
     match {
         $cat: WorkloadCategory { slug: $category }
@@ -37,6 +37,7 @@ query top_spend_by_category($category: String)
     }
     return {
         $a.slug, $a.name, $a.status,
+        $w.slug, $w.name,
         $e.annualUSD, $e.method, $e.confidence
     }
     order { $e.annualUSD desc }
