@@ -1,0 +1,258 @@
+{"type":"Investor","data":{"id":"inv-thrive","slug":"inv-thrive","name":"Thrive Capital","thesis":"generalist","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-a16z","slug":"inv-a16z","name":"Andreessen Horowitz","thesis":"generalist","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-benchmark","slug":"inv-benchmark","name":"Benchmark","thesis":"apps","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-founders-fund","slug":"inv-founders-fund","name":"Founders Fund","thesis":"frontier","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-sequoia","slug":"inv-sequoia","name":"Sequoia Capital","thesis":"generalist","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-redpoint","slug":"inv-redpoint","name":"Redpoint Ventures","thesis":"apps","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-goldcrest","slug":"inv-goldcrest","name":"Goldcrest Capital","thesis":"apps","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-lightspeed","slug":"inv-lightspeed","name":"Lightspeed Venture Partners","thesis":"generalist","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-matrix","slug":"inv-matrix","name":"Matrix Partners","thesis":"apps","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-nat-friedman","slug":"inv-nat-friedman","name":"Nat Friedman","thesis":"angel","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-khosla","slug":"inv-khosla","name":"Khosla Ventures","thesis":"frontier","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-8vc","slug":"inv-8vc","name":"8VC","thesis":"generalist","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-nea","slug":"inv-nea","name":"New Enterprise Associates","thesis":"generalist","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-lux","slug":"inv-lux","name":"Lux Capital","thesis":"frontier","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-spark","slug":"inv-spark","name":"Spark Capital","thesis":"apps","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-adam-d","slug":"inv-adam-d","name":"Adam D'Angelo","thesis":"angel","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-elad","slug":"inv-elad","name":"Elad Gil","thesis":"angel","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-openai-sf","slug":"inv-openai-sf","name":"OpenAI Startup Fund","thesis":"frontier","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-marc-a","slug":"inv-marc-a","name":"Marc Andreessen","thesis":"angel","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-pear-vc","slug":"inv-pear-vc","name":"Pear VC","thesis":"generalist","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-amd","slug":"inv-amd","name":"AMD Ventures","thesis":"infra","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-dcvc","slug":"inv-dcvc","name":"DCVC","thesis":"frontier","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-samsung","slug":"inv-samsung","name":"Samsung NEXT","thesis":"infra","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-coatue","slug":"inv-coatue","name":"Coatue Management","thesis":"generalist","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-nvidia","slug":"inv-nvidia","name":"NVentures","thesis":"infra","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-accel","slug":"inv-accel","name":"Accel","thesis":"generalist","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-bessemer","slug":"inv-bessemer","name":"Bessemer Venture Partners","thesis":"generalist","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-ivp","slug":"inv-ivp","name":"IVP","thesis":"generalist","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-dst","slug":"inv-dst","name":"DST Global","thesis":"generalist","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-bain","slug":"inv-bain","name":"Bain Capital Ventures","thesis":"generalist","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Investor","data":{"id":"inv-ebay-vc","slug":"inv-ebay-vc","name":"eBay Ventures","thesis":"apps","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Account","data":{"id":"acct-cursor","slug":"acct-cursor","name":"Cursor","domain":"cursor.com","status":"customer","hq":"San Francisco, CA","foundedYear":2022,"createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Account","data":{"id":"acct-sourcegraph","slug":"acct-sourcegraph","name":"Sourcegraph (Amp)","domain":"sourcegraph.com","status":"customer","hq":"San Francisco, CA","foundedYear":2013,"createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Account","data":{"id":"acct-suno","slug":"acct-suno","name":"Suno","domain":"suno.com","status":"customer","hq":"Cambridge, MA","foundedYear":2022,"createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Account","data":{"id":"acct-cognition","slug":"acct-cognition","name":"Cognition (Devin)","domain":"cognition.ai","status":"prospect","hq":"San Francisco, CA","foundedYear":2023,"createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Account","data":{"id":"acct-factory","slug":"acct-factory","name":"Factory","domain":"factory.ai","status":"prospect","hq":"San Francisco, CA","foundedYear":2023,"createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Account","data":{"id":"acct-pika","slug":"acct-pika","name":"Pika Labs","domain":"pika.art","status":"prospect","hq":"Palo Alto, CA","foundedYear":2023,"createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Account","data":{"id":"acct-krea","slug":"acct-krea","name":"Krea","domain":"krea.ai","status":"prospect","hq":"San Francisco, CA","foundedYear":2022,"createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Account","data":{"id":"acct-mistral","slug":"acct-mistral","name":"Mistral AI","domain":"mistral.ai","status":"prospect","hq":"Paris, FR","foundedYear":2023,"createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Account","data":{"id":"acct-harvey","slug":"acct-harvey","name":"Harvey","domain":"harvey.ai","status":"prospect","hq":"San Francisco, CA","foundedYear":2022,"createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Account","data":{"id":"acct-character-ai","slug":"acct-character-ai","name":"Character.AI","domain":"character.ai","status":"prospect","hq":"Menlo Park, CA","foundedYear":2021,"createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Account","data":{"id":"acct-liquid-ai","slug":"acct-liquid-ai","name":"Liquid AI","domain":"liquid.ai","status":"prospect","hq":"Cambridge, MA","foundedYear":2023,"createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Account","data":{"id":"acct-runway","slug":"acct-runway","name":"Runway","domain":"runwayml.com","status":"prospect","hq":"New York, NY","foundedYear":2018,"createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Account","data":{"id":"acct-decagon","slug":"acct-decagon","name":"Decagon","domain":"decagon.ai","status":"prospect","hq":"San Francisco, CA","foundedYear":2023,"createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Account","data":{"id":"acct-perplexity","slug":"acct-perplexity","name":"Perplexity","domain":"perplexity.ai","status":"prospect","hq":"San Francisco, CA","foundedYear":2022,"createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Account","data":{"id":"acct-poolside","slug":"acct-poolside","name":"Poolside","domain":"poolside.ai","status":"cold","hq":"Paris, FR","foundedYear":2023,"createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Product","data":{"id":"prod-cursor-ide","slug":"prod-cursor-ide","name":"Cursor IDE","kind":"coding-agent","description":"AI-first code editor with autonomous agent mode.","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Product","data":{"id":"prod-amp","slug":"prod-amp","name":"Amp","kind":"coding-agent","description":"Sourcegraph's coding agent running on sandboxed dev environments.","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Product","data":{"id":"prod-suno-music","slug":"prod-suno-music","name":"Suno Music","kind":"music-gen","description":"Consumer music generation product.","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Product","data":{"id":"prod-devin","slug":"prod-devin","name":"Devin","kind":"coding-agent","description":"Autonomous software engineering agent running tasks end-to-end in sandboxes.","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Product","data":{"id":"prod-factory-droids","slug":"prod-factory-droids","name":"Factory Droids","kind":"coding-agent","description":"Team of specialized coding droids running concurrent sandboxed tasks.","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Product","data":{"id":"prod-pika-video","slug":"prod-pika-video","name":"Pika","kind":"video-gen","description":"Consumer video generation.","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Product","data":{"id":"prod-krea-image","slug":"prod-krea-image","name":"Krea","kind":"image-gen","description":"Realtime AI image and video canvas.","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Product","data":{"id":"prod-mistral-models","slug":"prod-mistral-models","name":"Mistral Foundation Models","kind":"foundation-model","description":"Open-weight and commercial foundation models.","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Product","data":{"id":"prod-harvey-legal","slug":"prod-harvey-legal","name":"Harvey","kind":"vertical-saas","description":"Legal AI copilot for lawyers.","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Product","data":{"id":"prod-character-chat","slug":"prod-character-chat","name":"Character.AI","kind":"consumer-agent","description":"Consumer conversational AI characters.","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Product","data":{"id":"prod-liquid-models","slug":"prod-liquid-models","name":"Liquid Foundation Models","kind":"foundation-model","description":"Liquid neural network foundation models.","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Product","data":{"id":"prod-runway-video","slug":"prod-runway-video","name":"Runway Gen-4","kind":"video-gen","description":"Generative video platform.","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Product","data":{"id":"prod-decagon-agent","slug":"prod-decagon-agent","name":"Decagon","kind":"consumer-agent","description":"AI customer support agents.","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Product","data":{"id":"prod-perplexity-search","slug":"prod-perplexity-search","name":"Perplexity","kind":"consumer-agent","description":"Answer engine for the web.","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Product","data":{"id":"prod-poolside-coding","slug":"prod-poolside-coding","name":"Poolside","kind":"foundation-model","description":"Code-specialized foundation models.","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"WorkloadCategory","data":{"id":"wlc-training","slug":"wlc-training","name":"training","description":"Model training (foundation or fine-tune); GPU clusters, continuous or long-horizon runs."}}
+{"type":"WorkloadCategory","data":{"id":"wlc-inference","slug":"wlc-inference","name":"inference","description":"Online model inference serving end users; high-concurrency, short-to-medium duration."}}
+{"type":"WorkloadCategory","data":{"id":"wlc-sandbox","slug":"wlc-sandbox","name":"sandbox","description":"Isolated execution sandboxes for coding agents; CPU/GPU mix, short-to-long per run."}}
+{"type":"WorkloadCategory","data":{"id":"wlc-batch","slug":"wlc-batch","name":"batch","description":"Offline batch processing, fan-out workloads."}}
+{"type":"WorkloadCategory","data":{"id":"wlc-eval","slug":"wlc-eval","name":"eval","description":"Model and agent evaluations; bursty, parallel."}}
+{"type":"WorkloadCategory","data":{"id":"wlc-data-pipeline","slug":"wlc-data-pipeline","name":"data-pipeline","description":"Data ingest/transform/embedding pipelines."}}
+{"type":"Workload","data":{"id":"wl-cursor-sandbox","slug":"wl-cursor-sandbox","name":"Cursor background agent sandbox","hardwareProfile":"A10G, 8 vCPU","concurrencyClass":"high","durationClass":"short","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Workload","data":{"id":"wl-amp-sandbox","slug":"wl-amp-sandbox","name":"Amp sandbox","hardwareProfile":"CPU, 4 vCPU","concurrencyClass":"medium","durationClass":"short","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Workload","data":{"id":"wl-suno-inference","slug":"wl-suno-inference","name":"Suno music inference","hardwareProfile":"H100","concurrencyClass":"very-high","durationClass":"medium","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Workload","data":{"id":"wl-devin-sandbox","slug":"wl-devin-sandbox","name":"Devin sandbox","hardwareProfile":"A10G, 16 vCPU","concurrencyClass":"very-high","durationClass":"long","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Workload","data":{"id":"wl-factory-sandbox","slug":"wl-factory-sandbox","name":"Factory droid sandbox","hardwareProfile":"CPU, 8 vCPU","concurrencyClass":"high","durationClass":"medium","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Workload","data":{"id":"wl-pika-inference","slug":"wl-pika-inference","name":"Pika video inference","hardwareProfile":"H100","concurrencyClass":"high","durationClass":"long","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Workload","data":{"id":"wl-krea-inference","slug":"wl-krea-inference","name":"Krea realtime canvas inference","hardwareProfile":"L40S","concurrencyClass":"high","durationClass":"short","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Workload","data":{"id":"wl-mistral-training","slug":"wl-mistral-training","name":"Mistral foundation training","hardwareProfile":"H100 cluster","concurrencyClass":"very-high","durationClass":"continuous","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Workload","data":{"id":"wl-harvey-inference","slug":"wl-harvey-inference","name":"Harvey legal inference","hardwareProfile":"A100","concurrencyClass":"medium","durationClass":"medium","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Workload","data":{"id":"wl-character-inference","slug":"wl-character-inference","name":"Character.AI chat inference","hardwareProfile":"H100","concurrencyClass":"very-high","durationClass":"continuous","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Workload","data":{"id":"wl-liquid-training","slug":"wl-liquid-training","name":"Liquid model training","hardwareProfile":"H100","concurrencyClass":"high","durationClass":"long","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Workload","data":{"id":"wl-runway-inference","slug":"wl-runway-inference","name":"Runway video inference","hardwareProfile":"H100","concurrencyClass":"high","durationClass":"long","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Workload","data":{"id":"wl-decagon-inference","slug":"wl-decagon-inference","name":"Decagon support inference","hardwareProfile":"A100","concurrencyClass":"medium","durationClass":"continuous","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Workload","data":{"id":"wl-perplexity-inference","slug":"wl-perplexity-inference","name":"Perplexity answer inference","hardwareProfile":"H100","concurrencyClass":"very-high","durationClass":"short","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"Workload","data":{"id":"wl-poolside-training","slug":"wl-poolside-training","name":"Poolside code model training","hardwareProfile":"H100 cluster","concurrencyClass":"very-high","durationClass":"continuous","createdAt":"2026-04-20T00:00:00Z","updatedAt":"2026-04-20T00:00:00Z"}}
+{"type":"SpendEstimate","data":{"id":"spend-cursor","slug":"spend-cursor","annualUSD":8000000,"method":"bottoms-up","validFrom":"2026-04-01","confidence":"high","notes":"Background agent fleet @ ~400 concurrent; 15 min avg session","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"SpendEstimate","data":{"id":"spend-amp","slug":"spend-amp","annualUSD":2500000,"method":"bottoms-up","validFrom":"2026-04-01","confidence":"high","notes":"CPU-bound agent sandboxes","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"SpendEstimate","data":{"id":"spend-suno","slug":"spend-suno","annualUSD":18000000,"method":"bottoms-up","validFrom":"2026-04-01","confidence":"high","notes":"H100 inference; hundreds of concurrent generations","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"SpendEstimate","data":{"id":"spend-devin","slug":"spend-devin","annualUSD":12000000,"method":"bottoms-up","validFrom":"2026-04-01","confidence":"medium","notes":"Long-running sandboxes; multi-hour tasks, high concurrency post-Series C","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"SpendEstimate","data":{"id":"spend-factory","slug":"spend-factory","annualUSD":3000000,"method":"bottoms-up","validFrom":"2026-04-01","confidence":"medium","notes":"Team-droid fan-out","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"SpendEstimate","data":{"id":"spend-pika","slug":"spend-pika","annualUSD":6500000,"method":"bottoms-up","validFrom":"2026-04-01","confidence":"high","notes":"Video = high minute-cost; consumer scale","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"SpendEstimate","data":{"id":"spend-krea","slug":"spend-krea","annualUSD":2100000,"method":"bottoms-up","validFrom":"2026-04-01","confidence":"medium","notes":"Realtime image canvas; many short bursts","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"SpendEstimate","data":{"id":"spend-mistral","slug":"spend-mistral","annualUSD":42000000,"method":"headcount-derived","validFrom":"2026-04-01","confidence":"low","notes":"Continuous training at foundation scale","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"SpendEstimate","data":{"id":"spend-harvey","slug":"spend-harvey","annualUSD":1200000,"method":"bottoms-up","validFrom":"2026-04-01","confidence":"medium","notes":"Enterprise inference, low volume","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"SpendEstimate","data":{"id":"spend-character","slug":"spend-character","annualUSD":8000000,"method":"bottoms-up","validFrom":"2026-04-01","confidence":"medium","notes":"Massive concurrent chat; in-house infra likely","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"SpendEstimate","data":{"id":"spend-liquid","slug":"spend-liquid","annualUSD":5000000,"method":"bottoms-up","validFrom":"2026-04-01","confidence":"medium","notes":"Training cadence","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"SpendEstimate","data":{"id":"spend-runway","slug":"spend-runway","annualUSD":11000000,"method":"bottoms-up","validFrom":"2026-04-01","confidence":"medium","notes":"Video inference at consumer scale","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"SpendEstimate","data":{"id":"spend-decagon","slug":"spend-decagon","annualUSD":900000,"method":"bottoms-up","validFrom":"2026-04-01","confidence":"low","notes":"Enterprise support inference","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"SpendEstimate","data":{"id":"spend-perplexity","slug":"spend-perplexity","annualUSD":4500000,"method":"bottoms-up","validFrom":"2026-04-01","confidence":"medium","notes":"Self-hosted much of inference","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"SpendEstimate","data":{"id":"spend-poolside","slug":"spend-poolside","annualUSD":9000000,"method":"headcount-derived","validFrom":"2026-04-01","confidence":"low","notes":"Code model training","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"FundingRound","data":{"id":"round-cognition-c","slug":"round-cognition-c","stage":"series-c","amountUSD":500000000,"closedOn":"2026-03-30","valuationUSD":9800000000,"createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"FundingRound","data":{"id":"round-pika-c","slug":"round-pika-c","stage":"series-c","amountUSD":80000000,"closedOn":"2026-04-02","valuationUSD":700000000,"createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"FundingRound","data":{"id":"round-factory-a","slug":"round-factory-a","stage":"series-a","amountUSD":35000000,"closedOn":"2026-03-15","valuationUSD":200000000,"createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"TechSignal","data":{"id":"tsig-cognition-series-c","slug":"tsig-cognition-series-c","kind":"funding","title":"Cognition raises $500M Series C led by Founders Fund","observedAt":"2026-03-30T14:00:00Z","url":"https://techcrunch.com/2026/03/30/cognition-series-c","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"TechSignal","data":{"id":"tsig-pika-series-c","slug":"tsig-pika-series-c","kind":"funding","title":"Pika announces $80M Series C","observedAt":"2026-04-02T12:00:00Z","url":"https://www.wsj.com/articles/pika-series-c-2026","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"TechSignal","data":{"id":"tsig-factory-launch","slug":"tsig-factory-launch","kind":"launch","title":"Factory launches Droids GA","observedAt":"2026-03-20T17:00:00Z","url":"https://factory.ai/blog/droids-ga","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"Source","data":{"id":"src-cognition-techcrunch","slug":"src-cognition-techcrunch","url":"https://techcrunch.com/2026/03/30/cognition-series-c","title":"Cognition raises $500M Series C","publisher":"TechCrunch","publishedAt":"2026-03-30","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"Source","data":{"id":"src-cognition-linkedin","slug":"src-cognition-linkedin","url":"https://www.linkedin.com/company/cognition-labs","title":"Cognition Labs — LinkedIn","publisher":"LinkedIn","publishedAt":"2026-04-15","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"Source","data":{"id":"src-pika-wsj","slug":"src-pika-wsj","url":"https://www.wsj.com/articles/pika-series-c-2026","title":"Pika Series C","publisher":"Wall Street Journal","publishedAt":"2026-04-02","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"Source","data":{"id":"src-factory-blog","slug":"src-factory-blog","url":"https://factory.ai/blog/droids-ga","title":"Droids GA","publisher":"Factory","publishedAt":"2026-03-20","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"Source","data":{"id":"src-suno-arr-report","slug":"src-suno-arr-report","url":"https://www.bloomberg.com/news/articles/2026-02-18/suno-arr-150m","title":"Suno reaches $150M ARR","publisher":"Bloomberg","publishedAt":"2026-02-18","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"ResearchRun","data":{"id":"run-enrich-2026-02","slug":"run-enrich-2026-02","taskId":"trun_demo_v3_feb","processor":"core","promptVersion":"v3","schemaVersion":"v1","ranAt":"2026-02-15T09:00:00Z","costUSD":42.5,"createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"ResearchRun","data":{"id":"run-enrich-2026-04","slug":"run-enrich-2026-04","taskId":"trun_demo_v4_apr","processor":"core","promptVersion":"v4","schemaVersion":"v1","ranAt":"2026-04-15T09:00:00Z","costUSD":44.8,"createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"Claim","data":{"id":"claim-cognition-headcount-v3","slug":"claim-cognition-headcount-v3","predicate":"headcount","value":"35","valueType":"number","confidence":"high","reasoning":"LinkedIn company page count as of Feb 14 2026","assertedAt":"2026-02-15T09:05:00Z","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"Claim","data":{"id":"claim-cognition-headcount-v4","slug":"claim-cognition-headcount-v4","predicate":"headcount","value":"72","valueType":"number","confidence":"high","reasoning":"Post-Series-C hiring surge visible on LinkedIn and careers page","assertedAt":"2026-04-15T09:05:00Z","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"Claim","data":{"id":"claim-cognition-stage-v4","slug":"claim-cognition-stage-v4","predicate":"latest_funding_stage","value":"series-c","valueType":"string","confidence":"high","reasoning":"TechCrunch and Crunchbase confirm Series C closed March 30 2026","assertedAt":"2026-04-15T09:05:10Z","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"Claim","data":{"id":"claim-cognition-lead-v4","slug":"claim-cognition-lead-v4","predicate":"latest_lead_investor","value":"Founders Fund","valueType":"string","confidence":"high","reasoning":"Named as lead in TechCrunch and official announcement","assertedAt":"2026-04-15T09:05:12Z","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"Claim","data":{"id":"claim-factory-headcount-v4","slug":"claim-factory-headcount-v4","predicate":"headcount","value":"48","valueType":"number","confidence":"medium","reasoning":"Combined LinkedIn and careers page signals","assertedAt":"2026-04-15T09:06:00Z","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"Claim","data":{"id":"claim-pika-last-round-v4","slug":"claim-pika-last-round-v4","predicate":"last_funding_amount_usd","value":"80000000","valueType":"currency","confidence":"high","reasoning":"WSJ-reported Series C amount","assertedAt":"2026-04-15T09:06:20Z","createdAt":"2026-04-20T00:00:00Z"}}
+{"type":"Claim","data":{"id":"claim-suno-arr-v4","slug":"claim-suno-arr-v4","predicate":"estimated_annual_revenue_usd","value":"150000000","valueType":"currency","confidence":"medium","reasoning":"Bloomberg reported $150M ARR in February 2026","assertedAt":"2026-04-15T09:06:40Z","createdAt":"2026-04-20T00:00:00Z"}}
+{"edge":"InvestsIn","from":"inv-thrive","to":"acct-cursor","data":{}}
+{"edge":"InvestsIn","from":"inv-a16z","to":"acct-cursor","data":{}}
+{"edge":"InvestsIn","from":"inv-benchmark","to":"acct-cursor","data":{}}
+{"edge":"InvestsIn","from":"inv-founders-fund","to":"acct-cursor","data":{}}
+{"edge":"InvestsIn","from":"inv-sequoia","to":"acct-sourcegraph","data":{}}
+{"edge":"InvestsIn","from":"inv-a16z","to":"acct-sourcegraph","data":{}}
+{"edge":"InvestsIn","from":"inv-redpoint","to":"acct-sourcegraph","data":{}}
+{"edge":"InvestsIn","from":"inv-goldcrest","to":"acct-sourcegraph","data":{}}
+{"edge":"InvestsIn","from":"inv-lightspeed","to":"acct-suno","data":{}}
+{"edge":"InvestsIn","from":"inv-matrix","to":"acct-suno","data":{}}
+{"edge":"InvestsIn","from":"inv-founders-fund","to":"acct-suno","data":{}}
+{"edge":"InvestsIn","from":"inv-nat-friedman","to":"acct-suno","data":{}}
+{"edge":"InvestsIn","from":"inv-founders-fund","to":"acct-cognition","data":{}}
+{"edge":"InvestsIn","from":"inv-khosla","to":"acct-cognition","data":{}}
+{"edge":"InvestsIn","from":"inv-8vc","to":"acct-cognition","data":{}}
+{"edge":"InvestsIn","from":"inv-sequoia","to":"acct-factory","data":{}}
+{"edge":"InvestsIn","from":"inv-nea","to":"acct-factory","data":{}}
+{"edge":"InvestsIn","from":"inv-lux","to":"acct-factory","data":{}}
+{"edge":"InvestsIn","from":"inv-lightspeed","to":"acct-pika","data":{}}
+{"edge":"InvestsIn","from":"inv-spark","to":"acct-pika","data":{}}
+{"edge":"InvestsIn","from":"inv-adam-d","to":"acct-pika","data":{}}
+{"edge":"InvestsIn","from":"inv-matrix","to":"acct-krea","data":{}}
+{"edge":"InvestsIn","from":"inv-a16z","to":"acct-krea","data":{}}
+{"edge":"InvestsIn","from":"inv-a16z","to":"acct-mistral","data":{}}
+{"edge":"InvestsIn","from":"inv-nvidia","to":"acct-mistral","data":{}}
+{"edge":"InvestsIn","from":"inv-lightspeed","to":"acct-mistral","data":{}}
+{"edge":"InvestsIn","from":"inv-dst","to":"acct-mistral","data":{}}
+{"edge":"InvestsIn","from":"inv-sequoia","to":"acct-harvey","data":{}}
+{"edge":"InvestsIn","from":"inv-elad","to":"acct-harvey","data":{}}
+{"edge":"InvestsIn","from":"inv-openai-sf","to":"acct-harvey","data":{}}
+{"edge":"InvestsIn","from":"inv-a16z","to":"acct-character-ai","data":{}}
+{"edge":"InvestsIn","from":"inv-marc-a","to":"acct-character-ai","data":{}}
+{"edge":"InvestsIn","from":"inv-elad","to":"acct-character-ai","data":{}}
+{"edge":"InvestsIn","from":"inv-pear-vc","to":"acct-character-ai","data":{}}
+{"edge":"InvestsIn","from":"inv-amd","to":"acct-liquid-ai","data":{}}
+{"edge":"InvestsIn","from":"inv-dcvc","to":"acct-liquid-ai","data":{}}
+{"edge":"InvestsIn","from":"inv-samsung","to":"acct-liquid-ai","data":{}}
+{"edge":"InvestsIn","from":"inv-a16z","to":"acct-runway","data":{}}
+{"edge":"InvestsIn","from":"inv-coatue","to":"acct-runway","data":{}}
+{"edge":"InvestsIn","from":"inv-nvidia","to":"acct-runway","data":{}}
+{"edge":"InvestsIn","from":"inv-a16z","to":"acct-decagon","data":{}}
+{"edge":"InvestsIn","from":"inv-accel","to":"acct-decagon","data":{}}
+{"edge":"InvestsIn","from":"inv-bessemer","to":"acct-decagon","data":{}}
+{"edge":"InvestsIn","from":"inv-ivp","to":"acct-perplexity","data":{}}
+{"edge":"InvestsIn","from":"inv-nea","to":"acct-perplexity","data":{}}
+{"edge":"InvestsIn","from":"inv-bessemer","to":"acct-perplexity","data":{}}
+{"edge":"InvestsIn","from":"inv-bain","to":"acct-poolside","data":{}}
+{"edge":"InvestsIn","from":"inv-redpoint","to":"acct-poolside","data":{}}
+{"edge":"InvestsIn","from":"inv-ebay-vc","to":"acct-poolside","data":{}}
+{"edge":"BuildsProduct","from":"acct-cursor","to":"prod-cursor-ide","data":{}}
+{"edge":"BuildsProduct","from":"acct-sourcegraph","to":"prod-amp","data":{}}
+{"edge":"BuildsProduct","from":"acct-suno","to":"prod-suno-music","data":{}}
+{"edge":"BuildsProduct","from":"acct-cognition","to":"prod-devin","data":{}}
+{"edge":"BuildsProduct","from":"acct-factory","to":"prod-factory-droids","data":{}}
+{"edge":"BuildsProduct","from":"acct-pika","to":"prod-pika-video","data":{}}
+{"edge":"BuildsProduct","from":"acct-krea","to":"prod-krea-image","data":{}}
+{"edge":"BuildsProduct","from":"acct-mistral","to":"prod-mistral-models","data":{}}
+{"edge":"BuildsProduct","from":"acct-harvey","to":"prod-harvey-legal","data":{}}
+{"edge":"BuildsProduct","from":"acct-character-ai","to":"prod-character-chat","data":{}}
+{"edge":"BuildsProduct","from":"acct-liquid-ai","to":"prod-liquid-models","data":{}}
+{"edge":"BuildsProduct","from":"acct-runway","to":"prod-runway-video","data":{}}
+{"edge":"BuildsProduct","from":"acct-decagon","to":"prod-decagon-agent","data":{}}
+{"edge":"BuildsProduct","from":"acct-perplexity","to":"prod-perplexity-search","data":{}}
+{"edge":"BuildsProduct","from":"acct-poolside","to":"prod-poolside-coding","data":{}}
+{"edge":"DrivesWorkload","from":"prod-cursor-ide","to":"wl-cursor-sandbox","data":{}}
+{"edge":"DrivesWorkload","from":"prod-amp","to":"wl-amp-sandbox","data":{}}
+{"edge":"DrivesWorkload","from":"prod-suno-music","to":"wl-suno-inference","data":{}}
+{"edge":"DrivesWorkload","from":"prod-devin","to":"wl-devin-sandbox","data":{}}
+{"edge":"DrivesWorkload","from":"prod-factory-droids","to":"wl-factory-sandbox","data":{}}
+{"edge":"DrivesWorkload","from":"prod-pika-video","to":"wl-pika-inference","data":{}}
+{"edge":"DrivesWorkload","from":"prod-krea-image","to":"wl-krea-inference","data":{}}
+{"edge":"DrivesWorkload","from":"prod-mistral-models","to":"wl-mistral-training","data":{}}
+{"edge":"DrivesWorkload","from":"prod-harvey-legal","to":"wl-harvey-inference","data":{}}
+{"edge":"DrivesWorkload","from":"prod-character-chat","to":"wl-character-inference","data":{}}
+{"edge":"DrivesWorkload","from":"prod-liquid-models","to":"wl-liquid-training","data":{}}
+{"edge":"DrivesWorkload","from":"prod-runway-video","to":"wl-runway-inference","data":{}}
+{"edge":"DrivesWorkload","from":"prod-decagon-agent","to":"wl-decagon-inference","data":{}}
+{"edge":"DrivesWorkload","from":"prod-perplexity-search","to":"wl-perplexity-inference","data":{}}
+{"edge":"DrivesWorkload","from":"prod-poolside-coding","to":"wl-poolside-training","data":{}}
+{"edge":"OfKind","from":"wl-cursor-sandbox","to":"wlc-sandbox","data":{}}
+{"edge":"OfKind","from":"wl-amp-sandbox","to":"wlc-sandbox","data":{}}
+{"edge":"OfKind","from":"wl-suno-inference","to":"wlc-inference","data":{}}
+{"edge":"OfKind","from":"wl-devin-sandbox","to":"wlc-sandbox","data":{}}
+{"edge":"OfKind","from":"wl-factory-sandbox","to":"wlc-sandbox","data":{}}
+{"edge":"OfKind","from":"wl-pika-inference","to":"wlc-inference","data":{}}
+{"edge":"OfKind","from":"wl-krea-inference","to":"wlc-inference","data":{}}
+{"edge":"OfKind","from":"wl-mistral-training","to":"wlc-training","data":{}}
+{"edge":"OfKind","from":"wl-harvey-inference","to":"wlc-inference","data":{}}
+{"edge":"OfKind","from":"wl-character-inference","to":"wlc-inference","data":{}}
+{"edge":"OfKind","from":"wl-liquid-training","to":"wlc-training","data":{}}
+{"edge":"OfKind","from":"wl-runway-inference","to":"wlc-inference","data":{}}
+{"edge":"OfKind","from":"wl-decagon-inference","to":"wlc-inference","data":{}}
+{"edge":"OfKind","from":"wl-perplexity-inference","to":"wlc-inference","data":{}}
+{"edge":"OfKind","from":"wl-poolside-training","to":"wlc-training","data":{}}
+{"edge":"EstimatedBy","from":"wl-cursor-sandbox","to":"spend-cursor","data":{}}
+{"edge":"EstimatedBy","from":"wl-amp-sandbox","to":"spend-amp","data":{}}
+{"edge":"EstimatedBy","from":"wl-suno-inference","to":"spend-suno","data":{}}
+{"edge":"EstimatedBy","from":"wl-devin-sandbox","to":"spend-devin","data":{}}
+{"edge":"EstimatedBy","from":"wl-factory-sandbox","to":"spend-factory","data":{}}
+{"edge":"EstimatedBy","from":"wl-pika-inference","to":"spend-pika","data":{}}
+{"edge":"EstimatedBy","from":"wl-krea-inference","to":"spend-krea","data":{}}
+{"edge":"EstimatedBy","from":"wl-mistral-training","to":"spend-mistral","data":{}}
+{"edge":"EstimatedBy","from":"wl-harvey-inference","to":"spend-harvey","data":{}}
+{"edge":"EstimatedBy","from":"wl-character-inference","to":"spend-character","data":{}}
+{"edge":"EstimatedBy","from":"wl-liquid-training","to":"spend-liquid","data":{}}
+{"edge":"EstimatedBy","from":"wl-runway-inference","to":"spend-runway","data":{}}
+{"edge":"EstimatedBy","from":"wl-decagon-inference","to":"spend-decagon","data":{}}
+{"edge":"EstimatedBy","from":"wl-perplexity-inference","to":"spend-perplexity","data":{}}
+{"edge":"EstimatedBy","from":"wl-poolside-training","to":"spend-poolside","data":{}}
+{"edge":"RaisedRound","from":"acct-cognition","to":"round-cognition-c","data":{}}
+{"edge":"RaisedRound","from":"acct-pika","to":"round-pika-c","data":{}}
+{"edge":"RaisedRound","from":"acct-factory","to":"round-factory-a","data":{}}
+{"edge":"LedRound","from":"inv-founders-fund","to":"round-cognition-c","data":{}}
+{"edge":"LedRound","from":"inv-lightspeed","to":"round-pika-c","data":{}}
+{"edge":"LedRound","from":"inv-sequoia","to":"round-factory-a","data":{}}
+{"edge":"ObservedTechSignal","from":"acct-cognition","to":"tsig-cognition-series-c","data":{}}
+{"edge":"ObservedTechSignal","from":"acct-pika","to":"tsig-pika-series-c","data":{}}
+{"edge":"ObservedTechSignal","from":"acct-factory","to":"tsig-factory-launch","data":{}}
+{"edge":"TriggeredBy","from":"run-enrich-2026-04","to":"tsig-cognition-series-c","data":{}}
+{"edge":"AssertedClaim","from":"run-enrich-2026-02","to":"claim-cognition-headcount-v3","data":{}}
+{"edge":"AssertedClaim","from":"run-enrich-2026-04","to":"claim-cognition-headcount-v4","data":{}}
+{"edge":"AssertedClaim","from":"run-enrich-2026-04","to":"claim-cognition-stage-v4","data":{}}
+{"edge":"AssertedClaim","from":"run-enrich-2026-04","to":"claim-cognition-lead-v4","data":{}}
+{"edge":"AssertedClaim","from":"run-enrich-2026-04","to":"claim-factory-headcount-v4","data":{}}
+{"edge":"AssertedClaim","from":"run-enrich-2026-04","to":"claim-pika-last-round-v4","data":{}}
+{"edge":"AssertedClaim","from":"run-enrich-2026-04","to":"claim-suno-arr-v4","data":{}}
+{"edge":"AboutAccount","from":"claim-cognition-headcount-v3","to":"acct-cognition","data":{}}
+{"edge":"AboutAccount","from":"claim-cognition-headcount-v4","to":"acct-cognition","data":{}}
+{"edge":"AboutAccount","from":"claim-cognition-stage-v4","to":"acct-cognition","data":{}}
+{"edge":"AboutAccount","from":"claim-cognition-lead-v4","to":"acct-cognition","data":{}}
+{"edge":"AboutAccount","from":"claim-factory-headcount-v4","to":"acct-factory","data":{}}
+{"edge":"AboutAccount","from":"claim-pika-last-round-v4","to":"acct-pika","data":{}}
+{"edge":"AboutAccount","from":"claim-suno-arr-v4","to":"acct-suno","data":{}}
+{"edge":"GroundedInSource","from":"claim-cognition-headcount-v3","to":"src-cognition-linkedin","data":{}}
+{"edge":"GroundedInSource","from":"claim-cognition-headcount-v4","to":"src-cognition-linkedin","data":{}}
+{"edge":"GroundedInSource","from":"claim-cognition-stage-v4","to":"src-cognition-techcrunch","data":{}}
+{"edge":"GroundedInSource","from":"claim-cognition-lead-v4","to":"src-cognition-techcrunch","data":{}}
+{"edge":"GroundedInSource","from":"claim-factory-headcount-v4","to":"src-factory-blog","data":{}}
+{"edge":"GroundedInSource","from":"claim-pika-last-round-v4","to":"src-pika-wsj","data":{}}
+{"edge":"GroundedInSource","from":"claim-suno-arr-v4","to":"src-suno-arr-report","data":{}}
+{"edge":"Supersedes","from":"claim-cognition-headcount-v4","to":"claim-cognition-headcount-v3","data":{}}

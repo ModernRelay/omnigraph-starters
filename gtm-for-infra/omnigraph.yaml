@@ -1,0 +1,278 @@
+project:
+  name: gtm-for-infra
+
+auth:
+  env_file: ./.env.omni
+
+graphs:
+  local_s3:
+    uri: s3://omnigraph-local/repos/gtm-for-infra
+  local_server:
+    uri: http://127.0.0.1:8080
+    bearer_token_env: OMNIGRAPH_BEARER_TOKEN
+
+server:
+  graph: local_s3
+  bind: 127.0.0.1:8080
+
+cli:
+  graph: local_server
+  branch: main
+  output_format: table
+  table_max_column_width: 80
+  table_cell_layout: truncate
+
+query:
+  roots:
+    - queries
+    - .
+
+aliases:
+  # ── Reads: accounts ────────────────────────────────────────
+  account:
+    command: read
+    query: accounts.gq
+    name: get_account
+    args: [slug]
+    format: kv
+
+  accounts:
+    command: read
+    query: accounts.gq
+    name: accounts_by_status
+    args: [status]
+
+  account-workload:
+    command: read
+    query: accounts.gq
+    name: account_workload
+    args: [slug]
+
+  account-investors:
+    command: read
+    query: accounts.gq
+    name: account_investors
+    args: [slug]
+
+  # ── Reads: workloads ───────────────────────────────────────
+  workload:
+    command: read
+    query: workloads.gq
+    name: get_workload
+    args: [slug]
+    format: kv
+
+  workloads-by-category:
+    command: read
+    query: workloads.gq
+    name: workloads_by_category
+    args: [category]
+
+  top-spend:
+    command: read
+    query: workloads.gq
+    name: top_spend_by_category
+    args: [category]
+
+  # ── Reads: investors ───────────────────────────────────────
+  investor:
+    command: read
+    query: investors.gq
+    name: get_investor
+    args: [slug]
+    format: kv
+
+  investor-portfolio:
+    command: read
+    query: investors.gq
+    name: investor_portfolio
+    args: [slug]
+
+  co-investors:
+    command: read
+    query: investors.gq
+    name: shared_investors
+    args: [account_a, account_b]
+
+  # ── Reads: the aha query ───────────────────────────────────
+  lookalikes:
+    command: read
+    query: lookalikes.gq
+    name: lookalikes_of_customers
+
+  lookalikes-for:
+    command: read
+    query: lookalikes.gq
+    name: lookalikes_for_customer
+    args: [customer]
+
+  # ── Reads: claim lineage ───────────────────────────────────
+  claims-for:
+    command: read
+    query: claims.gq
+    name: claims_for_account
+    args: [slug]
+
+  claim-drift:
+    command: read
+    query: claims.gq
+    name: claim_drift
+    args: [slug, predicate]
+
+  run-output:
+    command: read
+    query: claims.gq
+    name: run_output
+    args: [taskId]
+
+  # ── Mutations: nodes ───────────────────────────────────────
+  add-account:
+    command: change
+    query: mutations.gq
+    name: add_account
+    args: [slug, name, domain, status, createdAt, updatedAt]
+
+  add-product:
+    command: change
+    query: mutations.gq
+    name: add_product
+    args: [slug, name, kind, createdAt, updatedAt]
+
+  add-workload:
+    command: change
+    query: mutations.gq
+    name: add_workload
+    args: [slug, name, createdAt, updatedAt]
+
+  add-workload-category:
+    command: change
+    query: mutations.gq
+    name: add_workload_category
+    args: [slug, name, description]
+
+  add-spend:
+    command: change
+    query: mutations.gq
+    name: add_spend_estimate
+    args: [slug, annualUSD, method, validFrom, confidence, createdAt]
+
+  add-investor:
+    command: change
+    query: mutations.gq
+    name: add_investor
+    args: [slug, name, createdAt, updatedAt]
+
+  add-round:
+    command: change
+    query: mutations.gq
+    name: add_funding_round
+    args: [slug, stage, closedOn, createdAt]
+
+  add-signal:
+    command: change
+    query: mutations.gq
+    name: add_tech_signal
+    args: [slug, kind, title, observedAt, createdAt]
+
+  add-run:
+    command: change
+    query: mutations.gq
+    name: add_research_run
+    args: [slug, taskId, processor, promptVersion, schemaVersion, ranAt, createdAt]
+
+  add-claim:
+    command: change
+    query: mutations.gq
+    name: add_claim
+    args: [slug, predicate, value, confidence, assertedAt, createdAt]
+
+  add-source:
+    command: change
+    query: mutations.gq
+    name: add_source
+    args: [slug, url, createdAt]
+
+  # ── Mutations: edges ───────────────────────────────────────
+  link-builds:
+    command: change
+    query: mutations.gq
+    name: link_builds_product
+    args: [account, product]
+
+  link-drives:
+    command: change
+    query: mutations.gq
+    name: link_drives_workload
+    args: [product, workload]
+
+  link-of-kind:
+    command: change
+    query: mutations.gq
+    name: link_of_kind
+    args: [workload, category]
+
+  link-estimate:
+    command: change
+    query: mutations.gq
+    name: link_estimated_by
+    args: [workload, estimate]
+
+  link-invests:
+    command: change
+    query: mutations.gq
+    name: link_invests_in
+    args: [investor, account]
+
+  link-raised:
+    command: change
+    query: mutations.gq
+    name: link_raised_round
+    args: [account, round]
+
+  link-led:
+    command: change
+    query: mutations.gq
+    name: link_led_round
+    args: [investor, round]
+
+  link-observed:
+    command: change
+    query: mutations.gq
+    name: link_observed_signal
+    args: [account, signal]
+
+  link-triggered:
+    command: change
+    query: mutations.gq
+    name: link_triggered_by
+    args: [run, signal]
+
+  link-asserted:
+    command: change
+    query: mutations.gq
+    name: link_asserted_claim
+    args: [run, claim]
+
+  link-about-account:
+    command: change
+    query: mutations.gq
+    name: link_about_account
+    args: [claim, account]
+
+  link-about-product:
+    command: change
+    query: mutations.gq
+    name: link_about_product
+    args: [claim, product]
+
+  link-grounded:
+    command: change
+    query: mutations.gq
+    name: link_grounded_in
+    args: [claim, source]
+
+  link-supersedes:
+    command: change
+    query: mutations.gq
+    name: link_supersedes
+    args: [newer, older]

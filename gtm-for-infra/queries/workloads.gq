@@ -1,0 +1,45 @@
+// Workload reads
+
+query get_workload($slug: String) {
+    match {
+        $w: Workload { slug: $slug }
+        $w ofKind $cat
+    }
+    return {
+        $w.slug, $w.name, $cat.name, $w.hardwareProfile,
+        $w.concurrencyClass, $w.durationClass
+    }
+}
+
+query workloads_by_category($category: String)
+    @description("Workloads under a given category slug (e.g. wlc-sandbox, wlc-inference)")
+{
+    match {
+        $cat: WorkloadCategory { slug: $category }
+        $w ofKind $cat
+    }
+    return { $w.slug, $w.name, $w.hardwareProfile }
+    order { $w.name }
+}
+
+// Top workload spend rows for a workload category
+
+query top_spend_by_category($category: String)
+    @description("Ranked workload spend rows for a given workload category")
+{
+    match {
+        $cat: WorkloadCategory { slug: $category }
+        $a: Account
+        $a buildsProduct $p
+        $p drivesWorkload $w
+        $w ofKind $cat
+        $w estimatedBy $e
+    }
+    return {
+        $a.slug, $a.name, $a.status,
+        $w.slug, $w.name,
+        $e.annualUSD, $e.method, $e.confidence
+    }
+    order { $e.annualUSD desc }
+    limit 20
+}

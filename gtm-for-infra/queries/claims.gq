@@ -1,0 +1,58 @@
+// Claim + ResearchRun reads — provenance and prompt-drift
+
+query claims_for_account($slug: String) {
+    match {
+        $a: Account { slug: $slug }
+        $c aboutAccount $a
+        $r assertedClaim $c
+    }
+    return {
+        $c.predicate, $c.value, $c.confidence,
+        $r.promptVersion, $r.processor, $c.assertedAt
+    }
+    order { $c.assertedAt desc }
+}
+
+// Prompt-drift query — what did a newer prompt version change its mind about?
+
+query claim_drift($slug: String, $predicate: String)
+    @description("Show how a single predicate's asserted value changed across prompt versions for one account")
+{
+    match {
+        $a: Account { slug: $slug }
+        $old: Claim { predicate: $predicate }
+        $new: Claim { predicate: $predicate }
+        $old aboutAccount $a
+        $new aboutAccount $a
+        $new supersedes $old
+        $rOld assertedClaim $old
+        $rNew assertedClaim $new
+    }
+    return {
+        $old.value, $new.value,
+        $rOld.promptVersion, $rNew.promptVersion,
+        $rOld.ranAt, $rNew.ranAt
+    }
+}
+
+// All claims asserted in a single Parallel Task run
+
+query run_output($taskId: String) {
+    match {
+        $r: ResearchRun { taskId: $taskId }
+        $r assertedClaim $c
+    }
+    return {
+        $c.predicate, $c.value, $c.confidence, $c.reasoning
+    }
+}
+
+// Claim + its grounding sources
+
+query claim_with_sources($slug: String) {
+    match {
+        $c: Claim { slug: $slug }
+        $c groundedInSource $s
+    }
+    return { $c.predicate, $c.value, $s.url, $s.title }
+}

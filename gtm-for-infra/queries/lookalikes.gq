@@ -1,0 +1,67 @@
+// Lookalike prospecting — the aha
+//
+// Find prospects that share both an investor AND a workload category with an
+// existing customer. Ranked by the prospect's estimated annual spend on that
+// workload. One query, zero SQL joins. "Same kind of workload" is expressed
+// as a shared WorkloadCategory node — the match is a join on graph identity,
+// not a cross-variable property comparison.
+
+query lookalikes_of_customers()
+    @description("Prospects sharing an investor AND a workload category with an existing customer")
+    @instruction("Use this to surface top accounts for outbound — results are already ranked by bottoms-up spend on the matched workload")
+{
+    match {
+        $cust: Account { status: "customer" }
+        $cust buildsProduct $cp
+        $cp drivesWorkload $cw
+        $cw ofKind $cat
+        $inv investsIn $cust
+
+        $pros: Account { status: "prospect" }
+        $inv investsIn $pros
+        $pros buildsProduct $pp
+        $pp drivesWorkload $pw
+        $pw ofKind $cat
+
+        $pw estimatedBy $est
+    }
+    return {
+        $pros.slug, $pros.name,
+        $inv.name,
+        $cat.name,
+        $est.annualUSD,
+        $cust.name
+    }
+    order { $est.annualUSD desc }
+    limit 25
+}
+
+
+// Same question, scoped to a specific customer — "who looks like Cursor?"
+
+query lookalikes_for_customer($customer: String)
+    @description("Prospects sharing an investor + workload category with one named customer")
+{
+    match {
+        $cust: Account { slug: $customer, status: "customer" }
+        $cust buildsProduct $cp
+        $cp drivesWorkload $cw
+        $cw ofKind $cat
+        $inv investsIn $cust
+
+        $pros: Account { status: "prospect" }
+        $inv investsIn $pros
+        $pros buildsProduct $pp
+        $pp drivesWorkload $pw
+        $pw ofKind $cat
+
+        $pw estimatedBy $est
+    }
+    return {
+        $pros.slug, $pros.name,
+        $inv.name,
+        $cat.name,
+        $est.annualUSD
+    }
+    order { $est.annualUSD desc }
+}
