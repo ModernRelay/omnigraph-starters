@@ -11,7 +11,7 @@ For schema **design** principles (identity, types, edges, constraints) see [`omn
 > `omnigraph.yaml` deployments. Per-operator settings (identity, named servers,
 > credentials, aliases) live in `~/.omnigraph/config.yaml` (RFC-007/008;
 > `omnigraph.yaml` is the deprecated combined file). See the omnigraph repo's
-> `docs/user/cluster.md` and the `omnigraph-best-practices` skill's
+> `docs/user/clusters/index.md` and the `omnigraph-best-practices` skill's
 > `references/cluster.md`. Everything below remains valid for the classic
 > single-graph path and for all data-plane operations.
 
@@ -359,6 +359,7 @@ omnigraph-server --config omnigraph.yaml --unauthenticated   # legacy combined f
 | `GET /export` | JSONL stream of a branch |
 | `POST /query` | read query execution |
 | `POST /mutate` | mutation execution |
+| `POST /load` | bulk JSONL load (canonical, RFC-009 Phase 5); supersedes deprecated `POST /ingest` |
 | `GET /queries`, `POST /queries/{name}` | stored-query catalog + invocation (v0.6.1) |
 | `POST /schema/apply` | schema migration |
 | `GET /branches` | branch list |
@@ -372,7 +373,7 @@ Set bearer tokens on the server process — `OMNIGRAPH_SERVER_BEARER_TOKENS_JSON
 
 ### Setup operations (`init`, `load`) write directly to storage
 
-`init` and `load` write the repo on disk or in S3 — they don't go through the server. Pass the repo URI directly:
+`init` and **local** `load` write the repo on disk or in S3 — they don't go through the server (a **remote** `load` is server-orchestrated, POSTing `/load`). Pass the repo URI directly:
 
 ```bash
 omnigraph init --schema schema.pg s3://my-bucket/repos/<name>
@@ -389,7 +390,7 @@ Cedar policies can gate `schema_apply`, `branch_merge`, `change`, `export`, `inv
 
 ### Config follows identity (v0.6.1)
 
-A top-level `policy:` (and `queries:`) block applies **only** to an anonymous bare-URI single-graph server. A graph served **by name** (`server.graph` / `--target`) must nest them under `graphs.<name>.policy` / `graphs.<name>.queries`. Leaving them at the top level with a named graph makes the server **refuse to boot** with migration guidance.
+A top-level `policy:` (and `queries:`) block applies **only** to an anonymous bare-URI single-graph server. A graph served **by name** (`server.graph`, or the `omnigraph-server --target` boot flag) must nest them under `graphs.<name>.policy` / `graphs.<name>.queries`. Leaving them at the top level with a named graph makes the server **refuse to boot** with migration guidance.
 
 ### Validate, test, explain
 
@@ -432,14 +433,18 @@ omnigraph commit show $REPO <id>
 
 ### Init
 
-`omnigraph init --schema schema.pg $REPO` creates a graph at `$REPO`. **It no longer scaffolds a config file** (RFC-008) — start a `cluster.yaml` from the omnigraph repo's `docs/user/cluster.md`, or run `omnigraph config migrate` against an existing legacy `omnigraph.yaml`. `init` does not accept `--json`.
+`omnigraph init --schema schema.pg $REPO` creates a graph at `$REPO`. **It no longer scaffolds a config file** (RFC-008) — start a `cluster.yaml` from the omnigraph repo's `docs/user/clusters/index.md`, or run `omnigraph config migrate` against an existing legacy `omnigraph.yaml`. `init` does not accept `--json`.
 
-### Config resolution order
+### Addressing a graph (RFC-011)
 
-1. Explicit `--uri` or positional URI wins
-2. `--server <name>` (with optional `--graph <id>`) selects an operator-defined endpoint from `~/.omnigraph/config.yaml` — the modern remote path
-3. `--target <name>` selects a named graph from a legacy `omnigraph.yaml`
-4. Config default (`cli.graph`) wins last
+`--target` was **removed from the CLI** (the `omnigraph-server --target` boot flag is unchanged); a positional `http(s)://` URL no longer dispatches to a server. Precedence:
+
+1. `--store <uri>` or a positional `file://`/`s3://` URI — direct storage (no catalog)
+2. `--server <name|url>` (+ `--graph <id>`) — served/remote (a remote **must** use `--server`)
+3. `--profile <name>` / `$OMNIGRAPH_PROFILE` — a named scope bundle from `profiles:`
+4. operator `defaults.server` + `default_graph`, then legacy `cli.graph` (deprecated)
+
+Maintenance against a cluster-managed graph: `--cluster <dir|s3://> --cluster-graph <id>`. Each command declares a capability (`any`/`served`/`direct`/`control`/`local`, shown in `omnigraph --help`).
 
 ## Common Mistakes
 

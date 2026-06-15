@@ -30,17 +30,13 @@ edits.
 >
 > **Local and remote are one command.** `load` works against a local repo URI
 > (writing storage directly) *and* a remote `omnigraph-server` endpoint (the
-> server orchestrates the write and publishes one atomic commit). The old
-> "load is only supported against local repo URIs" rejection is gone as of
-> 0.7.0. See [`references/remote-ops.md`](remote-ops.md) for remote-specific
-> concerns (504 handling, write-verification ritual).
->
-> `ingest` is a **deprecated alias** of `load --from main --mode merge` — it
-> prints a warning and forwards to `load`. Use `load` directly.
+> server orchestrates the write and publishes one atomic commit). See
+> [`references/remote-ops.md`](remote-ops.md) for remote-specific concerns
+> (504 handling, write-verification ritual).
 
 ## `mutate` — Single Edits
 
-Goes through the running server via `cli.graph` (or an alias):
+Goes through the running server (the configured default graph, or an alias):
 
 ```bash
 omnigraph mutate \
@@ -130,7 +126,7 @@ omnigraph branch delete --uri $REPO staging-2026-04-14
 - Bare `load` operates on an existing branch (default `main`).
 - `load --from main --branch <name>` forks `<name>` from `main`, loads onto it, and leaves it for review — the whole review-branch flow in one command.
 
-Use `--from` for anything you want reviewed before it touches `main`. (`ingest` was the old name for `load --from main --mode merge`; it still works as a deprecated alias that forwards to `load`.)
+Use `--from` for anything you want reviewed before it touches `main`.
 
 ### Keep branches short-lived
 

@@ -68,8 +68,7 @@ omnigraph-server --cluster . --bind 127.0.0.1:8080 --unauthenticated  # serve (l
   config directory (byte-compatible with pre-existing clusters). Credentials
   come from the standard `AWS_*` env contract, never `cluster.yaml`.
 - **`--as <actor>` attributes every run** (sidecars, audit, engine commits).
-  Defaults from your operator config's `operator.actor` (or legacy `cli.actor`);
-  required for `approve`.
+  Defaults from your operator config's `operator.actor`; required for `approve`.
 - **Destructive changes are gated**: removing a graph from `cluster.yaml`
   blocks with `approval_required` until
   `omnigraph cluster approve graph.<id> --config . --as <you>` records a
@@ -86,14 +85,12 @@ omnigraph-server --cluster . --bind 127.0.0.1:8080 --unauthenticated  # serve (l
 | `cluster.yaml` | the deployment: graph set, schemas, stored queries, policy bindings, storage | `cluster` commands; the `--cluster` server |
 | `~/.omnigraph/config.yaml` | per-operator: identity (`operator.actor`), named `servers:`, output defaults, personal aliases | data-plane CLI commands (tokens live in `~/.omnigraph/credentials` via `omnigraph login`) |
 
-The operator surface used to be the legacy combined `omnigraph.yaml`
-(deprecated, RFC-008 — its `cli.actor` and aliases still resolve through the
-deprecation window). Cluster commands read the operator config for **exactly
-one thing**: the actor default when `--as` is omitted (`--as` > legacy
-`cli.actor` > `operator.actor`). A `--cluster` server reads it for
-**nothing** — boot from cluster state XOR the operator file, never a merge.
-Point a `graphs.<name>.uri` (or use `--server`) at a derived root so aliases
-and targeting work against cluster-managed graphs — that is ergonomics, not
+Cluster commands read the operator config for **exactly one thing**: the actor
+default when `--as` is omitted (`--as` > `operator.actor`). A `--cluster` server
+reads it for **nothing** — boot from cluster state XOR the operator file, never
+a merge.
+Address a cluster-managed graph's data directly with `--store <storage>/graphs/<id>.omni`,
+or via `--server`/aliases against a serving instance — that is ergonomics, not
 coupling.
 
 ## Serving
@@ -127,5 +124,5 @@ in-container `cluster apply`.
 | Server refuses to boot | the error names its remedy (usually `cluster refresh` + `apply`, restart) |
 | `approval_stale` warning | re-run `cluster approve` — the plan changed since you approved |
 
-Full reference: the omnigraph repo's `docs/user/cluster.md` (operator guide)
-and `docs/user/cluster-config.md` (every key, flag, and diagnostic).
+Full reference: the omnigraph repo's `docs/user/clusters/index.md` (operator guide)
+and `docs/user/clusters/config.md` (every key, flag, and diagnostic).

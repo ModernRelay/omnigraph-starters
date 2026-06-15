@@ -17,7 +17,7 @@ When the graph URI is a remote endpoint (`omnigraph-server` behind ALB / CloudFr
 
 ## What's different about remote
 
-A remote graph runs server-side. Every write executes on the server — staged per touched table, then published atomically as a **single manifest commit** guarded by a compare-and-swap on expected table versions — and is gated by a connection-level idle timeout (CloudFront defaults to ~30s). There is no separate "run" object to poll; the transactional Run state machine was removed in v0.4.0, and write status is implied by the HTTP response (and verifiable via `commit list`). The local CLI is a thin client; it never sees the commit happen, only the HTTP response. That asymmetry is the root of every gotcha below.
+A remote graph runs server-side. Every write executes on the server — staged per touched table, then published atomically as a **single manifest commit** guarded by a compare-and-swap on expected table versions — and is gated by a connection-level idle timeout (CloudFront defaults to ~30s). There is no separate "run" object to poll — write status is implied by the HTTP response (and verifiable via `commit list`). The local CLI is a thin client; it never sees the commit happen, only the HTTP response. That asymmetry is the root of every gotcha below.
 
 | Local repo | Remote repo |
 |---|---|
@@ -65,7 +65,7 @@ Always verify via `commit list` before retrying. Blind retry on append-only type
 
 ## Fork-branch 504 fingerprint
 
-`load --from <base>` (and the legacy `ingest`) creates the branch **before** loading data. A timed-out fork-load where the data didn't land leaves an empty branch at `<base>`'s head. Stale numbered branches (`feature-v2`, `-v3`, `-v4` …) all sitting at the same `graph_commit_id` as `main` are the fingerprint of prior 504-blocked attempts.
+`load --from <base>` creates the branch **before** loading data. A timed-out fork-load where the data didn't land leaves an empty branch at `<base>`'s head. Stale numbered branches (`feature-v2`, `-v3`, `-v4` …) all sitting at the same `graph_commit_id` as `main` are the fingerprint of prior 504-blocked attempts.
 
 Find them by comparing each branch's head against `main`'s in `omnigraph branch list --config X --json`, then delete the empty ones.
 
@@ -79,7 +79,7 @@ omnigraph load --server intel-dev --graph spike \
   --data delta.jsonl --from main --mode merge --branch staging
 ```
 
-`--server <name>` resolves the URL from `~/.omnigraph/config.yaml` and the token via `OMNIGRAPH_TOKEN_<NAME>` → the credentials file → the legacy `bearer_token_env` chain. A token is only ever sent to the server it is keyed to. `--graph <id>` selects the graph on a multi-graph server.
+`--server <name>` resolves the URL from `~/.omnigraph/config.yaml` and the token via `OMNIGRAPH_TOKEN_<NAME>` or the credentials file. A token is only ever sent to the server it is keyed to. `--graph <id>` selects the graph on a multi-graph server.
 
 ## Version drift / `sync_branch()`
 
