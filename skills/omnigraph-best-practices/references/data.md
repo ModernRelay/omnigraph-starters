@@ -108,7 +108,7 @@ REPO=s3://my-bucket/repos/spike-intel
 omnigraph branch create --uri $REPO --from main staging-2026-04-14
 
 # 2. Load delta onto the branch (merge mode is typical for review)
-omnigraph load --data delta.jsonl --branch staging-2026-04-14 --mode merge --uri $REPO
+omnigraph load --data delta.jsonl --branch staging-2026-04-14 --mode merge $REPO
 
 # 3. Verify on the branch (reads can target --branch or --snapshot)
 omnigraph query recent_signals --query queries/signals.gq --branch staging-2026-04-14
@@ -141,7 +141,7 @@ For any bulk load that could disrupt downstream queries (overwriting a heavily-r
 
 ```bash
 omnigraph load --data risky.jsonl --branch recovery-2026-04-14 \
-  --from main --mode overwrite --uri $REPO
+  --from main --mode overwrite $REPO
 # inspect, diff, verify reads
 omnigraph branch merge --uri $REPO recovery-2026-04-14 --into main
 ```
