@@ -1,0 +1,10 @@
+version: 1
+metadata:
+  name: second-brain
+state:
+  backend: cluster
+  lock: true
+graphs:
+  brain:
+    schema: schema.pg
+    queries: queries/

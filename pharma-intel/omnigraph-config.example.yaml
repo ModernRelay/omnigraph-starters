@@ -1,0 +1,146 @@
+# Operator-config example for the Pharma Intel cookbook (RFC-007/008).
+# Your operator config lives at ~/.omnigraph/config.yaml (per-user, NOT committed).
+# Merge the `aliases:` below into it for short names over this graph's stored
+# queries. Point `local` at your running cluster server (`omnigraph-server
+# --cluster .`); alias invocation needs the server up.
+servers:
+  local:
+    url: http://127.0.0.1:8080
+defaults:
+  server: local
+  default_graph: pharma
+aliases:
+  # ── Signals ──
+  signal: { server: local, graph: pharma, query: get_signal, args: [slug], format: kv }
+  signals: { server: local, graph: pharma, query: recent_signals }
+  search-signals: { server: local, graph: pharma, query: search_signals, args: [q] }
+  signals-by-domain: { server: local, graph: pharma, query: signals_by_domain, args: [domain] }
+  signal-patterns: { server: local, graph: pharma, query: signal_patterns, args: [slug] }
+  signal-contradictions: { server: local, graph: pharma, query: signal_contradictions, args: [slug] }
+  signal-compound: { server: local, graph: pharma, query: signal_compound, args: [slug] }
+  signal-mechanism: { server: local, graph: pharma, query: signal_mechanism, args: [slug] }
+  signal-trial: { server: local, graph: pharma, query: signal_trial, args: [slug] }
+  signal-companies: { server: local, graph: pharma, query: signal_companies, args: [slug] }
+  signal-supports-assumptions: { server: local, graph: pharma, query: signal_supports_assumptions, args: [slug] }
+  signal-contradicts-assumptions: { server: local, graph: pharma, query: signal_contradicts_assumptions, args: [slug] }
+  signal-informs-questions: { server: local, graph: pharma, query: signal_informs_questions, args: [slug] }
+  signal-artifacts: { server: local, graph: pharma, query: signal_artifacts, args: [slug] }
+
+  # ── Patterns ──
+  pattern: { server: local, graph: pharma, query: get_pattern, args: [slug], format: kv }
+  patterns: { server: local, graph: pharma, query: patterns_all }
+  patterns-by-kind: { server: local, graph: pharma, query: patterns_by_kind, args: [kind] }
+  pattern-signals: { server: local, graph: pharma, query: pattern_signals, args: [slug] }
+  pattern-contradictions: { server: local, graph: pharma, query: pattern_contradictions, args: [slug] }
+  pattern-drives: { server: local, graph: pharma, query: pattern_drives, args: [slug] }
+  pattern-contradicts-patterns: { server: local, graph: pharma, query: pattern_contradicts_patterns, args: [slug] }
+  pattern-insights: { server: local, graph: pharma, query: pattern_insights, args: [slug] }
+
+  # ── Compounds & Mechanisms ──
+  compound: { server: local, graph: pharma, query: get_compound, args: [slug], format: kv }
+  compounds: { server: local, graph: pharma, query: compounds_all }
+  compounds-by-phase: { server: local, graph: pharma, query: compounds_by_phase, args: [phase] }
+  compounds-by-mechanism: { server: local, graph: pharma, query: compounds_by_mechanism, args: [mechanism] }
+  compound-sponsor: { server: local, graph: pharma, query: compound_sponsor, args: [slug] }
+  compound-trials: { server: local, graph: pharma, query: compound_trials, args: [slug] }
+  compound-signals: { server: local, graph: pharma, query: compound_signals, args: [slug] }
+  mechanism: { server: local, graph: pharma, query: get_mechanism, args: [slug], format: kv }
+  mechanisms: { server: local, graph: pharma, query: mechanisms_all }
+  mechanism-compounds: { server: local, graph: pharma, query: mechanism_compounds, args: [slug] }
+  mechanism-signals: { server: local, graph: pharma, query: mechanism_signals, args: [slug] }
+  mechanism-signals-via-compound: { server: local, graph: pharma, query: mechanism_signals_via_compound, args: [slug] }
+
+  # ── Trials, Deals, Regulatory ──
+  trial: { server: local, graph: pharma, query: get_trial, args: [slug], format: kv }
+  trials-by-status: { server: local, graph: pharma, query: trials_by_status, args: [status] }
+  trial-sponsor: { server: local, graph: pharma, query: trial_sponsor, args: [slug] }
+  deal: { server: local, graph: pharma, query: get_deal, args: [slug], format: kv }
+  deals: { server: local, graph: pharma, query: deals_all }
+  deal-parties: { server: local, graph: pharma, query: deal_parties, args: [slug] }
+  regulatory: { server: local, graph: pharma, query: get_regulatory, args: [slug], format: kv }
+  regulatory-recent: { server: local, graph: pharma, query: regulatory_recent }
+  regulatory-compound: { server: local, graph: pharma, query: regulatory_compound, args: [slug] }
+  company: { server: local, graph: pharma, query: get_company, args: [slug], format: kv }
+  company-compounds: { server: local, graph: pharma, query: company_compounds, args: [slug] }
+  insight: { server: local, graph: pharma, query: get_insight, args: [slug], format: kv }
+  insights: { server: local, graph: pharma, query: insights_all }
+  insight-patterns: { server: local, graph: pharma, query: insight_patterns, args: [slug] }
+
+  # ── Internal Context (the value layer) ──
+  program: { server: local, graph: pharma, query: get_program, args: [slug], format: kv }
+  programs: { server: local, graph: pharma, query: programs_all }
+  program-compound: { server: local, graph: pharma, query: program_compound, args: [slug] }
+  program-mechanism: { server: local, graph: pharma, query: program_mechanism, args: [slug] }
+  program-assumptions: { server: local, graph: pharma, query: program_assumptions, args: [slug] }
+  program-decisions: { server: local, graph: pharma, query: program_decisions, args: [slug] }
+  program-competitors: { server: local, graph: pharma, query: program_competitors, args: [slug] }
+  program-signals: { server: local, graph: pharma, query: program_signals, args: [slug] }
+  program-landscape-signals: { server: local, graph: pharma, query: program_landscape_signals, args: [slug] }
+  assumption: { server: local, graph: pharma, query: get_assumption, args: [slug], format: kv }
+  assumptions: { server: local, graph: pharma, query: assumptions_all }
+  assumption-supports: { server: local, graph: pharma, query: assumption_supporting_signals, args: [slug] }
+  assumption-contradictions: { server: local, graph: pharma, query: assumption_contradicting_signals, args: [slug] }
+  decision: { server: local, graph: pharma, query: get_decision, args: [slug], format: kv }
+  decisions-upcoming: { server: local, graph: pharma, query: decisions_upcoming }
+  decisions-all: { server: local, graph: pharma, query: decisions_all }
+  decision-program: { server: local, graph: pharma, query: decision_program, args: [slug] }
+  decision-questions: { server: local, graph: pharma, query: decision_questions, args: [slug] }
+  decision-assumptions: { server: local, graph: pharma, query: decision_assumptions, args: [slug] }
+  question: { server: local, graph: pharma, query: get_question, args: [slug], format: kv }
+  questions: { server: local, graph: pharma, query: questions_open }
+  question-signals: { server: local, graph: pharma, query: question_signals, args: [slug] }
+
+  # ── Mutations: pipeline nodes ──
+  add-compound: { server: local, graph: pharma, query: add_compound, args: [slug, name, phase, createdAt, updatedAt] }
+  add-mechanism: { server: local, graph: pharma, query: add_mechanism, args: [slug, name, createdAt, updatedAt] }
+  add-trial: { server: local, graph: pharma, query: add_trial, args: [slug, name, status, createdAt, updatedAt] }
+  add-company: { server: local, graph: pharma, query: add_company, args: [slug, name] }
+  add-deal: { server: local, graph: pharma, query: add_deal, args: [slug, name, createdAt, updatedAt] }
+  add-regulatory: { server: local, graph: pharma, query: add_regulatory, args: [slug, name, createdAt, updatedAt] }
+
+  # ── Mutations: SPIKE nodes ──
+  add-signal: { server: local, graph: pharma, query: add_signal, args: [slug, name, brief, stagingTimestamp, createdAt, updatedAt] }
+  add-pattern: { server: local, graph: pharma, query: add_pattern, args: [slug, name, kind, createdAt, updatedAt] }
+  add-insight: { server: local, graph: pharma, query: add_insight, args: [slug, name, createdAt, updatedAt] }
+
+  # ── Mutations: provenance ──
+  add-source: { server: local, graph: pharma, query: add_source, args: [slug, name] }
+  add-artifact: { server: local, graph: pharma, query: add_artifact, args: [slug, name, artifactType, stagingTimestamp, createdAt, updatedAt] }
+
+  # ── Mutations: internal context ──
+  add-program: { server: local, graph: pharma, query: add_program, args: [slug, name, createdAt, updatedAt] }
+  add-assumption: { server: local, graph: pharma, query: add_assumption, args: [slug, name, level, createdAt, updatedAt] }
+  add-decision: { server: local, graph: pharma, query: add_decision, args: [slug, name, status, createdAt, updatedAt] }
+  add-question: { server: local, graph: pharma, query: add_question, args: [slug, name, status, createdAt, updatedAt] }
+
+  # ── Mutations: SPIKE analytical edges ──
+  link-forms-pattern: { server: local, graph: pharma, query: link_forms_pattern, args: [signal, pattern] }
+  link-contradicts-pattern: { server: local, graph: pharma, query: link_contradicts_pattern, args: [signal, pattern] }
+  link-highlights-pattern: { server: local, graph: pharma, query: link_highlights_pattern, args: [insight, pattern] }
+  link-drives-pattern: { server: local, graph: pharma, query: link_drives_pattern, args: [from, to] }
+
+  # ── Mutations: signal → pipeline classification ──
+  link-about-compound: { server: local, graph: pharma, query: link_about_compound, args: [signal, compound] }
+  link-about-mechanism: { server: local, graph: pharma, query: link_about_mechanism, args: [signal, mechanism] }
+  link-about-trial: { server: local, graph: pharma, query: link_about_trial, args: [signal, trial] }
+  link-relevant-company: { server: local, graph: pharma, query: link_relevant_company, args: [signal, company] }
+
+  # ── Mutations: pipeline structure ──
+  link-compound-mechanism: { server: local, graph: pharma, query: link_compound_mechanism, args: [compound, mechanism] }
+  link-compound-company: { server: local, graph: pharma, query: link_compound_company, args: [compound, company] }
+  link-trial-compound: { server: local, graph: pharma, query: link_trial_compound, args: [trial, compound] }
+
+  # ── Mutations: internal ↔ external (the value bridge) ──
+  link-signal-supports-assumption: { server: local, graph: pharma, query: link_signal_supports_assumption, args: [signal, assumption] }
+  link-signal-contradicts-assumption: { server: local, graph: pharma, query: link_signal_contradicts_assumption, args: [signal, assumption] }
+  link-signal-informs-question: { server: local, graph: pharma, query: link_signal_informs_question, args: [signal, question] }
+
+  # ── Mutations: internal structure ──
+  link-program-assumption: { server: local, graph: pharma, query: link_program_assumption, args: [program, assumption] }
+  link-decision-program: { server: local, graph: pharma, query: link_decision_program, args: [decision, program] }
+  link-decision-question: { server: local, graph: pharma, query: link_decision_question, args: [decision, question] }
+  link-decision-assumption: { server: local, graph: pharma, query: link_decision_assumption, args: [decision, assumption] }
+
+  # ── Mutations: provenance edges ──
+  link-artifact-source: { server: local, graph: pharma, query: link_artifact_source, args: [artifact, source] }
+  link-signal-artifact: { server: local, graph: pharma, query: link_signal_artifact, args: [signal, artifact] }

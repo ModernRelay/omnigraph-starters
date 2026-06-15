@@ -1,0 +1,383 @@
+# Operator-config example for the VC OS cookbook (RFC-007/008).
+# Your operator config lives at ~/.omnigraph/config.yaml (per-user, NOT committed).
+# Merge the `aliases:` below into it for short names over this graph's stored
+# queries. Point `local` at your running cluster server (`omnigraph-server
+# --cluster .`); alias invocation needs the server up.
+servers:
+  local:
+    url: http://127.0.0.1:8080
+defaults:
+  server: local
+  default_graph: vcos
+aliases:
+  # ══════════════════════════════════════════════════════════════════
+  # VIEW: IC Meeting
+  # ══════════════════════════════════════════════════════════════════
+  # All pre-ic-brief-* aliases take a *Deal* slug (not an Organization slug).
+  # Example: omnigraph alias pre-ic-brief-organization deal-helix-series-a
+  pre-ic-brief-organization: { server: local, graph: vcos, query: pre_ic_brief_organization, args: [slug] }
+  pre-ic-brief-thesis: { server: local, graph: vcos, query: pre_ic_brief_thesis, args: [slug] }
+  pre-ic-brief-evidence: { server: local, graph: vcos, query: pre_ic_brief_evidence, args: [slug] }
+  pre-ic-brief-questions: { server: local, graph: vcos, query: pre_ic_brief_questions, args: [slug] }
+  pre-ic-brief-debate: { server: local, graph: vcos, query: pre_ic_brief_debate, args: [slug] }
+  pre-ic-meeting-history: { server: local, graph: vcos, query: ic_prep_meeting_history, args: [slug] }
+  pre-ic-open-commitments: { server: local, graph: vcos, query: ic_prep_open_commitments, args: [slug] }
+  debate-stances: { server: local, graph: vcos, query: debate_stances, args: [slug] }
+  founder-card: { server: local, graph: vcos, query: get_person, args: [slug], format: kv }
+  person-insights: { server: local, graph: vcos, query: person_insights, args: [slug] }
+
+  # ══════════════════════════════════════════════════════════════════
+  # VIEW: Weekly Pipeline Meeting
+  # ══════════════════════════════════════════════════════════════════
+  deals-open: { server: local, graph: vcos, query: deals_open }
+  pipeline-organizations: { server: local, graph: vcos, query: pipeline_organizations }
+  high-fit-pipeline: { server: local, graph: vcos, query: high_fit_pipeline }
+  observed-organizations: { server: local, graph: vcos, query: observed_organizations }
+  recent-signals: { server: local, graph: vcos, query: recent_signals }
+  recent-contradictions: { server: local, graph: vcos, query: recent_contradictions }
+  open-questions: { server: local, graph: vcos, query: open_questions }
+
+  # ══════════════════════════════════════════════════════════════════
+  # VIEW: Portfolio Support Meeting
+  # ══════════════════════════════════════════════════════════════════
+  portfolio-book: { server: local, graph: vcos, query: portfolio_book }
+  portfolio-organizations: { server: local, graph: vcos, query: portfolio_organizations }
+  portfolio-recent-signals: { server: local, graph: vcos, query: portfolio_recent_signals }
+  portfolio-updates-recent: { server: local, graph: vcos, query: portfolio_updates_recent }
+  portfolio-open-questions: { server: local, graph: vcos, query: portfolio_open_questions }
+  portfolio-open-commitments: { server: local, graph: vcos, query: portfolio_open_commitments }
+  board-prep-pack: { server: local, graph: vcos, query: board_prep_pack, args: [slug] }
+  board-prep-open-questions: { server: local, graph: vcos, query: board_prep_open_questions, args: [slug] }
+  board-prep-commitments: { server: local, graph: vcos, query: board_prep_commitments, args: [slug] }
+  board-prep-meeting-history: { server: local, graph: vcos, query: board_meetings_for_organization, args: [slug] }
+  board-prep-next-meeting: { server: local, graph: vcos, query: upcoming_board_meetings_for_organization, args: [slug] }
+  signal-portfolio-impact: { server: local, graph: vcos, query: signal_portfolio_impact, args: [slug] }
+  # Broader than portfolio: any engaged org (pipeline, evaluating, in-diligence, ic-ready, watching, portfolio).
+  signal-engagement-impact: { server: local, graph: vcos, query: signal_engagement_impact, args: [slug] }
+  exit-landscape: { server: local, graph: vcos, query: exit_landscape, args: [slug] }
+  exit-landscape-decision-makers: { server: local, graph: vcos, query: exit_landscape_decision_makers, args: [slug] }
+  contradicted-active-theses: { server: local, graph: vcos, query: contradicted_active_theses }
+  co-investor-leads: { server: local, graph: vcos, query: co_investor_leads }
+  co-investor-participants: { server: local, graph: vcos, query: co_investor_participants }
+  # `organization-co-investors` was renamed to make the lead/participant split honest.
+  # Callers wanting the full co-investor view should union both reads.
+  organization-co-investor-leads: { server: local, graph: vcos, query: organization_co_investor_leads, args: [slug] }
+  organization-co-investor-participants: { server: local, graph: vcos, query: organization_co_investor_participants, args: [slug] }
+  vc-firm-coinvestments: { server: local, graph: vcos, query: vc_firm_coinvestments, args: [slug] }
+
+  # ══════════════════════════════════════════════════════════════════
+  # VIEW: LPAC / Fund Reporting
+  # ══════════════════════════════════════════════════════════════════
+  fund-portfolio: { server: local, graph: vcos, query: fund_portfolio, args: [fund_slug] }
+  reserve-pressure: { server: local, graph: vcos, query: reserve_pressure, args: [fund_slug] }
+  portco-rounds: { server: local, graph: vcos, query: portco_rounds, args: [slug] }
+  decisions-recent: { server: local, graph: vcos, query: decisions_recent }
+
+  # ══════════════════════════════════════════════════════════════════
+  # PRIMITIVES — Deals
+  # ══════════════════════════════════════════════════════════════════
+  deal: { server: local, graph: vcos, query: get_deal, args: [slug], format: kv }
+  deals-by-stage: { server: local, graph: vcos, query: deals_by_stage, args: [stage] }
+  deals-by-outcome: { server: local, graph: vcos, query: deals_by_outcome, args: [outcome] }
+  search-deals: { server: local, graph: vcos, query: search_deals, args: [q] }
+  deal-organization: { server: local, graph: vcos, query: deal_organization, args: [slug] }
+  deal-fund: { server: local, graph: vcos, query: deal_fund, args: [slug] }
+  deal-lead-partner: { server: local, graph: vcos, query: deal_lead_partner, args: [slug] }
+  deal-thesis: { server: local, graph: vcos, query: deal_thesis, args: [slug] }
+  deal-market: { server: local, graph: vcos, query: deal_market, args: [slug] }
+  deal-lead-investor: { server: local, graph: vcos, query: deal_lead_investor, args: [slug] }
+  deal-participants: { server: local, graph: vcos, query: deal_participants, args: [slug] }
+  deal-people: { server: local, graph: vcos, query: deal_people, args: [slug] }
+  deal-signals: { server: local, graph: vcos, query: deal_signals, args: [slug] }
+  deal-artifacts: { server: local, graph: vcos, query: deal_artifacts, args: [slug] }
+  deal-insights: { server: local, graph: vcos, query: deal_insights, args: [slug] }
+  deal-open-questions: { server: local, graph: vcos, query: deal_open_questions, args: [slug] }
+  deal-decisions: { server: local, graph: vcos, query: deal_decisions, args: [slug] }
+  deal-commitments: { server: local, graph: vcos, query: deal_commitments, args: [slug] }
+
+  # ══════════════════════════════════════════════════════════════════
+  # PRIMITIVES — Companies & Markets
+  # ══════════════════════════════════════════════════════════════════
+  organization: { server: local, graph: vcos, query: get_organization, args: [slug], format: kv }
+  organizations-by-kind: { server: local, graph: vcos, query: organizations_by_kind, args: [kind] }
+  organizations-by-status: { server: local, graph: vcos, query: organizations_by_status, args: [status] }
+  search-organizations: { server: local, graph: vcos, query: search_organizations, args: [q] }
+  organization-deals: { server: local, graph: vcos, query: organization_deals, args: [slug] }
+  organization-founders: { server: local, graph: vcos, query: organization_founders, args: [slug] }
+  organization-board: { server: local, graph: vcos, query: organization_board, args: [slug] }
+  organization-signals: { server: local, graph: vcos, query: organization_signals, args: [slug] }
+  organization-artifacts: { server: local, graph: vcos, query: organization_artifacts, args: [slug] }
+  organization-insights: { server: local, graph: vcos, query: organization_insights, args: [slug] }
+  organization-markets: { server: local, graph: vcos, query: organization_markets, args: [slug] }
+  organization-theses: { server: local, graph: vcos, query: organization_theses, args: [slug] }
+  market: { server: local, graph: vcos, query: get_market, args: [slug], format: kv }
+  markets: { server: local, graph: vcos, query: markets_all }
+  market-organizations: { server: local, graph: vcos, query: market_organizations, args: [slug] }
+  market-theses: { server: local, graph: vcos, query: market_theses, args: [slug] }
+  market-signals: { server: local, graph: vcos, query: market_signals, args: [slug] }
+  market-lessons: { server: local, graph: vcos, query: market_lessons, args: [slug] }
+
+  # ══════════════════════════════════════════════════════════════════
+  # PRIMITIVES — People (roles via edges, not enum)
+  # ══════════════════════════════════════════════════════════════════
+  person: { server: local, graph: vcos, query: get_person, args: [slug], format: kv }
+  search-people: { server: local, graph: vcos, query: search_people, args: [q] }
+  team: { server: local, graph: vcos, query: team }
+  founders: { server: local, graph: vcos, query: founders }
+  founders-enriched: { server: local, graph: vcos, query: founders_enriched }
+  lp-contacts: { server: local, graph: vcos, query: lp_contacts }
+  acquirer-decision-makers: { server: local, graph: vcos, query: acquirer_decision_makers }
+  deal-role-participants: { server: local, graph: vcos, query: deal_role_participants }
+  person-works-at: { server: local, graph: vcos, query: person_works_at, args: [slug] }
+  person-founder-of: { server: local, graph: vcos, query: person_founder_of, args: [slug] }
+  person-board-seats: { server: local, graph: vcos, query: person_board_seats, args: [slug] }
+  person-role-in-deal: { server: local, graph: vcos, query: person_role_in_deal, args: [slug] }
+  person-decision-maker-at: { server: local, graph: vcos, query: person_decision_maker_at, args: [slug] }
+  # Network-leverage queries. For full "who can intro me?" coverage, call both
+  # intro-direct-to-founder (1-hop) and intro-path-to-founder (2-hop bridge).
+  intro-direct-to-founder: { server: local, graph: vcos, query: intro_direct_to_founder, args: [slug] }
+  intro-path-to-founder: { server: local, graph: vcos, query: intro_path_to_founder, args: [slug] }
+  direct-team-knowers: { server: local, graph: vcos, query: direct_team_knowers, args: [slug] }
+  close-network: { server: local, graph: vcos, query: close_network, args: [slug] }
+  person-decisions: { server: local, graph: vcos, query: person_decisions, args: [slug] }
+  person-open-commitments: { server: local, graph: vcos, query: person_open_commitments, args: [slug] }
+  person-commitments-for: { server: local, graph: vcos, query: person_commitments_for, args: [slug] }
+  person-signals: { server: local, graph: vcos, query: person_signals, args: [slug] }
+
+  # ══════════════════════════════════════════════════════════════════
+  # PRIMITIVES — Signals
+  # ══════════════════════════════════════════════════════════════════
+  signal: { server: local, graph: vcos, query: get_signal, args: [slug], format: kv }
+  signals-by-kind: { server: local, graph: vcos, query: signals_by_kind, args: [kind] }
+  search-signals: { server: local, graph: vcos, query: search_signals, args: [q] }
+  signal-organization: { server: local, graph: vcos, query: signal_organization, args: [slug] }
+  signal-person: { server: local, graph: vcos, query: signal_person, args: [slug] }
+  signal-market: { server: local, graph: vcos, query: signal_market, args: [slug] }
+  signal-deal: { server: local, graph: vcos, query: signal_deal, args: [slug] }
+  signal-artifact: { server: local, graph: vcos, query: signal_artifact, args: [slug] }
+  signal-supports-assumptions: { server: local, graph: vcos, query: signal_supports_assumptions, args: [slug] }
+  signal-contradicts-assumptions: { server: local, graph: vcos, query: signal_contradicts_assumptions, args: [slug] }
+  signal-supports-theses: { server: local, graph: vcos, query: signal_supports_theses, args: [slug] }
+  signal-contradicts-theses: { server: local, graph: vcos, query: signal_contradicts_theses, args: [slug] }
+  signal-informs-questions: { server: local, graph: vcos, query: signal_informs_questions, args: [slug] }
+
+  # ══════════════════════════════════════════════════════════════════
+  # PRIMITIVES — Beliefs (Thesis / Assumption / Question)
+  # ══════════════════════════════════════════════════════════════════
+  thesis: { server: local, graph: vcos, query: get_thesis, args: [slug], format: kv }
+  theses-active: { server: local, graph: vcos, query: theses_active }
+  theses-contradicted: { server: local, graph: vcos, query: theses_contradicted }
+  theses-retired: { server: local, graph: vcos, query: theses_retired }
+  thesis-assumptions: { server: local, graph: vcos, query: thesis_assumptions, args: [slug] }
+  thesis-supporting-signals: { server: local, graph: vcos, query: thesis_supporting_signals, args: [slug] }
+  thesis-contradicting-signals: { server: local, graph: vcos, query: thesis_contradicting_signals, args: [slug] }
+  thesis-market: { server: local, graph: vcos, query: thesis_market, args: [slug] }
+  thesis-organizations: { server: local, graph: vcos, query: thesis_organizations, args: [slug] }
+  thesis-deals: { server: local, graph: vcos, query: thesis_deals, args: [slug] }
+  thesis-contradictions-via-assumptions: { server: local, graph: vcos, query: thesis_contradictions_via_assumptions, args: [slug] }
+  assumption: { server: local, graph: vcos, query: get_assumption, args: [slug], format: kv }
+  assumptions-by-level: { server: local, graph: vcos, query: assumptions_by_level, args: [level] }
+  assumption-supports: { server: local, graph: vcos, query: assumption_supports, args: [slug] }
+  assumption-contradictions: { server: local, graph: vcos, query: assumption_contradictions, args: [slug] }
+  assumption-theses: { server: local, graph: vcos, query: assumption_theses, args: [slug] }
+  assumption-decisions: { server: local, graph: vcos, query: assumption_decisions, args: [slug] }
+  question: { server: local, graph: vcos, query: get_question, args: [slug], format: kv }
+  questions-by-status: { server: local, graph: vcos, query: questions_by_status, args: [status] }
+  question-signals: { server: local, graph: vcos, query: question_signals, args: [slug] }
+  question-decisions: { server: local, graph: vcos, query: question_decisions, args: [slug] }
+  question-deal: { server: local, graph: vcos, query: question_deal, args: [slug] }
+
+  # ══════════════════════════════════════════════════════════════════
+  # PRIMITIVES — Decisions & Commitments
+  # ══════════════════════════════════════════════════════════════════
+  decision: { server: local, graph: vcos, query: get_decision, args: [slug], format: kv }
+  decisions-by-kind: { server: local, graph: vcos, query: decisions_by_kind, args: [kind] }
+  decision-deal: { server: local, graph: vcos, query: decision_deal, args: [slug] }
+  decision-thesis: { server: local, graph: vcos, query: decision_thesis, args: [slug] }
+  decision-assumptions: { server: local, graph: vcos, query: decision_assumptions, args: [slug] }
+  decision-questions: { server: local, graph: vcos, query: decision_questions, args: [slug] }
+  decision-by-person: { server: local, graph: vcos, query: decision_by_person, args: [slug] }
+  commitment: { server: local, graph: vcos, query: get_commitment, args: [slug], format: kv }
+  commitments-open: { server: local, graph: vcos, query: commitments_open }
+  commitments-by-status: { server: local, graph: vcos, query: commitments_by_status, args: [status] }
+  commitment-for-person: { server: local, graph: vcos, query: commitment_for_person, args: [slug] }
+  commitment-assigned-to: { server: local, graph: vcos, query: commitment_assigned_to, args: [slug] }
+  commitment-deal: { server: local, graph: vcos, query: commitment_deal, args: [slug] }
+  commitment-artifact: { server: local, graph: vcos, query: commitment_artifact, args: [slug] }
+
+  # ══════════════════════════════════════════════════════════════════
+  # PRIMITIVES — Patterns & Lessons (reflexive layer)
+  # ══════════════════════════════════════════════════════════════════
+  pattern: { server: local, graph: vcos, query: get_pattern, args: [slug], format: kv }
+  patterns: { server: local, graph: vcos, query: patterns_all }
+  patterns-by-kind: { server: local, graph: vcos, query: patterns_by_kind, args: [kind] }
+  pattern-signals: { server: local, graph: vcos, query: pattern_signals, args: [slug] }
+  pattern-decisions: { server: local, graph: vcos, query: pattern_decisions, args: [slug] }
+  pattern-organizations: { server: local, graph: vcos, query: pattern_organizations, args: [slug] }
+  pattern-insights: { server: local, graph: vcos, query: pattern_insights, args: [slug] }
+  lesson: { server: local, graph: vcos, query: get_lesson, args: [slug], format: kv }
+  lessons-active: { server: local, graph: vcos, query: lessons_active }
+  lessons-tentative: { server: local, graph: vcos, query: lessons_tentative }
+  lessons-by-kind: { server: local, graph: vcos, query: lessons_by_kind, args: [kind] }
+  lesson-pattern: { server: local, graph: vcos, query: lesson_pattern, args: [slug] }
+  lesson-markets: { server: local, graph: vcos, query: lesson_markets, args: [slug] }
+  lessons-for-market: { server: local, graph: vcos, query: lessons_for_market, args: [slug] }
+  protocols: { server: local, graph: vcos, query: protocols }
+
+  # ══════════════════════════════════════════════════════════════════
+  # PRIMITIVES — Meetings (operational layer)
+  # ══════════════════════════════════════════════════════════════════
+  meeting: { server: local, graph: vcos, query: get_meeting, args: [slug], format: kv }
+  meetings-recent: { server: local, graph: vcos, query: meetings_recent }
+  meetings-upcoming: { server: local, graph: vcos, query: meetings_upcoming }
+  meetings-by-kind: { server: local, graph: vcos, query: meetings_by_kind, args: [kind] }
+  meetings-by-status: { server: local, graph: vcos, query: meetings_by_status, args: [status] }
+  search-meetings: { server: local, graph: vcos, query: search_meetings, args: [q] }
+  meeting-deal: { server: local, graph: vcos, query: meeting_deal, args: [slug] }
+  meeting-organization: { server: local, graph: vcos, query: meeting_organization, args: [slug] }
+  meeting-thesis: { server: local, graph: vcos, query: meeting_thesis, args: [slug] }
+  meeting-market: { server: local, graph: vcos, query: meeting_market, args: [slug] }
+  meeting-attendees: { server: local, graph: vcos, query: meeting_attendees, args: [slug] }
+  meetings-attended-by: { server: local, graph: vcos, query: meetings_attended_by, args: [slug] }
+  meeting-artifacts: { server: local, graph: vcos, query: meeting_artifacts, args: [slug] }
+  meeting-decisions: { server: local, graph: vcos, query: meeting_decisions, args: [slug] }
+  meeting-commitments: { server: local, graph: vcos, query: meeting_commitments, args: [slug] }
+  meetings-with-organization: { server: local, graph: vcos, query: meetings_with_organization, args: [slug] }
+  meetings-via-deal-for-organization: { server: local, graph: vcos, query: meetings_via_deal_for_organization, args: [slug] }
+  meetings-with-deal: { server: local, graph: vcos, query: meetings_with_deal, args: [slug] }
+  meetings-with-thesis: { server: local, graph: vcos, query: meetings_with_thesis, args: [slug] }
+  board-meetings-for-organization: { server: local, graph: vcos, query: board_meetings_for_organization, args: [slug] }
+  upcoming-board-meetings-for-organization: { server: local, graph: vcos, query: upcoming_board_meetings_for_organization, args: [slug] }
+  ic-prep-meeting-history: { server: local, graph: vcos, query: ic_prep_meeting_history, args: [slug] }
+  ic-prep-open-commitments: { server: local, graph: vcos, query: ic_prep_open_commitments, args: [slug] }
+
+  # ══════════════════════════════════════════════════════════════════
+  # PRIMITIVES — Wiki (markdown artifacts pinned to git commits)
+  # ══════════════════════════════════════════════════════════════════
+  markdown-artifact: { server: local, graph: vcos, query: get_markdown_artifact, args: [slug], format: kv }
+  markdown-artifacts-recent: { server: local, graph: vcos, query: markdown_artifacts_recent }
+  markdown-artifacts-in-repo: { server: local, graph: vcos, query: markdown_artifacts_in_repo, args: [repo] }
+  markdown-artifacts-only: { server: local, graph: vcos, query: markdown_artifacts_only }
+  thesis-doc: { server: local, graph: vcos, query: thesis_doc, args: [slug], format: kv }
+  lesson-doc: { server: local, graph: vcos, query: lesson_doc, args: [slug], format: kv }
+  pattern-doc: { server: local, graph: vcos, query: pattern_doc, args: [slug], format: kv }
+  markdown-documents-thesis: { server: local, graph: vcos, query: markdown_documents_thesis, args: [slug] }
+  markdown-documents-lesson: { server: local, graph: vcos, query: markdown_documents_lesson, args: [slug] }
+  markdown-documents-pattern: { server: local, graph: vcos, query: markdown_documents_pattern, args: [slug] }
+  # Drift JTBD = set-diff on the caller side: active-for-review minus with-docs
+  # = the set that needs partner attention. Omnigraph 0.4 has no NOT-EXISTS.
+  theses-active-for-doc-review: { server: local, graph: vcos, query: theses_active_for_doc_review }
+  theses-with-docs: { server: local, graph: vcos, query: theses_with_docs }
+  lessons-active-for-doc-review: { server: local, graph: vcos, query: lessons_active_for_doc_review }
+  lessons-with-docs: { server: local, graph: vcos, query: lessons_with_docs }
+
+  # ══════════════════════════════════════════════════════════════════
+  # PRIMITIVES — Sources (provenance + reliability)
+  # ══════════════════════════════════════════════════════════════════
+  # Sources are Organizations with kind in (publisher, database, expert-network)
+  # and a `reliability` rating. Reliability drops trigger downstream-signal revalidation.
+  # 0.4 has no enum-IN filter, so "all sources" is the union of publishers + databases + expert-networks.
+  source: { server: local, graph: vcos, query: get_source, args: [slug], format: kv }
+  publishers: { server: local, graph: vcos, query: publishers }
+  databases: { server: local, graph: vcos, query: databases }
+  expert-networks: { server: local, graph: vcos, query: expert_networks }
+  sources-by-reliability: { server: local, graph: vcos, query: sources_by_reliability, args: [reliability] }
+  sources-by-kind: { server: local, graph: vcos, query: sources_by_kind, args: [kind] }
+  source-artifacts: { server: local, graph: vcos, query: source_artifacts, args: [slug] }
+  source-downstream-signals: { server: local, graph: vcos, query: source_downstream_signals, args: [slug] }
+  artifact-source: { server: local, graph: vcos, query: artifact_source, args: [slug] }
+
+  # ══════════════════════════════════════════════════════════════════
+  # MUTATIONS — nodes
+  # ══════════════════════════════════════════════════════════════════
+  add-organization: { server: local, graph: vcos, query: add_organization, args: [slug, name, kind, createdAt, updatedAt] }
+  add-person: { server: local, graph: vcos, query: add_person, args: [slug, name, createdAt, updatedAt] }
+  add-market: { server: local, graph: vcos, query: add_market, args: [slug, name, createdAt, updatedAt] }
+  add-deal: { server: local, graph: vcos, query: add_deal, args: [slug, name, stage, outcome, createdAt, updatedAt] }
+  add-fund: { server: local, graph: vcos, query: add_fund, args: [slug, name, createdAt, updatedAt] }
+  add-artifact: { server: local, graph: vcos, query: add_artifact, args: [slug, name, kind, source, source_app, date, captured_at, createdAt, updatedAt] }
+  add-meeting: { server: local, graph: vcos, query: add_meeting, args: [slug, name, kind, scheduled_at, status, createdAt, updatedAt] }
+  add-markdown-artifact: { server: local, graph: vcos, query: add_markdown_artifact, args: [slug, name, kind, source, repo, path, commit_sha, branch, url, body, date, captured_at, last_synced_at, createdAt, updatedAt] }
+  add-thesis: { server: local, graph: vcos, query: add_thesis, args: [slug, name, status, createdAt, updatedAt] }
+  add-assumption: { server: local, graph: vcos, query: add_assumption, args: [slug, name, level, createdAt, updatedAt] }
+  add-question: { server: local, graph: vcos, query: add_question, args: [slug, name, status, createdAt, updatedAt] }
+  add-signal: { server: local, graph: vcos, query: add_signal, args: [slug, name, kind, date, stagingTimestamp, createdAt, updatedAt] }
+  add-insight: { server: local, graph: vcos, query: add_insight, args: [slug, name, kind, createdAt, updatedAt] }
+  add-insight-with-stance: { server: local, graph: vcos, query: add_insight_with_stance, args: [slug, name, kind, stance, summary, createdAt, updatedAt] }
+  add-publisher-organization: { server: local, graph: vcos, query: add_publisher_organization, args: [slug, name, kind, reliability, createdAt, updatedAt] }
+  add-chunk: { server: local, graph: vcos, query: add_chunk, args: [slug, text, chunk_index, createdAt] }
+  add-decision: { server: local, graph: vcos, query: add_decision, args: [slug, name, kind, createdAt, updatedAt] }
+  add-commitment: { server: local, graph: vcos, query: add_commitment, args: [slug, name, status, createdAt, updatedAt] }
+  add-pattern: { server: local, graph: vcos, query: add_pattern, args: [slug, name, kind, createdAt, updatedAt] }
+  add-lesson: { server: local, graph: vcos, query: add_lesson, args: [slug, name, kind, body, status, createdAt, updatedAt] }
+
+  # ══════════════════════════════════════════════════════════════════
+  # MUTATIONS — edges
+  # ══════════════════════════════════════════════════════════════════
+  link-deal-organization: { server: local, graph: vcos, query: link_deal_organization, args: [deal, organization] }
+  link-deal-fund: { server: local, graph: vcos, query: link_deal_fund, args: [deal, fund] }
+  link-deal-lead: { server: local, graph: vcos, query: link_deal_lead, args: [deal, person] }
+  link-deal-thesis: { server: local, graph: vcos, query: link_deal_thesis, args: [deal, thesis] }
+  link-deal-market: { server: local, graph: vcos, query: link_deal_market, args: [deal, market] }
+  link-deal-lead-investor: { server: local, graph: vcos, query: link_deal_lead_investor, args: [deal, organization] }
+  link-deal-participant: { server: local, graph: vcos, query: link_deal_participant, args: [deal, organization] }
+  link-knows: { server: local, graph: vcos, query: link_knows, args: [from, to] }
+  link-works-at: { server: local, graph: vcos, query: link_works_at, args: [from, to] }
+  link-founder-of: { server: local, graph: vcos, query: link_founder_of, args: [person, organization] }
+  link-board-member-at: { server: local, graph: vcos, query: link_board_member_at, args: [person, organization] }
+  link-role-in-deal: { server: local, graph: vcos, query: link_role_in_deal, args: [person, deal] }
+  link-decision-maker-at: { server: local, graph: vcos, query: link_decision_maker_at, args: [person, organization] }
+  link-would-acquire: { server: local, graph: vcos, query: link_would_acquire, args: [from, to] }
+  link-lp-in-fund: { server: local, graph: vcos, query: link_lp_in_fund, args: [organization, fund] }
+  link-organization-in-market: { server: local, graph: vcos, query: link_organization_in_market, args: [organization, market] }
+  link-signal-about-organization: { server: local, graph: vcos, query: link_signal_about_organization, args: [signal, organization] }
+  link-signal-about-person: { server: local, graph: vcos, query: link_signal_about_person, args: [signal, person] }
+  link-signal-about-market: { server: local, graph: vcos, query: link_signal_about_market, args: [signal, market] }
+  link-signal-about-deal: { server: local, graph: vcos, query: link_signal_about_deal, args: [signal, deal] }
+  link-supports-thesis: { server: local, graph: vcos, query: link_supports_thesis, args: [signal, thesis] }
+  link-contradicts-thesis: { server: local, graph: vcos, query: link_contradicts_thesis, args: [signal, thesis] }
+  link-supports-assumption: { server: local, graph: vcos, query: link_supports_assumption, args: [signal, assumption] }
+  link-contradicts-assumption: { server: local, graph: vcos, query: link_contradicts_assumption, args: [signal, assumption] }
+  link-informs-question: { server: local, graph: vcos, query: link_informs_question, args: [signal, question] }
+  link-thesis-relies-on-assumption: { server: local, graph: vcos, query: link_thesis_relies_on_assumption, args: [thesis, assumption] }
+  link-thesis-about-market: { server: local, graph: vcos, query: link_thesis_about_market, args: [thesis, market] }
+  link-thesis-about-organization: { server: local, graph: vcos, query: link_thesis_about_organization, args: [thesis, organization] }
+  link-question-about-deal: { server: local, graph: vcos, query: link_question_about_deal, args: [question, deal] }
+  link-insight-about-deal: { server: local, graph: vcos, query: link_insight_about_deal, args: [insight, deal] }
+  link-insight-about-organization: { server: local, graph: vcos, query: link_insight_about_organization, args: [insight, organization] }
+  link-insight-about-person: { server: local, graph: vcos, query: link_insight_about_person, args: [insight, person] }
+  link-insight-highlights-pattern: { server: local, graph: vcos, query: link_insight_highlights_pattern, args: [insight, pattern] }
+  link-insight-relies-on-signal: { server: local, graph: vcos, query: link_insight_relies_on_signal, args: [insight, signal] }
+  link-signal-sourced-from-artifact: { server: local, graph: vcos, query: link_signal_sourced_from_artifact, args: [signal, artifact] }
+  link-published-by-organization: { server: local, graph: vcos, query: link_published_by_organization, args: [artifact, organization] }
+  link-artifact-from-person: { server: local, graph: vcos, query: link_artifact_from_person, args: [artifact, person] }
+  link-artifact-about-deal: { server: local, graph: vcos, query: link_artifact_about_deal, args: [artifact, deal] }
+  link-artifact-about-organization: { server: local, graph: vcos, query: link_artifact_about_organization, args: [artifact, organization] }
+  link-artifact-mentions-person: { server: local, graph: vcos, query: link_artifact_mentions_person, args: [artifact, person] }
+  link-artifact-derived-from: { server: local, graph: vcos, query: link_artifact_derived_from, args: [from, to] }
+  link-artifact-documents-thesis: { server: local, graph: vcos, query: link_artifact_documents_thesis, args: [artifact, thesis] }
+  link-artifact-documents-lesson: { server: local, graph: vcos, query: link_artifact_documents_lesson, args: [artifact, lesson] }
+  link-artifact-documents-pattern: { server: local, graph: vcos, query: link_artifact_documents_pattern, args: [artifact, pattern] }
+  link-chunk-of-artifact: { server: local, graph: vcos, query: link_chunk_of_artifact, args: [chunk, artifact] }
+  link-decision-regarding-deal: { server: local, graph: vcos, query: link_decision_regarding_deal, args: [decision, deal] }
+  link-decision-regarding-thesis: { server: local, graph: vcos, query: link_decision_regarding_thesis, args: [decision, thesis] }
+  link-decision-based-on-assumption: { server: local, graph: vcos, query: link_decision_based_on_assumption, args: [decision, assumption] }
+  link-decision-needs-answer: { server: local, graph: vcos, query: link_decision_needs_answer, args: [decision, question] }
+  link-decision-by-person: { server: local, graph: vcos, query: link_decision_by_person, args: [decision, person] }
+  link-commitment-for-person: { server: local, graph: vcos, query: link_commitment_for_person, args: [commitment, person] }
+  link-commitment-regarding-deal: { server: local, graph: vcos, query: link_commitment_regarding_deal, args: [commitment, deal] }
+  link-commitment-assigned-to: { server: local, graph: vcos, query: link_commitment_assigned_to, args: [commitment, person] }
+  link-commitment-from-artifact: { server: local, graph: vcos, query: link_commitment_from_artifact, args: [commitment, artifact] }
+  link-pattern-across-decision: { server: local, graph: vcos, query: link_pattern_across_decision, args: [pattern, decision] }
+  link-pattern-across-signal: { server: local, graph: vcos, query: link_pattern_across_signal, args: [pattern, signal] }
+  link-pattern-across-organization: { server: local, graph: vcos, query: link_pattern_across_organization, args: [pattern, organization] }
+  link-lesson-distilled-from: { server: local, graph: vcos, query: link_lesson_distilled_from, args: [lesson, pattern] }
+  link-lesson-applies-to-market: { server: local, graph: vcos, query: link_lesson_applies_to_market, args: [lesson, market] }
+  link-meeting-about-deal: { server: local, graph: vcos, query: link_meeting_about_deal, args: [meeting, deal] }
+  link-meeting-about-organization: { server: local, graph: vcos, query: link_meeting_about_organization, args: [meeting, organization] }
+  link-meeting-about-thesis: { server: local, graph: vcos, query: link_meeting_about_thesis, args: [meeting, thesis] }
+  link-meeting-about-market: { server: local, graph: vcos, query: link_meeting_about_market, args: [meeting, market] }
+  link-meeting-attended-by: { server: local, graph: vcos, query: link_meeting_attended_by, args: [meeting, person] }
+  link-artifact-from-meeting: { server: local, graph: vcos, query: link_artifact_from_meeting, args: [artifact, meeting] }
+  link-decision-from-meeting: { server: local, graph: vcos, query: link_decision_from_meeting, args: [decision, meeting] }
+  link-commitment-from-meeting: { server: local, graph: vcos, query: link_commitment_from_meeting, args: [commitment, meeting] }

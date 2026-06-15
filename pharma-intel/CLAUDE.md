@@ -14,7 +14,7 @@ The reference seed is **Viking Therapeutics** (NASDAQ: VKTX), a public GLP-1/GIP
 - `README.md` — Reference seed description, schema essentials, quick start.
 - `seed.md` / `seed.jsonl` — Seed dataset (human-readable / loadable).
 - `queries/*.gq` — Read and mutation queries.
-- `omnigraph.yaml` — CLI config with aliases.
+- `omnigraph-config.example.yaml` — Example operator config (aliases). Merge its `aliases:` into your per-user `~/.omnigraph/config.yaml`; this cookbook ships no `omnigraph.yaml`.
 
 Omnigraph CLI/schema reference: [ModernRelay/omnigraph](https://github.com/ModernRelay/omnigraph).
 
@@ -92,8 +92,11 @@ The `lint` command validates both queries and schema against each other — use 
 `cluster.yaml` is the deployment: graph `pharma`, `schema.pg`, and every
 stored query, converged with `omnigraph cluster import|plan|apply --config .`
 (apply creates `graphs/pharma.omni`; schema edits show migration previews
-in plan; graph deletion is approval-gated). `omnigraph.yaml` is per-operator
-only — aliases, CLI defaults, `cli.actor` for `--as` attribution. Serve with
-`omnigraph-server --cluster .` (never reads omnigraph.yaml). Data still flows
-through `omnigraph load/mutate` against `graphs/pharma.omni`. Never commit
+in plan; graph deletion is approval-gated). Per-operator ergonomics (aliases,
+CLI defaults, identity) live in your per-user `~/.omnigraph/config.yaml`, NOT
+in this cookbook — merge the aliases from `omnigraph-config.example.yaml` into
+it. Aliases invoke stored queries (`omnigraph alias <name> [args]`), so they
+need a running server. Serve with `omnigraph-server --cluster .` (a cluster
+server never reads operator config). Data still flows through
+`omnigraph load/mutate` against `graphs/pharma.omni`. Never commit
 `__cluster/` or `graphs/` (gitignored — local state).
