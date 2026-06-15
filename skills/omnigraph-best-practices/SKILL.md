@@ -5,7 +5,7 @@ license: MIT (see LICENSE at repo root)
 compatibility: Requires omnigraph CLI >= 0.7.0 — the unified `load`, the two config surfaces (cluster.yaml + ~/.omnigraph/config.yaml), and cluster apply/serve all require 0.7.0.
 metadata:
   author: ModernRelay
-  version: "0.6.0"
+  version: "0.7.0"
   repository: https://github.com/ModernRelay/omnigraph-cookbooks
 ---
 

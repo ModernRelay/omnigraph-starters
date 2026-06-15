@@ -105,7 +105,7 @@ Branches exist for **data review**, not schema changes. Schema goes straight to 
 REPO=s3://my-bucket/repos/spike-intel
 
 # 1. Create feature branch from main
-omnigraph branch create --uri $REPO --from main staging-2026-04-14
+omnigraph branch create --from main staging-2026-04-14 $REPO
 
 # 2. Load delta onto the branch (merge mode is typical for review)
 omnigraph load --data delta.jsonl --branch staging-2026-04-14 --mode merge $REPO
@@ -114,10 +114,10 @@ omnigraph load --data delta.jsonl --branch staging-2026-04-14 --mode merge $REPO
 omnigraph query recent_signals --query queries/signals.gq --branch staging-2026-04-14
 
 # 4. Merge to main when happy
-omnigraph branch merge --uri $REPO staging-2026-04-14 --into main
+omnigraph branch merge staging-2026-04-14 --into main $REPO
 
 # 5. Optionally delete the branch
-omnigraph branch delete --uri $REPO staging-2026-04-14
+omnigraph branch delete staging-2026-04-14 $REPO
 ```
 
 ### Fork a branch in one shot with `--from`
@@ -143,19 +143,20 @@ For any bulk load that could disrupt downstream queries (overwriting a heavily-r
 omnigraph load --data risky.jsonl --branch recovery-2026-04-14 \
   --from main --mode overwrite $REPO
 # inspect, diff, verify reads
-omnigraph branch merge --uri $REPO recovery-2026-04-14 --into main
+omnigraph branch merge recovery-2026-04-14 --into main $REPO
 ```
 
 ## Branch Commands (quick reference)
 
 ```bash
-omnigraph branch create --uri $REPO --from main <branch-name>
-omnigraph branch list --uri $REPO
-omnigraph branch merge --uri $REPO <branch-name> --into main
-omnigraph branch delete --uri $REPO <branch-name>
+omnigraph branch create --from main <branch-name> $REPO
+omnigraph branch list $REPO
+omnigraph branch merge <branch-name> --into main $REPO
+omnigraph branch delete <branch-name> $REPO
 ```
 
-All support `--json` for automation-friendly output.
+All support `--json` for automation-friendly output. Address the graph with a
+positional `file://`/`s3://` URI (shown), `--store <uri>`, or `--server <name>`.
 
 ## Inspecting State After Changes
 
