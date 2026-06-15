@@ -30,29 +30,24 @@ edits.
 >
 > **Local and remote are one command.** `load` works against a local repo URI
 > (writing storage directly) *and* a remote `omnigraph-server` endpoint (the
-> server orchestrates the write and publishes one atomic commit). The old
-> "load is only supported against local repo URIs" rejection is gone as of
-> 0.7.0. See [`references/remote-ops.md`](remote-ops.md) for remote-specific
-> concerns (504 handling, write-verification ritual).
->
-> `ingest` is a **deprecated alias** of `load --from main --mode merge` — it
-> prints a warning and forwards to `load`. Use `load` directly.
+> server orchestrates the write and publishes one atomic commit). See
+> [`references/remote-ops.md`](remote-ops.md) for remote-specific concerns
+> (504 handling, write-verification ritual).
 
 ## `mutate` — Single Edits
 
-Goes through the running server via `cli.graph` (or an alias):
+Goes through the running server (the configured default graph, or an alias):
 
 ```bash
-omnigraph mutate \
+omnigraph mutate add_signal \
   --query mutations.gq \
-  --name add_signal \
   --params '{"slug":"sig-foo","name":"Foo","brief":"...","stagingTimestamp":"2026-04-14T00:00:00Z","createdAt":"2026-04-14T00:00:00Z","updatedAt":"2026-04-14T00:00:00Z"}'
 ```
 
 Or via an alias:
 
 ```bash
-omnigraph mutate --alias add-signal sig-foo "Foo" "..." 2026-04-14T00:00:00Z 2026-04-14T00:00:00Z 2026-04-14T00:00:00Z
+omnigraph alias add-signal sig-foo "Foo" "..." 2026-04-14T00:00:00Z 2026-04-14T00:00:00Z 2026-04-14T00:00:00Z
 ```
 
 Prefer `mutate` for interactive edits, mutations called from agents, and anything you want typechecked at call time.
@@ -113,10 +108,10 @@ REPO=s3://my-bucket/repos/spike-intel
 omnigraph branch create --uri $REPO --from main staging-2026-04-14
 
 # 2. Load delta onto the branch (merge mode is typical for review)
-omnigraph load --data delta.jsonl --branch staging-2026-04-14 --mode merge --uri $REPO
+omnigraph load --data delta.jsonl --branch staging-2026-04-14 --mode merge $REPO
 
 # 3. Verify on the branch (reads can target --branch or --snapshot)
-omnigraph query --alias recent-signals --branch staging-2026-04-14
+omnigraph query recent_signals --query queries/signals.gq --branch staging-2026-04-14
 
 # 4. Merge to main when happy
 omnigraph branch merge --uri $REPO staging-2026-04-14 --into main
@@ -130,7 +125,7 @@ omnigraph branch delete --uri $REPO staging-2026-04-14
 - Bare `load` operates on an existing branch (default `main`).
 - `load --from main --branch <name>` forks `<name>` from `main`, loads onto it, and leaves it for review — the whole review-branch flow in one command.
 
-Use `--from` for anything you want reviewed before it touches `main`. (`ingest` was the old name for `load --from main --mode merge`; it still works as a deprecated alias that forwards to `load`.)
+Use `--from` for anything you want reviewed before it touches `main`.
 
 ### Keep branches short-lived
 
@@ -146,7 +141,7 @@ For any bulk load that could disrupt downstream queries (overwriting a heavily-r
 
 ```bash
 omnigraph load --data risky.jsonl --branch recovery-2026-04-14 \
-  --from main --mode overwrite --uri $REPO
+  --from main --mode overwrite $REPO
 # inspect, diff, verify reads
 omnigraph branch merge --uri $REPO recovery-2026-04-14 --into main
 ```

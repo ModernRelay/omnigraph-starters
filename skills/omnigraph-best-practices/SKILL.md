@@ -82,8 +82,10 @@ omnigraph load --data delta.jsonl --from main --branch review --mode merge $GRAP
 ### Dispatching
 
 ```bash
-omnigraph query  --alias signal sig-foo          # or: --query file.gq --name get_signal --params '{...}'
-omnigraph mutate --alias add-signal sig-foo "Foo" "brief" 2026-04-14T00:00:00Z
+omnigraph alias  signal sig-foo                  # operator alias → its bound stored query (read or write)
+omnigraph query  get_signal --params '{"slug":"sig-foo"}'   # served stored query by name (verb asserts read vs write)
+omnigraph query  -e 'query q() { match { $s: Signal } return { $s.slug } limit 5 }'   # ad-hoc/inline (or: --query f.gq <name>)
+omnigraph mutate add_signal --query mutations.gq --params '{"slug":"sig-foo", ...}'   # name positional; ad-hoc file source
 omnigraph lint   --schema schema.pg --query queries/foo.gq    # after EVERY .gq/.pg edit (no server needed)
 ```
 
@@ -220,6 +222,42 @@ integer = @{ ASCII_DIGIT+ }
 bool_lit = { "true" | "false" }
 ```
 
+## CLI Reference (condensed)
+
+Notation: `<x>` required · `[x]` optional · `<a|b>` choice · `…` repeatable.
+
+**Global addressing flags**: `--as <actor>` (direct/`--store` writes only — a server resolves the actor from its token), `--server <name|url>`, `--cluster <dir|uri>` (cluster-managed storage, for maintenance), `--graph <id>` (selects the graph within a `--server` or `--cluster` scope), `--profile <name>` (`$OMNIGRAPH_PROFILE`), `--store <uri>`. Plus a positional `file://`/`s3://` URI and `--config <path>` on most graph commands. Output: `--json`, or reads take `--format <json|jsonl|csv|kv|table>`. **Write guards:** `--yes` skips the confirm prompt for a destructive write (`cleanup`, overwrite `load`, `branch delete`) against a non-local scope (it *refuses* without it when non-TTY or `--json`); `--quiet` suppresses the resolved-target echo.
+
+**Data plane** — `any` (served via `--server`/`--profile`, or direct via `--store`/URI):
+- `query` (alias `read`) `<name>` — a **served stored query** by name (via `--server`/`--profile`); or ad-hoc `[<name>] (--query <f.gq> | -e '<GQ>')` where `<name>` picks which query in the source. `[--params <json> | --params-file <p>] [--branch <b> | --snapshot <id>] [--format <fmt> | --json]`. No positional URI — address via `--server`/`--store`/`--profile`.
+- `mutate` (alias `change`) — same shape (served stored mutation by `<name>`, or ad-hoc `--query`/`-e`); `[--params …] [--branch <b>] [--json]`. The verb asserts kind: `query`→read, `mutate`→write (400 on mismatch).
+- `alias <name> [args…]` — invoke an operator alias's bound stored query (read or write); `[--params … | --params-file <p>] [--format <fmt> | --json]` (server/graph/query come from the binding)
+- `load --data <f.jsonl> --mode <overwrite|append|merge> [--branch <b>] [--from <base>] [--json]` — `--mode` required; `--from` forks a missing `--branch`
+- `snapshot [--branch <b>] [--json]`
+- `export [--branch <b>] [--type <T>…] [--table <K>…]` (streams JSONL)
+- `branch <create <name> [--from <base>] | list | delete <name> | merge <source> --into <target>> [--json]`
+- `commit <list [--branch <b>] | show <commit_id>> [--json]`
+- `schema <plan | apply> --schema <f.pg> [--allow-data-loss] [--json]` · `schema show` (alias `get`)
+
+**Served only** (needs `--server`/`--profile`): `graphs list [--json]`
+
+**Direct / storage** — reject `--server`; address by positional URI or `--cluster <dir|s3> --graph <id>`:
+- `init --schema <f.pg> <uri> [--force]`
+- `lint --query <f.gq> [--schema <f.pg>] [<uri>] [--json]` — offline with `--schema`, graph-backed with a URI
+- `optimize [--json]` · `repair [--confirm] [--force] [--json]` · `cleanup (--keep <N> | --older-than <7d>) --confirm [--json]`
+- `queries <validate [<uri>] | list> [--json]`
+
+**Control plane** — cluster (`--config <dir>`, default `.`):
+- `cluster <validate | plan | apply | status | refresh | import> [--config <dir>] [--json]`
+- `cluster approve <resource> --as <actor> [--config <dir>] [--json]` · `cluster force-unlock <lock_id> [--config <dir>] [--json]`
+
+**Local** (no graph):
+- `policy <validate | test | explain --actor <a> --action <act> [--branch <b> | --target-branch <b>]> [--config <p>]`
+- `embed --seed <embed.yaml> [--reembed_all | --clean | --select "<Type>:<field>=<value>"]`
+- `login <server> [--token <t>]` (prefer piping the token on stdin) · `logout <server>` · `config migrate [--write]` · `version`
+
+Pre-0.7.0 spellings (`read`/`change`/`ingest`, `--target`, positional `http://`) → [`references/migrations.md`](references/migrations.md).
+
 ## Five Ontology Design Criteria (Gruber 1993)
 
 Omnigraph schemas are ontologies. The canonical design criteria from Gruber's *Toward Principles for the Design of Ontologies Used for Knowledge Sharing* (Int. J. Human-Computer Studies 43:907–928) apply directly when authoring `.pg` files.
@@ -289,31 +327,32 @@ everything-explicit flag/env tier:
 ```yaml
 # ~/.omnigraph/config.yaml — per operator, never committed
 operator:
-  actor: act-andrew          # default --as identity (last hop: --as > legacy cli.actor > operator.actor)
+  actor: act-andrew          # default --as identity
 servers:
   intel-dev:
     url: https://graph.example.com    # no tokens here, ever
 defaults:
   output: table              # read-format default
+  server: intel-dev          # default served scope (or `store: file://…/g.omni` for a local default — mutually exclusive)
+  default_graph: spike       # graph within a server/cluster scope
+profiles:                    # optional named scope bundles — pick with --profile <name>
+  staging: { server: intel-staging, default_graph: spike }
 aliases:                     # personal bindings to TEAM stored queries (see references/aliases.md)
   triage: { server: intel-dev, graph: spike, query: weekly_triage, args: [since] }
 ```
 
-The operator config and credentials are **auto-discovered — no flag points at them**: the CLI reads `$OMNIGRAPH_HOME/config.yaml` (default `~/.omnigraph/config.yaml`), and an absent file is just an empty layer (zero-config). `$OMNIGRAPH_HOME` relocates the *directory* only, not a specific file. (`--config`/`$OMNIGRAPH_CONFIG` is a separate flag for the cluster/legacy/server config — not this.)
+The operator config and credentials are **auto-discovered — no flag points at them**: the CLI reads `$OMNIGRAPH_HOME/config.yaml` (default `~/.omnigraph/config.yaml`), and an absent file is just an empty layer (zero-config). `$OMNIGRAPH_HOME` relocates the *directory* only, not a specific file. (`--config`/`$OMNIGRAPH_CONFIG` is a separate flag for the cluster / server config — not this.)
 
 Credentials live outside config: `echo $TOKEN | omnigraph login intel-dev`
-writes `~/.omnigraph/credentials` (`0600`). Address a server with
-`--server intel-dev` (`--graph <id>` for multi-graph); the matching token
-resolves via `OMNIGRAPH_TOKEN_INTEL_DEV` → the credentials file → the legacy
-chain. Run data-plane CLI commands from a graph's project folder so relative
-`queries/`, `schema.pg`, and `.env.omni` paths resolve.
+writes `~/.omnigraph/credentials` (`0600`); the matching token resolves via
+`OMNIGRAPH_TOKEN_INTEL_DEV` or that file.
 
-> **Legacy `omnigraph.yaml` is deprecated (RFC-008).** It still works through
-> the deprecation window (loading it prints a deprecation notice; silence with
-> `OMNIGRAPH_SUPPRESS_YAML_DEPRECATION=1`). Run `omnigraph config migrate
-> [--write]` to split it — team half → `cluster.yaml`, personal half →
-> `~/.omnigraph/config.yaml`. `omnigraph init` no longer scaffolds it; new work
-> uses the two surfaces above.
+**Addressing a graph**: `--store <file://|s3:// uri>` or a positional URI for
+direct storage; `--server <name|url>` (+ `--graph <id>`) for a served remote;
+`--profile <name>` for a named bundle; else the operator `defaults`. A remote is
+addressed with `--server` (a bare `http(s)://` URL is not a graph address). Run
+data-plane commands from a graph's project folder so relative `queries/`,
+`schema.pg`, and `.env.omni` paths resolve.
 
 ### What to commit
 
@@ -350,14 +389,12 @@ These are the traps most likely to bite. Scan this table before debugging any pa
 | `mutation { ... }` wrapper in `.gq` | `parse error: expected query_file` at line 1 | Use `query <name>(...) { insert T { ... } }`; there is no top-level `mutation` keyword |
 | `--config` placed before subcommand | `unexpected argument --config` | Put `--config` **after** the subcommand (e.g. `omnigraph schema show --config X`) |
 | Reading a large schema via stdout-capped tool | Truncated, garbled, or duplicated output | `omnigraph schema show > /tmp/schema.pg` first; then read the file with offset/limit |
-| `omnigraph load` without `--mode` | error: `--mode` is required | Pass `--mode merge\|append\|overwrite` — there is no default (overwrite is destructive, so it is never implicit). `load` works against remote URIs now; the old "local repo URIs only" rejection is gone |
+| `omnigraph load` without `--mode` | error: `--mode` is required | Pass `--mode merge\|append\|overwrite` — there is no default (overwrite is destructive, so it is never implicit). `load` works against local and remote URIs |
 | Blind retry after 504 | Duplicate Signal/Decision/Claim (append-only types lack `@key` dedup) | `commit list --branch main --json` first; head advanced means it landed; only retry if unchanged |
 | `sync_branch()` mentioned in version-drift error | Searching for nonexistent CLI command | Server-internal directive in error text; just retry — the next call re-pins to the new head |
-| Stale empty branches at `main`'s head | 504-orphaned forks from a timed-out `load --from` (or the legacy `ingest`); eventually block writes | List branches, find ones at `main`'s `graph_commit_id`, `omnigraph branch delete --config X <name>` |
-| Top-level `policy:`/`queries:` with a **named** graph (`server.graph`/`--target`) | server refuses to boot with migration guidance (v0.6.1) | Nest under `graphs.<name>.policy` / `graphs.<name>.queries`. Top-level is valid **only** for an anonymous bare-URI single-graph server |
+| Stale empty branches at `main`'s head | 504-orphaned forks from a timed-out `load --from`; eventually block writes | List branches, find ones at `main`'s `graph_commit_id`, `omnigraph branch delete --config X <name>` |
+| Top-level `policy:`/`queries:` with a **named** graph (`server.graph`) | server refuses to boot with migration guidance (v0.6.1) | Nest under `graphs.<name>.policy` / `graphs.<name>.queries`. Top-level is valid **only** for an anonymous bare-URI single-graph server |
 | `omnigraph optimize` against a table with a `Blob` property | table is **skipped**, not failed (Lance blob-v2 compaction bug) | Expected — `--json` reports it under `skipped`; non-blob tables still compact |
-| `omnigraph init` writes no `omnigraph.yaml` | expected (RFC-008) — `init` stopped scaffolding it | Start a `cluster.yaml` from the `references/cluster.md` template, or `omnigraph config migrate` an existing legacy file |
-| Legacy `omnigraph.yaml` prints a deprecation block on load | expected (RFC-008); the file still works | `OMNIGRAPH_SUPPRESS_YAML_DEPRECATION=1` to silence in CI; `config migrate` to split it; `OMNIGRAPH_NO_LEGACY_CONFIG=1` to hard-error |
 | `@unique` on a `[List]`/`Blob` column | `load` now errors loudly (was silently un-enforced before #160) | Use `@unique` only on scalar columns (and composite `@unique(a, b)`, now keyed as a true tuple) — uniqueness needs a type that reduces to a scalar key |
 
 ## Deep Dives
@@ -376,4 +413,5 @@ For anything beyond the basics, load the relevant reference file. Each is self-c
 | [`references/aliases.md`](references/aliases.md) | Defining aliases for agents, structured output, JSON args |
 | [`references/stored-queries.md`](references/stored-queries.md) | Server-side stored-query registry (v0.6.1): `queries:` config, `omnigraph queries validate/list`, `GET /queries` + `POST /queries/{name}`, `invoke_query` Cedar gating, MCP exposure |
 | [`references/server-policy.md`](references/server-policy.md) | Starting the HTTP server, routes, bearer auth, Cedar policy gating, multi-graph mode |
-| [`references/commands.md`](references/commands.md) | `snapshot`, `export`, `commit list/show`, config resolution order |
+| [`references/commands.md`](references/commands.md) | `snapshot`, `export`, `commit list/show`, addressing & resolution |
+| [`references/migrations.md`](references/migrations.md) | Migrating a pre-0.7.0 setup, or you hit an old config/command/flag/route/error and need its current form |
