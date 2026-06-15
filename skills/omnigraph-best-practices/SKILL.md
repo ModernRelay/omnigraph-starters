@@ -83,6 +83,7 @@ omnigraph load --data delta.jsonl --from main --branch review --mode merge $GRAP
 
 ```bash
 omnigraph query  --alias signal sig-foo          # or: --query file.gq --name get_signal --params '{...}'
+omnigraph query  -e 'query q() { match { $s: Signal } return { $s.slug } limit 5 }'   # ad-hoc/inline (-e); excludes --alias/--query
 omnigraph mutate --alias add-signal sig-foo "Foo" "brief" 2026-04-14T00:00:00Z
 omnigraph lint   --schema schema.pg --query queries/foo.gq    # after EVERY .gq/.pg edit (no server needed)
 ```
