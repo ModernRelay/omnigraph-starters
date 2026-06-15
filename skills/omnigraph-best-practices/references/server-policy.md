@@ -33,6 +33,7 @@ The boot sources are mutually exclusive — a server boots from one, never a mer
 | `GET /export` | JSONL stream of a branch |
 | `POST /query` | read query execution |
 | `POST /mutate` | mutation execution |
+| `POST /load` | bulk JSONL load into a branch (canonical, RFC-009 Phase 5; 32 MB body limit). Branch creation opt-in via `from`. Supersedes `POST /ingest`, now a deprecated alias (`Deprecation: true` + `Link: </load>`) |
 | `GET /queries` | stored-query catalog (v0.6.1) — lists `mcp.expose` queries as a typed tool catalog; **read**-gated |
 | `POST /queries/{name}` | invoke a named stored query (v0.6.1); **`invoke_query`**-gated (+ `change` for a stored mutation); never accepts ad-hoc `.gq` from the client; deny == 404 |
 | `POST /schema/apply` | schema migration |
@@ -61,7 +62,7 @@ omnigraph query --server remote --graph spike --alias signal sig-foo
 
 `--server remote` resolves the URL from `~/.omnigraph/config.yaml`'s `servers:` and the token via `OMNIGRAPH_TOKEN_REMOTE` → the credentials file → the legacy chain. A token is only ever sent to the server it is keyed to.
 
-**Legacy token chain** (still honored for URLs that match no operator server): declare the env var holding the token in a legacy `omnigraph.yaml`'s `graphs.<name>.bearer_token_env`, `export` it, and target with `--target <name>`.
+**Legacy token chain** (still honored for URLs that match no operator server): declare the env var holding the token in a legacy `omnigraph.yaml`'s `graphs.<name>.bearer_token_env`, `export` it, and address the server by URL with `--server <url>` (the CLI `--target` flag was removed in 0.7.0).
 
 ### Running without auth requires an explicit opt-in
 
@@ -76,7 +77,7 @@ This is a guardrail against accidentally shipping an open server. For pure local
 
 ## Setup Operations Bypass the Server
 
-`init` and `load` write the repo on storage directly — they don't go through the server. Pass the repo URI:
+`init` and **local** `load` write storage directly — they don't go through the server (a **remote** `load` is server-orchestrated, POSTing `/load`). Pass the repo URI:
 
 ```bash
 omnigraph init --schema schema.pg s3://my-bucket/repos/<name>
@@ -126,7 +127,7 @@ For any shared repo, gate at least `schema_apply` and `branch_merge`.
 
 In **cluster mode** (recommended), Cedar bundles are declared in `cluster.yaml` and attach via `applies_to` (`[cluster]` server-level, `[<graph-id>]` per graph) — see *Cluster-Booted Servers* below. The `policy.yaml` rule format is identical in both modes. The classic single-graph server instead points at a policy file from the now-deprecated `omnigraph.yaml`:
 
-> **Config-follows-identity (v0.6.1, breaking).** A top-level `policy:` (and `queries:`) block applies **only** to an anonymous bare-URI single-graph server. A graph served **by name** — `server.graph: <name>` or `--target <name>` — must nest its policy under that graph:
+> **Config-follows-identity (v0.6.1, breaking).** A top-level `policy:` (and `queries:`) block applies **only** to an anonymous bare-URI single-graph server. A graph served **by name** — `server.graph: <name>` (or the `omnigraph-server` `--target <name>` boot flag) — must nest its policy under that graph:
 >
 > ```yaml
 > graphs:

@@ -92,8 +92,8 @@ deprecation window). Cluster commands read the operator config for **exactly
 one thing**: the actor default when `--as` is omitted (`--as` > legacy
 `cli.actor` > `operator.actor`). A `--cluster` server reads it for
 **nothing** — boot from cluster state XOR the operator file, never a merge.
-Point a `graphs.<name>.uri` (or use `--server`) at a derived root so aliases
-and targeting work against cluster-managed graphs — that is ergonomics, not
+Address a cluster-managed graph's data directly with `--store <storage>/graphs/<id>.omni`,
+or via `--server`/aliases against a serving instance — that is ergonomics, not
 coupling.
 
 ## Serving
@@ -127,5 +127,5 @@ in-container `cluster apply`.
 | Server refuses to boot | the error names its remedy (usually `cluster refresh` + `apply`, restart) |
 | `approval_stale` warning | re-run `cluster approve` — the plan changed since you approved |
 
-Full reference: the omnigraph repo's `docs/user/cluster.md` (operator guide)
-and `docs/user/cluster-config.md` (every key, flag, and diagnostic).
+Full reference: the omnigraph repo's `docs/user/clusters/index.md` (operator guide)
+and `docs/user/clusters/config.md` (every key, flag, and diagnostic).

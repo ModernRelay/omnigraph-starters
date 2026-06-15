@@ -295,6 +295,10 @@ servers:
     url: https://graph.example.com    # no tokens here, ever
 defaults:
   output: table              # read-format default
+  server: intel-dev          # the everyday scope when no address is given
+  default_graph: spike       # graph selected within a server/cluster scope
+profiles:                    # optional named scope bundles — pick with --profile <name>
+  staging: { server: intel-staging, default_graph: spike }
 aliases:                     # personal bindings to TEAM stored queries (see references/aliases.md)
   triage: { server: intel-dev, graph: spike, query: weekly_triage, args: [since] }
 ```
@@ -302,11 +306,16 @@ aliases:                     # personal bindings to TEAM stored queries (see ref
 The operator config and credentials are **auto-discovered — no flag points at them**: the CLI reads `$OMNIGRAPH_HOME/config.yaml` (default `~/.omnigraph/config.yaml`), and an absent file is just an empty layer (zero-config). `$OMNIGRAPH_HOME` relocates the *directory* only, not a specific file. (`--config`/`$OMNIGRAPH_CONFIG` is a separate flag for the cluster/legacy/server config — not this.)
 
 Credentials live outside config: `echo $TOKEN | omnigraph login intel-dev`
-writes `~/.omnigraph/credentials` (`0600`). Address a server with
-`--server intel-dev` (`--graph <id>` for multi-graph); the matching token
-resolves via `OMNIGRAPH_TOKEN_INTEL_DEV` → the credentials file → the legacy
-chain. Run data-plane CLI commands from a graph's project folder so relative
-`queries/`, `schema.pg`, and `.env.omni` paths resolve.
+writes `~/.omnigraph/credentials` (`0600`); the matching token resolves via
+`OMNIGRAPH_TOKEN_INTEL_DEV` → the credentials file → the legacy chain.
+
+**Addressing a graph** (RFC-011): `--store <file://|s3:// uri>` or a positional
+URI for direct storage; `--server <name|url>` (+ `--graph <id>`) for a served
+remote; `--profile <name>` for a named bundle; else the operator `defaults`. A
+remote **must** use `--server` — a positional `http(s)://` URL no longer
+dispatches, and the CLI `--target` flag was removed (the `omnigraph-server`
+`--target` *boot* flag is unchanged). Run data-plane commands from a graph's
+project folder so relative `queries/`, `schema.pg`, and `.env.omni` paths resolve.
 
 > **Legacy `omnigraph.yaml` is deprecated (RFC-008).** It still works through
 > the deprecation window (loading it prints a deprecation notice; silence with
@@ -354,7 +363,8 @@ These are the traps most likely to bite. Scan this table before debugging any pa
 | Blind retry after 504 | Duplicate Signal/Decision/Claim (append-only types lack `@key` dedup) | `commit list --branch main --json` first; head advanced means it landed; only retry if unchanged |
 | `sync_branch()` mentioned in version-drift error | Searching for nonexistent CLI command | Server-internal directive in error text; just retry — the next call re-pins to the new head |
 | Stale empty branches at `main`'s head | 504-orphaned forks from a timed-out `load --from` (or the legacy `ingest`); eventually block writes | List branches, find ones at `main`'s `graph_commit_id`, `omnigraph branch delete --config X <name>` |
-| Top-level `policy:`/`queries:` with a **named** graph (`server.graph`/`--target`) | server refuses to boot with migration guidance (v0.6.1) | Nest under `graphs.<name>.policy` / `graphs.<name>.queries`. Top-level is valid **only** for an anonymous bare-URI single-graph server |
+| Top-level `policy:`/`queries:` with a **named** graph (`server.graph`) | server refuses to boot with migration guidance (v0.6.1) | Nest under `graphs.<name>.policy` / `graphs.<name>.queries`. Top-level is valid **only** for an anonymous bare-URI single-graph server |
+| `omnigraph query --target …`, or a positional `http(s)://` URL to a data verb | `--target` was removed from the CLI; a positional `http(s)://` URL no longer dispatches to a server (RFC-011) | Address a remote with `--server <name\|url>` (+ `--graph <id>`); use `--store`/positional `file://`·`s3://` for direct storage. The `omnigraph-server --target` **boot** flag is unchanged |
 | `omnigraph optimize` against a table with a `Blob` property | table is **skipped**, not failed (Lance blob-v2 compaction bug) | Expected — `--json` reports it under `skipped`; non-blob tables still compact |
 | `omnigraph init` writes no `omnigraph.yaml` | expected (RFC-008) — `init` stopped scaffolding it | Start a `cluster.yaml` from the `references/cluster.md` template, or `omnigraph config migrate` an existing legacy file |
 | Legacy `omnigraph.yaml` prints a deprecation block on load | expected (RFC-008); the file still works | `OMNIGRAPH_SUPPRESS_YAML_DEPRECATION=1` to silence in CI; `config migrate` to split it; `OMNIGRAPH_NO_LEGACY_CONFIG=1` to hard-error |

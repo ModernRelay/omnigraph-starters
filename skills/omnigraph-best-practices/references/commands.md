@@ -162,7 +162,7 @@ omnigraph queries validate              # type-check the stored-query registry v
 omnigraph queries list                  # list registry query names, MCP exposure, and typed params
 ```
 
-`validate` opens the selected graph and type-checks every query in the `queries:` block — catches schema drift without restarting the server. `list` prints the selected registry. Select the registry with `--target <graph>` or `cli.graph`; with no graph selected, `list` shows only the top-level `queries:` block. Distinct from `lint` (which validates a single `.gq` file). See `references/stored-queries.md`.
+`validate` opens the selected graph and type-checks every query in the `queries:` block — catches schema drift without restarting the server. `list` prints the selected registry. Select the graph with `--store <uri>` or a positional URI (or legacy `cli.graph`); with no graph selected, `list` shows only the top-level `queries:` block. Distinct from `lint` (which validates a single `.gq` file). See `references/stored-queries.md`.
 
 ## Operator Config & Credentials (0.7.0)
 
@@ -174,14 +174,18 @@ omnigraph config migrate [--write]         # split a legacy omnigraph.yaml → c
 
 The operator config and `~/.omnigraph/credentials` are **auto-discovered — there is no flag to point at them.** `$OMNIGRAPH_HOME` relocates the `~/.omnigraph` *directory* (mainly for test isolation; not a way to pass a specific file path), and an absent file is just an empty layer (zero-config). Separately, `$OMNIGRAPH_CONFIG` stands in for the `--config` flag — which targets the **cluster directory / legacy `omnigraph.yaml` / server config**, never the operator config. See SKILL.md → *The two config surfaces*.
 
-## Config Resolution Order
+## Addressing a Graph
 
-When the CLI decides which graph to target:
+How the CLI resolves which graph a data command (`query`, `mutate`, `load`, `branch`, …) runs against (RFC-011, 0.7.0). Two breaking changes from earlier versions: **`--target` was removed from the CLI** (the `omnigraph-server` `--target` *boot* flag is unchanged), and a **positional `http(s)://` URL no longer dispatches to a server** — address a remote with `--server`.
 
-1. **Explicit `--uri` or positional URI** wins
-2. **`--server <name>`** (with optional `--graph <id>`) selects an operator-defined endpoint from `~/.omnigraph/config.yaml` — the modern remote path
-3. **`--target <name>`** selects a named graph from a legacy `omnigraph.yaml`
-4. **Config default (`cli.graph`)** wins last
+Precedence (highest first):
+
+1. **`--store <uri>`** or a **positional `file://`/`s3://` URI** — direct storage access (bypasses any server; no catalog, so stored-query *names* don't resolve). `--store` is exclusive with a positional URI and with `--server`.
+2. **`--server <name|url>`** (+ `--graph <id>` for a multi-graph server) — served/remote. A name resolves from `servers:` in `~/.omnigraph/config.yaml`; a literal `http(s)://` URL also works.
+3. **`--profile <name>`** (or `$OMNIGRAPH_PROFILE`) — a named scope bundle from `profiles:` in the operator config (binds one of server/cluster/store + a default graph).
+4. **Operator defaults** (`defaults.server` + `defaults.default_graph`), then the legacy `omnigraph.yaml` `cli.graph` (deprecated).
+
+Control-plane commands use `--config <dir>` (cluster); maintenance against a cluster-managed graph uses `--cluster <dir|s3://> --cluster-graph <id>`. Each command declares a **capability** — `any` / `served` / `direct` / `control` / `local` — shown in `omnigraph --help`; mis-addressing (e.g. `--server` on a `direct` verb, or a remote URI to `optimize`) fails loudly.
 
 For queries:
 

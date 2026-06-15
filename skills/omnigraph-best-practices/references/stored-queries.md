@@ -10,7 +10,7 @@ Each entry's **key must equal the `query <name>` symbol inside the `.gq` file**.
 
 ### Per-graph (named graphs)
 
-A graph served by name (`server.graph` / `--target`) carries its registry under `graphs.<name>.queries`:
+A graph served by name (`server.graph`) carries its registry under `graphs.<name>.queries`:
 
 ```yaml
 graphs:
@@ -46,7 +46,7 @@ omnigraph queries list         # print the selected registry: query names, MCP e
 ```
 
 - `validate` catches schema drift **without restarting the server** — run it after a `schema apply` or before deploying a config change. The server also runs this check at startup and **refuses to boot** on drift or on a duplicate MCP tool name.
-- Select the registry with `--target <graph>` or `cli.graph`. With no graph selected, `list` shows only the top-level `queries:` block.
+- Select the graph with `--store <uri>` or a positional URI (or legacy `cli.graph`). With no graph selected, `list` shows only the top-level `queries:` block.
 - `queries` is distinct from `lint` — `lint` validates a single `.gq` file you point it at; `queries validate` validates the registry the server will actually serve.
 
 ## HTTP surface

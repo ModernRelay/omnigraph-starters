@@ -271,7 +271,7 @@ query add_and_link($slug: String, $pattern: String, $createdAt: DateTime, $updat
 
 There's no `upsert` keyword at the query level — use `load --mode merge` for bulk upsert.
 
-> **Insert/update-only OR delete-only (the D₂ rule).** A single mutation query may contain inserts and updates, **or** deletes — never both. Mixing a `delete` with an `insert`/`update` in the same query is rejected at parse time. (Inserts/updates go through a staged two-phase publish; deletes inline-commit because Lance has no public two-phase delete, so they can't share one atomic statement.) Split a delete-then-insert into two separate mutations.
+> **Insert/update-only OR delete-only (the D₂ rule).** A single mutation query may contain inserts and updates, **or** deletes — never both. Mixing a `delete` with an `insert`/`update` in the same query is rejected at parse time. (Inserts/updates go through a staged two-phase publish; deletes inline-commit — omnigraph doesn't yet use Lance's two-phase delete API (it shipped in Lance 7.0.0 but isn't wired in) — so they can't share one atomic statement.) Split a delete-then-insert into two separate mutations.
 
 ### Date and DateTime values
 
