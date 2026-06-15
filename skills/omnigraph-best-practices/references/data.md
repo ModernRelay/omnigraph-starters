@@ -48,7 +48,7 @@ omnigraph mutate \
 Or via an alias:
 
 ```bash
-omnigraph mutate --alias add-signal sig-foo "Foo" "..." 2026-04-14T00:00:00Z 2026-04-14T00:00:00Z 2026-04-14T00:00:00Z
+omnigraph alias add-signal sig-foo "Foo" "..." 2026-04-14T00:00:00Z 2026-04-14T00:00:00Z 2026-04-14T00:00:00Z
 ```
 
 Prefer `mutate` for interactive edits, mutations called from agents, and anything you want typechecked at call time.
@@ -112,7 +112,7 @@ omnigraph branch create --uri $REPO --from main staging-2026-04-14
 omnigraph load --data delta.jsonl --branch staging-2026-04-14 --mode merge --uri $REPO
 
 # 3. Verify on the branch (reads can target --branch or --snapshot)
-omnigraph query --alias recent-signals --branch staging-2026-04-14
+omnigraph query --query queries/signals.gq --name recent_signals --branch staging-2026-04-14
 
 # 4. Merge to main when happy
 omnigraph branch merge --uri $REPO staging-2026-04-14 --into main

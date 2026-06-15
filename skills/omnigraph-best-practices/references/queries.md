@@ -58,7 +58,7 @@ omnigraph query --query signals.gq --name get_signal --params '{"slug":"sig-foo"
 
 The compiler typechecks parameter values against declared types.
 
-> For one-off/ad-hoc execution, pass the query inline instead of a file with `-e/--query-string` (v0.6.0+): `omnigraph query -e 'query q($slug: String){ match { $s: Signal { slug: $slug } } return { $s.name } }' --params '{"slug":"sig-foo"}'` (and `omnigraph mutate -e '...'`). `-e` is mutually exclusive with `--query <file>` and `--alias` — exactly one is required.
+> For one-off/ad-hoc execution, pass the query inline instead of a file with `-e/--query-string` (v0.6.0+): `omnigraph query -e 'query q($slug: String){ match { $s: Signal { slug: $slug } } return { $s.name } }' --params '{"slug":"sig-foo"}'` (and `omnigraph mutate -e '...'`). `-e` is mutually exclusive with `--query <file>` — exactly one of the two is required. (Operator aliases are invoked via the separate `omnigraph alias <name>` subcommand.)
 
 ## Query Structure
 

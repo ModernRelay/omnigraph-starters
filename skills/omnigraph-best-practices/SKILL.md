@@ -82,9 +82,9 @@ omnigraph load --data delta.jsonl --from main --branch review --mode merge $GRAP
 ### Dispatching
 
 ```bash
-omnigraph query  --alias signal sig-foo          # or: --query file.gq --name get_signal --params '{...}'
-omnigraph query  -e 'query q() { match { $s: Signal } return { $s.slug } limit 5 }'   # ad-hoc/inline (-e); excludes --alias/--query
-omnigraph mutate --alias add-signal sig-foo "Foo" "brief" 2026-04-14T00:00:00Z
+omnigraph alias  signal sig-foo                  # invoke an operator alias (a bound stored query — read or write)
+omnigraph query  -e 'query q() { match { $s: Signal } return { $s.slug } limit 5 }'   # ad-hoc/inline; or --query file.gq --name get_signal
+omnigraph mutate --query mutations.gq --name add_signal --params '{"slug":"sig-foo", ...}'
 omnigraph lint   --schema schema.pg --query queries/foo.gq    # after EVERY .gq/.pg edit (no server needed)
 ```
 
@@ -225,11 +225,12 @@ bool_lit = { "true" | "false" }
 
 Notation: `<x>` required · `[x]` optional · `<a|b>` choice · `…` repeatable.
 
-**Global addressing flags** (graph commands): `--as <actor>` (direct/`--store` writes only — a server resolves the actor from its token), `--server <name|url>`, `--graph <id>` (requires `--server`), `--profile <name>` (`$OMNIGRAPH_PROFILE`), `--store <uri>`. Most graph commands also accept a positional `file://`/`s3://` URI and `--config <path>`. Output: `--json`, or reads take `--format <json|jsonl|csv|kv|table>`.
+**Global addressing flags**: `--as <actor>` (direct/`--store` writes only — a server resolves the actor from its token), `--server <name|url>`, `--cluster <dir|uri>` (cluster-managed storage, for maintenance), `--graph <id>` (selects the graph within a `--server` or `--cluster` scope), `--profile <name>` (`$OMNIGRAPH_PROFILE`), `--store <uri>`. Plus a positional `file://`/`s3://` URI and `--config <path>` on most graph commands. Output: `--json`, or reads take `--format <json|jsonl|csv|kv|table>`. **Write guards:** `--yes` skips the confirm prompt for a destructive write (`cleanup`, overwrite `load`, `branch delete`) against a non-local scope (it *refuses* without it when non-TTY or `--json`); `--quiet` suppresses the resolved-target echo.
 
 **Data plane** — `any` (served via `--server`/`--profile`, or direct via `--store`/URI):
-- `query` (alias `read`) `(--alias <n> [args…] | --query <f.gq> --name <n> | -e '<GQ>')` `[--params <json> | --params-file <p>] [--branch <b> | --snapshot <id>] [--format <fmt> | --json]`
+- `query` (alias `read`) `(--query <f.gq> --name <n> | -e '<GQ>')` `[--params <json> | --params-file <p>] [--branch <b> | --snapshot <id>] [--format <fmt> | --json]`
 - `mutate` (alias `change`) — same source + `--params` flags; `[--branch <b>] [--json]`
+- `alias <name> [args…]` — invoke an operator alias's bound stored query (read or write); `[--params … | --params-file <p>] [--format <fmt> | --json]` (server/graph/query come from the binding)
 - `load --data <f.jsonl> --mode <overwrite|append|merge> [--branch <b>] [--from <base>] [--json]` — `--mode` required; `--from` forks a missing `--branch`
 - `snapshot [--branch <b>] [--json]`
 - `export [--branch <b>] [--type <T>…] [--table <K>…]` (streams JSONL)
@@ -239,7 +240,7 @@ Notation: `<x>` required · `[x]` optional · `<a|b>` choice · `…` repeatable
 
 **Served only** (needs `--server`/`--profile`): `graphs list [--json]`
 
-**Direct / storage** — reject `--server`; address by positional URI or `--cluster <dir|s3> --cluster-graph <id>`:
+**Direct / storage** — reject `--server`; address by positional URI or `--cluster <dir|s3> --graph <id>`:
 - `init --schema <f.pg> <uri> [--force]`
 - `lint --query <f.gq> [--schema <f.pg>] [<uri>] [--json]` — offline with `--schema`, graph-backed with a URI
 - `optimize [--json]` · `repair [--confirm] [--force] [--json]` · `cleanup (--keep <N> | --older-than <7d>) --confirm [--json]`

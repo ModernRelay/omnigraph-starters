@@ -22,6 +22,7 @@ The rest of this skill teaches the **current 0.7.0 surface only**. Consult this 
 | `--target <name>` | **removed** — use `--server <name\|url>`, `--store <uri>`, or `--profile <name>` (SKILL.md → *Addressing a graph*) |
 | positional `http(s)://` URL → a server | **removed** — address a remote with `--server <url>` |
 | `--as` on a served (remote) write | no-op — the server resolves the actor from the bearer token (`--as` applies to direct `--store` writes) |
+| `--cluster-graph <id>` | **removed** — `--cluster <dir\|uri>` is a global scope; pick the graph with `--graph <id>`. `--graph` now selects within a `--server` *or* `--cluster` scope |
 
 The `omnigraph-server --target` **boot** flag is a different flag and is unchanged.
 
@@ -33,6 +34,7 @@ The `omnigraph-server --target` **boot** flag is a different flag and is unchang
 | `omnigraph read` | `omnigraph query` |
 | `omnigraph change` | `omnigraph mutate` |
 | `omnigraph query lint` / `query check` | `omnigraph lint` |
+| `omnigraph query --alias <n>` / `mutate --alias <n>` | `omnigraph alias <n>` (dedicated subcommand; the `--alias` flag was removed) |
 
 ## HTTP routes
 

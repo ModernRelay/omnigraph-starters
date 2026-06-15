@@ -131,8 +131,8 @@ omnigraph mutate --query queries/mutations.gq --name add_signal --params '{"slug
 With aliases:
 
 ```bash
-omnigraph query  --alias signal sig-foo
-omnigraph mutate --alias add-signal sig-foo "Name" "Brief" 2026-04-14T00:00:00Z 2026-04-14T00:00:00Z 2026-04-14T00:00:00Z
+omnigraph alias signal sig-foo
+omnigraph alias add-signal sig-foo "Name" "Brief" 2026-04-14T00:00:00Z 2026-04-14T00:00:00Z 2026-04-14T00:00:00Z
 ```
 
 > `query` and `mutate` also accept inline source via `-e/--query-string '<gq>'` instead of `--query <file>`.
@@ -184,13 +184,12 @@ Precedence (highest first):
 3. **`--profile <name>`** (or `$OMNIGRAPH_PROFILE`) — a named scope bundle from `profiles:` in the operator config (binds one of server/cluster/store + a default graph).
 4. **Operator defaults** (`defaults.server` + `defaults.default_graph`).
 
-Control-plane commands use `--config <dir>` (cluster); maintenance against a cluster-managed graph uses `--cluster <dir|s3://> --cluster-graph <id>`. Each command declares a **capability** — `any` / `served` / `direct` / `control` / `local` — shown in `omnigraph --help`; mis-addressing (e.g. `--server` on a `direct` verb, or a remote URI to `optimize`) fails loudly.
+Control-plane commands use `--config <dir>` (cluster); maintenance against a cluster-managed graph uses `--cluster <dir|s3://> --graph <id>`. Each command declares a **capability** — `any` / `served` / `direct` / `control` / `local` — shown in `omnigraph --help`; mis-addressing (e.g. `--server` on a `direct` verb, or a remote URI to `optimize`) fails loudly.
 
-For queries:
+For query source (`query`/`mutate`):
 
-1. **Explicit `--query <file>`** wins
-2. Otherwise the **alias's `query`** is used (if `--alias` set)
-3. Relative query paths resolve through **`query.roots`** in config
+1. **`--query <file>`** or **`-e/--query-string '<gq>'`** — exactly one (operator aliases are invoked via the separate `alias` subcommand)
+2. Relative `--query` paths resolve through **`query.roots`** in config
 
 For params:
 

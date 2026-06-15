@@ -54,7 +54,7 @@ On the client side (0.7.0), register the server once and store its token out of 
 
 ```bash
 echo "s3cret" | omnigraph login remote          # → ~/.omnigraph/credentials (0600)
-omnigraph query --server remote --graph spike --alias signal sig-foo
+omnigraph query --server remote --graph spike --query signals.gq --name get_signal --params '{"slug":"sig-foo"}'
 ```
 
 `--server remote` resolves the URL from `~/.omnigraph/config.yaml`'s `servers:` and the token via `OMNIGRAPH_TOKEN_REMOTE` or the credentials file. A token is only ever sent to the server it is keyed to.
