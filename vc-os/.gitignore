@@ -1,5 +1,0 @@
-.env.omni
-.claude/
-*.omni/
-__cluster/
-graphs/

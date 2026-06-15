@@ -163,7 +163,7 @@ omnigraph alias events-recent
 - `seed.md` / `seed.jsonl` — Reference seed (human-readable / loadable)
 - `queries/*.gq` — Read queries (8 files) + mutations (`mutations.gq`)
 - `cluster.yaml` — Deployment declaration (graph `brain`, schema, stored queries)
-- `omnigraph.yaml` — Per-operator CLI config with aliases for all wow queries
+- `omnigraph-config.example.yaml` — Example operator config: merge its `aliases:` into your per-user `~/.omnigraph/config.yaml`
 
 ## Quick Start
 
@@ -189,6 +189,11 @@ omnigraph alias close-friends
 omnigraph alias person-recent-events per-theo
 omnigraph alias tasks-i-owe
 ```
+
+> Aliases come from `omnigraph-config.example.yaml` — merge into
+> `~/.omnigraph/config.yaml` (or invoke a stored query directly: `omnigraph
+> query <name> --graph brain [--params …]`). The per-user operator config is
+> never committed; a `--cluster` server never reads it.
 
 Day-2 changes are declarative: edit `schema.pg` / a `.gq` file / `cluster.yaml`,
 then `cluster plan` (schema edits show real migration steps) → `cluster apply`

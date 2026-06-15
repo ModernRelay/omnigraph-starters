@@ -86,7 +86,7 @@ Full property tables and constraints in `schema.pg`.
 - `schema.pg` — Executable Omnigraph schema (source of truth)
 - `seed.md` / `seed.jsonl` — Seed dataset (human-readable / loadable)
 - `queries/*.gq` — Read and mutation queries
-- `omnigraph.yaml` — CLI config with aliases
+- `omnigraph-config.example.yaml` — example operator config (aliases over the stored queries); merge into your per-user `~/.omnigraph/config.yaml`
 - `.env.omni` — RustFS credentials (not committed)
 
 ## Quick Start
@@ -113,12 +113,16 @@ omnigraph load --data seed.jsonl --mode overwrite graphs/spike.omni
 # Serve the applied state (keep running — separate terminal or background)
 omnigraph-server --cluster . --bind 127.0.0.1:8080 --unauthenticated   # local dev
 
-# Query via CLI aliases (per-operator omnigraph.yaml sugar) …
-omnigraph query --alias pattern-signals pat-sovereign-ai
+# Query via CLI aliases (operator-config sugar) …
+omnigraph alias pattern-signals pat-sovereign-ai
 # … or straight HTTP — every declared query is a served endpoint:
 curl -s -X POST http://127.0.0.1:8080/graphs/spike/queries/recent_signals \
   -H 'content-type: application/json' -d '{"params":{}}'
 ```
+
+> Aliases come from `omnigraph-config.example.yaml` — merge into
+> `~/.omnigraph/config.yaml` (or invoke a stored query directly:
+> `omnigraph query <name> --graph spike [--params …]`).
 
 Day-2 changes are declarative: edit `schema.pg` / a `.gq` file / `cluster.yaml`,
 then `cluster plan` (schema edits show real migration steps) → `cluster apply`
@@ -153,12 +157,11 @@ classic path against RustFS (start it via the omnigraph repo's
 set -a && source .env.omni && set +a
 omnigraph init --schema schema.pg s3://omnigraph-local/repos/spike-intel
 omnigraph load --data seed.jsonl --mode overwrite s3://omnigraph-local/repos/spike-intel
-omnigraph-server --config omnigraph.yaml --unauthenticated
+omnigraph-server --graph s3://omnigraph-local/repos/spike-intel --unauthenticated
 ```
 
-Re-point `graphs.local_s3` in `omnigraph.yaml` (commented out by default) and
-set `server.graph: local_s3`. The two boot sources are exclusive — a server
-reads cluster state XOR omnigraph.yaml, never both.
+This classic single-graph path serves an S3-backed graph directly, with no
+cluster state involved.
 
 </details>
 
@@ -180,8 +183,8 @@ The graph earns its keep through a recurring loop, supported by the
    artifact or source attached — an agent cannot verify them. Fix or drop.
 
 ```bash
-omnigraph query --alias triage
-omnigraph query --alias momentum 2026-05-01T00:00:00Z
+omnigraph alias triage
+omnigraph alias momentum 2026-05-01T00:00:00Z
 ```
 
 ## Enable embeddings (hybrid retrieval)

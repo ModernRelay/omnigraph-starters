@@ -145,7 +145,7 @@ Full property tables and constraints in `schema.pg`.
 - `schema.pg` — Executable Omnigraph schema (source of truth)
 - `seed.md` / `seed.jsonl` — Seed dataset (human-readable / loadable)
 - `queries/*.gq` — Read queries (5 files, 70 queries) + mutations (1 file, 35 queries)
-- `omnigraph.yaml` — CLI config with aliases for all reads + mutations
+- `omnigraph-config.example.yaml` — Example operator config: aliases for all reads + mutations. Merge its `aliases:` into your per-user `~/.omnigraph/config.yaml` (never committed).
 - `.env.omni` — RustFS credentials (not committed; see `.env.omni.example`)
 
 ## Quick Start
@@ -172,11 +172,14 @@ omnigraph load --data seed.jsonl --mode overwrite graphs/pharma.omni
 # Serve the applied state (keep running — separate terminal or background)
 omnigraph-server --cluster . --bind 127.0.0.1:8080 --unauthenticated   # local dev
 
-# Query via CLI aliases (per-operator omnigraph.yaml sugar) …
-omnigraph query --alias assumption-contradictions asmp-oral-displaces-injectable
-omnigraph query --alias decision-questions dec-vanquish-interim-readout
-omnigraph query --alias pattern-contradictions pat-oral-glp1-thesis
-omnigraph query --alias decisions-upcoming
+# Query via CLI aliases (per-operator config sugar) …
+omnigraph alias assumption-contradictions asmp-oral-displaces-injectable
+omnigraph alias decision-questions dec-vanquish-interim-readout
+omnigraph alias pattern-contradictions pat-oral-glp1-thesis
+omnigraph alias decisions-upcoming
+# Aliases come from `omnigraph-config.example.yaml` — merge into
+# `~/.omnigraph/config.yaml` (or invoke a stored query directly:
+# `omnigraph query <name> --graph pharma [--params …]`).
 # … or straight HTTP — every declared query is a served endpoint:
 curl -s -X POST http://127.0.0.1:8080/graphs/pharma/queries/decisions_upcoming \
   -H 'content-type: application/json' -d '{"params":{}}'
@@ -195,12 +198,11 @@ cp .env.omni.example .env.omni
 set -a && source .env.omni && set +a
 omnigraph init --schema schema.pg s3://omnigraph-local/repos/pharma-intel
 omnigraph load --data seed.jsonl --mode overwrite s3://omnigraph-local/repos/pharma-intel
-omnigraph-server --config omnigraph.yaml --unauthenticated
+omnigraph-server --graph s3://omnigraph-local/repos/pharma-intel --unauthenticated
 ```
 
-Re-point `graphs.local_s3` in `omnigraph.yaml` (commented out by default) and
-set `server.graph: local_s3`. The two boot sources are exclusive — a server
-reads cluster state XOR omnigraph.yaml, never both.
+Point the server at the S3 graph URI directly (as above). The two boot sources
+are exclusive — a server reads cluster state XOR a single graph URI, never both.
 
 </details>
 
@@ -210,23 +212,23 @@ Four queries that show the three-layer model in action:
 
 ```bash
 # 1. Cross-silo contradiction: a regulatory-domain signal hits a strategic assumption
-omnigraph query --alias assumption-contradictions asmp-oral-displaces-injectable
+omnigraph alias assumption-contradictions asmp-oral-displaces-injectable
 # → Pfizer danuglipron discontinued + Structure GSBR-209 Phase 2a disappoints
 
 # 2. Pre-committee briefing: what rests on the upcoming Phase 3 start decision?
-omnigraph query --alias decision-assumptions dec-oral-phase3-start
+omnigraph alias decision-assumptions dec-oral-phase3-start
 # → asmp-oral-displaces-injectable (now contradicted) + asmp-mechanism-safe-at-scale
 
 # 3. Competitive landscape: all compounds targeting the same mechanism
-omnigraph query --alias program-competitors prog-vk2735-sc
+omnigraph alias program-competitors prog-vk2735-sc
 # → tirzepatide, VK2735 oral (self), VK2735 SC — mechanism peers across phase
 
 # 4. Proactive alert: what internal questions does a new signal inform?
-omnigraph query --alias signal-informs-questions sig-pfizer-danuglipron-discontinued
+omnigraph alias signal-informs-questions sig-pfizer-danuglipron-discontinued
 # → q-pfizer-failure-mechanism-risk (Viking clinical team)
 
 # 5. Landscape feed: every signal touching any compound in my mechanism
-omnigraph query --alias program-landscape-signals prog-vk2735-sc
+omnigraph alias program-landscape-signals prog-vk2735-sc
 # → 5 signals across VK2735 (SC + oral) + tirzepatide, time-sorted
 ```
 
@@ -236,17 +238,17 @@ Agents should operate the graph in this order:
 
 ```bash
 # 1. Pick a decision and expand its dependencies
-omnigraph query --alias decisions-upcoming
-omnigraph query --alias decision-assumptions dec-oral-phase3-start
-omnigraph query --alias decision-questions dec-oral-phase3-start
+omnigraph alias decisions-upcoming
+omnigraph alias decision-assumptions dec-oral-phase3-start
+omnigraph alias decision-questions dec-oral-phase3-start
 
 # 2. Gather evidence for the key assumptions
-omnigraph query --alias assumption-supports asmp-oral-displaces-injectable
-omnigraph query --alias assumption-contradictions asmp-oral-displaces-injectable
+omnigraph alias assumption-supports asmp-oral-displaces-injectable
+omnigraph alias assumption-contradictions asmp-oral-displaces-injectable
 
 # 3. Trace a new or existing signal into internal impact
-omnigraph query --alias signal-contradicts-assumptions sig-pfizer-danuglipron-discontinued
-omnigraph query --alias signal-informs-questions sig-pfizer-danuglipron-discontinued
+omnigraph alias signal-contradicts-assumptions sig-pfizer-danuglipron-discontinued
+omnigraph alias signal-informs-questions sig-pfizer-danuglipron-discontinued
 ```
 
 For fresh web findings, first map the signal to existing companies, compounds, patterns, assumptions, and open questions; then propose the minimal seed or mutation update.

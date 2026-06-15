@@ -12,7 +12,7 @@ An Omnigraph schema + seed modeling AI/ML industry intelligence using the SPIKE 
 - `README.md` — Reference seed description, schema essentials, quick start.
 - `seed.md` / `seed.jsonl` — Seed dataset (human-readable / loadable).
 - `queries/*.gq` — Read and mutation queries.
-- `omnigraph.yaml` — CLI config with aliases.
+- `omnigraph-config.example.yaml` — example operator config (aliases over the stored queries); merge into your per-user `~/.omnigraph/config.yaml`.
 
 Omnigraph CLI/schema reference: [ModernRelay/omnigraph](https://github.com/ModernRelay/omnigraph).
 
@@ -62,8 +62,12 @@ The `lint` command validates both queries and schema against each other — use 
 `cluster.yaml` is the deployment: graph `spike`, `schema.pg`, and every
 stored query, converged with `omnigraph cluster import|plan|apply --config .`
 (apply creates `graphs/spike.omni`; schema edits show migration previews in
-plan; graph deletion is approval-gated). `omnigraph.yaml` is per-operator
-only — aliases, CLI defaults, `cli.actor` for `--as` attribution. Serve with
-`omnigraph-server --cluster .` (never reads omnigraph.yaml). Data still flows
+plan; graph deletion is approval-gated). Operator settings (aliases, CLI
+defaults, actor for `--as` attribution) live in the per-user
+`~/.omnigraph/config.yaml` (RFC-007/008) — never committed; the cookbook ships
+`omnigraph-config.example.yaml` to merge in. Aliases bind to the stored
+queries declared in `cluster.yaml` and invoke them through a running server
+(`omnigraph alias <name> [args]`). Serve with `omnigraph-server --cluster .`
+(reads cluster state only, never the operator config). Data still flows
 through `omnigraph load/mutate` against `graphs/spike.omni`. Never commit
 `__cluster/` or `graphs/` (gitignored — local state).

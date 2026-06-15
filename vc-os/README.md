@@ -165,6 +165,8 @@ The seed populates a fictional Berlin-based AI-infra fund running Fund III ($250
 
 The seed is shaped to light these up. Each is a single graph traversal that would otherwise require hand-stitching across 4+ systems. Output below is verbatim from `omnigraph alias <name> [args]` against the loaded seed.
 
+> Aliases come from `omnigraph-config.example.yaml` — merge into `~/.omnigraph/config.yaml` (or invoke a stored query directly: `omnigraph query <name> --graph vcos [--params …]`).
+
 ### Pre-IC brief for a deal
 
 ```bash
@@ -519,7 +521,7 @@ vc-os/
 ├── schema.pg          # 17 nodes, ~62 edges, ~19 enums - source of truth
 ├── seed.md            # human-readable narrative (twin of seed.jsonl)
 ├── seed.jsonl         # loadable seed
-├── omnigraph.yaml     # per-operator CLI config + 294 aliases
+├── omnigraph-config.example.yaml  # example operator config — aliases to merge into ~/.omnigraph/config.yaml
 └── queries/
     ├── beliefs.gq        # 23 reads
     ├── deals.gq          # 20 reads
@@ -574,7 +576,7 @@ omnigraph alias person-insights          per-helix-yuki     # founder assessment
 omnigraph alias observed-organizations                      # PitchBook-imported (no Quito engagement)
 ```
 
-The aliases are also grouped by meeting view in `omnigraph.yaml` - `VIEW: IC Meeting`, `VIEW: Weekly Pipeline Meeting`, `VIEW: Portfolio Support Meeting`, `VIEW: LPAC / Fund Reporting` - so dashboards map 1:1 to alias bundles.
+The aliases are also grouped by meeting view in `omnigraph-config.example.yaml` - `VIEW: IC Meeting`, `VIEW: Weekly Pipeline Meeting`, `VIEW: Portfolio Support Meeting`, `VIEW: LPAC / Fund Reporting` - so dashboards map 1:1 to alias bundles.
 
 See the [Omnigraph](https://github.com/ModernRelay/omnigraph) repo for full CLI reference.
 

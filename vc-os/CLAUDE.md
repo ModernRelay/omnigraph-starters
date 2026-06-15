@@ -15,7 +15,7 @@ The reference seed is a **fictional Berlin-based AI-infra fund** ("Quito Capital
 - `seed.md` / `seed.jsonl` — Reference seed (human-readable / loadable).
 - `queries/*.gq` — Read and mutation queries. One file per domain.
 - `cluster.yaml` — Deployment declaration (graph `vcos`, schema, stored queries).
-- `omnigraph.yaml` — Per-operator CLI config with 294 aliases.
+- `omnigraph-config.example.yaml` — Example operator config. Your operator config is per-user at `~/.omnigraph/config.yaml` (never committed); merge this file's aliases into it. Aliases bind to the stored queries published by `cluster apply`.
 
 Omnigraph CLI/schema reference: [ModernRelay/omnigraph](https://github.com/ModernRelay/omnigraph).
 
@@ -24,8 +24,8 @@ Omnigraph CLI/schema reference: [ModernRelay/omnigraph](https://github.com/Moder
 This cookbook is a **filesystem-backed cluster** — no object store, no S3 creds.
 
 - `cluster.yaml` is the **deployment**: graph `vcos`, `schema.pg`, and every stored query. Converge it with `omnigraph cluster import|plan|apply --config .` — `apply` creates the graph at `graphs/vcos.omni`, applies the schema (plan previews migration steps), and publishes the queries.
-- `omnigraph.yaml` is **per-operator only** — aliases, CLI defaults, identity. A cluster-booted server (`omnigraph-server --cluster .`) never reads it.
-- **Data** flows through `omnigraph load` / `omnigraph mutate` against `graphs/vcos.omni`; invoke aliases with `omnigraph alias <name> [args]`.
+- The **operator config** is **per-operator only** — aliases, CLI defaults, identity — and lives per-user at `~/.omnigraph/config.yaml` (never committed). The cookbook ships `omnigraph-config.example.yaml`; merge its aliases in. A cluster-booted server (`omnigraph-server --cluster .`) never reads operator config.
+- **Data** flows through `omnigraph load` / `omnigraph mutate` against `graphs/vcos.omni`. Invoke aliases with `omnigraph alias <name> [args]` (aliases come from `omnigraph-config.example.yaml` — merge into `~/.omnigraph/config.yaml`, or invoke a stored query directly: `omnigraph query <name> --graph vcos [--params …]`).
 - Never commit `__cluster/` or `graphs/` (gitignored — local state).
 
 ## Schema Language (`.pg`)

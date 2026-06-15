@@ -50,9 +50,10 @@ omnigraph-cookbooks/
     ├── README.md
     ├── CLAUDE.md
     ├── schema.pg
+    ├── cluster.yaml
     ├── seed.md
     ├── seed.jsonl
-    ├── omnigraph.yaml
+    ├── omnigraph-config.example.yaml
     └── queries/*.gq
 ```
 

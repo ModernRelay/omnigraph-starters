@@ -15,7 +15,7 @@ The reference seed is **Alex Chen**, a fictional 36-year-old senior product desi
 - `seed.md` / `seed.jsonl` — Seed dataset (human-readable / loadable).
 - `queries/*.gq` — Read and mutation queries.
 - `cluster.yaml` — Deployment declaration (graph `brain`, schema, stored queries).
-- `omnigraph.yaml` — Per-operator CLI config with aliases.
+- `omnigraph-config.example.yaml` — Example operator config; merge its aliases into your per-user `~/.omnigraph/config.yaml`.
 
 For general Omnigraph ops — schema language, queries, loading, branches,
 cluster commands, CLI — see the **omnigraph-best-practices** skill and
@@ -27,12 +27,15 @@ This cookbook is a **filesystem-backed cluster** — no object store, no
 credentials. `cluster.yaml` is the deployment: graph `brain`, `schema.pg`, and
 every stored query, converged with `omnigraph cluster import|plan|apply
 --config .` (apply creates `graphs/brain.omni`; schema edits show migration
-previews in plan; graph deletion is approval-gated). `omnigraph.yaml` is
-per-operator only — aliases, CLI defaults, identity for `--as` attribution.
-Serve with `omnigraph-server --cluster .` (never reads omnigraph.yaml). Data
-flows through `omnigraph load` / `omnigraph mutate` against `graphs/brain.omni`;
-invoke aliases with `omnigraph alias <name> [args]`. Never commit `__cluster/`
-or `graphs/` (gitignored — local state).
+previews in plan; graph deletion is approval-gated). The per-operator surface
+(aliases, CLI defaults, identity for `--as` attribution) lives in your per-user
+`~/.omnigraph/config.yaml`, never committed — this cookbook ships
+`omnigraph-config.example.yaml` to merge in. Serve with `omnigraph-server
+--cluster .` (never reads the operator config). Data flows through `omnigraph
+load` / `omnigraph mutate` against `graphs/brain.omni`; invoke aliases with
+`omnigraph alias <name> [args]` (or a stored query directly: `omnigraph query
+<name> --graph brain [--params …]`). Never commit `__cluster/` or `graphs/`
+(gitignored — local state).
 
 ## Domain Model
 
