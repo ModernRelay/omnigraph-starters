@@ -34,9 +34,6 @@ omnigraph query --alias triage 2026-06-01
 ```
 
 > **Alias vs stored query.** The alias is *yours* (a personal name + defaults); the **stored query** it points at is the *team's* — declared in `cluster.yaml`, type-checked and served by the cluster (`GET /graphs/<id>/queries`, `POST /graphs/<id>/queries/<name>`, gated by `invoke_query`). See [`stored-queries.md`](stored-queries.md).
->
-> **Legacy `omnigraph.yaml` aliases are deprecated** (RFC-008). Run `omnigraph config migrate` to move them into `~/.omnigraph/config.yaml`.
-
 ## Operator Alias Schema
 
 ```yaml

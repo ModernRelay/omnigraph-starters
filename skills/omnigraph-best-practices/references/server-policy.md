@@ -17,12 +17,11 @@ How to run `omnigraph-server` and gate operations with Cedar policies.
 The server is the canonical runtime entry point. Start it once per deployment and keep it running — all CLI queries, mutations, and admin ops go through it.
 
 ```bash
-omnigraph-server --cluster ./company-brain          # recommended — boots an applied cluster (or `--cluster s3://bucket/prefix`)
+omnigraph-server --cluster ./company-brain     # boots an applied cluster (or `--cluster s3://bucket/prefix`)
 omnigraph-server s3://my-bucket/repos/spike    # a single bare graph URI
-omnigraph-server --config omnigraph.yaml             # legacy combined file (deprecated config surface, RFC-008)
 ```
 
-The boot sources are mutually exclusive — a server boots from one, never a merge. `--config omnigraph.yaml` reads `server.graph`/`server.bind` from the file; `--cluster` reads the applied ledger (see *Cluster-Booted Servers* below). Run the server in a separate terminal or background process.
+A server boots from one source — `--cluster` reads the applied ledger (see *Cluster-Booted Servers* below); a bare URI serves that one graph. Run the server in a separate terminal or background process.
 
 ## HTTP Routes
 
@@ -33,20 +32,18 @@ The boot sources are mutually exclusive — a server boots from one, never a mer
 | `GET /export` | JSONL stream of a branch |
 | `POST /query` | read query execution |
 | `POST /mutate` | mutation execution |
-| `POST /load` | bulk JSONL load into a branch (canonical, RFC-009 Phase 5; 32 MB body limit). Branch creation opt-in via `from`. Supersedes `POST /ingest`, now a deprecated alias (`Deprecation: true` + `Link: </load>`) |
+| `POST /load` | bulk JSONL load into a branch (32 MB body limit); branch creation opt-in via `from` |
 | `GET /queries` | stored-query catalog (v0.6.1) — lists `mcp.expose` queries as a typed tool catalog; **read**-gated |
 | `POST /queries/{name}` | invoke a named stored query (v0.6.1); **`invoke_query`**-gated (+ `change` for a stored mutation); never accepts ad-hoc `.gq` from the client; deny == 404 |
 | `POST /schema/apply` | schema migration |
 | `GET /branches` | branch list |
 | `GET /commits` | commit history |
 
-Query params for read routes: `?branch=main` or `?snapshot=<id>`.
-
-> **No `/runs` endpoint.** The transactional Run state machine and its `/runs` routes were removed in v0.4.0. Writes now publish directly and commit atomically via the `__manifest` table; use `GET /commits` for write/audit history. A request to `/runs` returns 404.
+Query params for read routes: `?branch=main` or `?snapshot=<id>`. Writes publish directly and commit atomically via the `__manifest` table; use `GET /commits` for write/audit history.
 
 ## Auth
 
-Set bearer tokens on the server process. Three sources, in precedence: `OMNIGRAPH_SERVER_BEARER_TOKENS_AWS_SECRET` (AWS Secrets Manager) → `OMNIGRAPH_SERVER_BEARER_TOKENS_JSON`/`_FILE` (JSON `{actor_id: token}`) → `OMNIGRAPH_SERVER_BEARER_TOKEN` (single legacy token, actor `default`):
+Set bearer tokens on the server process. Three sources, in precedence: `OMNIGRAPH_SERVER_BEARER_TOKENS_AWS_SECRET` (AWS Secrets Manager) → `OMNIGRAPH_SERVER_BEARER_TOKENS_JSON`/`_FILE` (JSON `{actor_id: token}`) → `OMNIGRAPH_SERVER_BEARER_TOKEN` (single token, actor `default`):
 
 ```bash
 OMNIGRAPH_SERVER_BEARER_TOKENS_JSON='{"act-reader":"s3cret"}' \
@@ -60,9 +57,7 @@ echo "s3cret" | omnigraph login remote          # → ~/.omnigraph/credentials (
 omnigraph query --server remote --graph spike --alias signal sig-foo
 ```
 
-`--server remote` resolves the URL from `~/.omnigraph/config.yaml`'s `servers:` and the token via `OMNIGRAPH_TOKEN_REMOTE` → the credentials file → the legacy chain. A token is only ever sent to the server it is keyed to.
-
-**Legacy token chain** (still honored for URLs that match no operator server): declare the env var holding the token in a legacy `omnigraph.yaml`'s `graphs.<name>.bearer_token_env`, `export` it, and address the server by URL with `--server <url>` (the CLI `--target` flag was removed in 0.7.0).
+`--server remote` resolves the URL from `~/.omnigraph/config.yaml`'s `servers:` and the token via `OMNIGRAPH_TOKEN_REMOTE` or the credentials file. A token is only ever sent to the server it is keyed to.
 
 ### Running without auth requires an explicit opt-in
 
@@ -119,13 +114,11 @@ Per-graph actions (evaluated against the graph being addressed):
 
 `admin` exists but is reserved (no call site yet — don't write rules for it). In multi-graph deployments there is also a server-scoped `graph_list` action gating `GET /graphs`; it lives in a separate `server.policy.file`.
 
-> The old `run_publish` / `run_abort` actions were **removed in v0.4.0**. A `policy.yaml` that still references them fails validation — delete those rules; the `change` action covers the equivalent gating.
-
 For any shared repo, gate at least `schema_apply` and `branch_merge`.
 
 ### Where policy is declared
 
-In **cluster mode** (recommended), Cedar bundles are declared in `cluster.yaml` and attach via `applies_to` (`[cluster]` server-level, `[<graph-id>]` per graph) — see *Cluster-Booted Servers* below. The `policy.yaml` rule format is identical in both modes. The classic single-graph server instead points at a policy file from the now-deprecated `omnigraph.yaml`:
+Cedar bundles are declared in `cluster.yaml` and attach via `applies_to` (`[cluster]` server-level, `[<graph-id>]` per graph) — see *Cluster-Booted Servers* below. The `policy.yaml` rule format (below) is the same everywhere; a classic single-graph server points its config at the policy file:
 
 > **Config-follows-identity (v0.6.1, breaking).** A top-level `policy:` (and `queries:`) block applies **only** to an anonymous bare-URI single-graph server. A graph served **by name** — `server.graph: <name>` (or the `omnigraph-server` `--target <name>` boot flag) — must nest its policy under that graph:
 >
