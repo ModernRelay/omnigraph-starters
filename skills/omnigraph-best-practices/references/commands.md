@@ -124,8 +124,9 @@ omnigraph load --data delta.jsonl --branch feature-x --from main --mode merge $R
 ## Query / Mutate
 
 ```bash
-omnigraph query  --query queries/signals.gq --name get_signal --params '{"slug":"sig-foo"}'
-omnigraph mutate --query queries/mutations.gq --name add_signal --params '{"slug":"sig-foo",...}'
+omnigraph query  get_signal --query queries/signals.gq --params '{"slug":"sig-foo"}'    # ad-hoc file; <name> is positional
+omnigraph query  get_signal --server intel-dev --params '{"slug":"sig-foo"}'            # served stored query by name
+omnigraph mutate add_signal --query queries/mutations.gq --params '{"slug":"sig-foo",...}'
 ```
 
 With aliases:
@@ -182,7 +183,7 @@ Precedence (highest first):
 1. **`--store <uri>`** or a **positional `file://`/`s3://` URI** — direct storage access (bypasses any server; no catalog, so stored-query *names* don't resolve). `--store` is exclusive with a positional URI and with `--server`.
 2. **`--server <name|url>`** (+ `--graph <id>` for a multi-graph server) — served/remote. A name resolves from `servers:` in `~/.omnigraph/config.yaml`; a literal `http(s)://` URL also works.
 3. **`--profile <name>`** (or `$OMNIGRAPH_PROFILE`) — a named scope bundle from `profiles:` in the operator config (binds one of server/cluster/store + a default graph).
-4. **Operator defaults** (`defaults.server` + `defaults.default_graph`).
+4. **Operator defaults** — `defaults.server` + `defaults.default_graph`, or `defaults.store` for a zero-flag local scope (mutually exclusive with `defaults.server`).
 
 Control-plane commands use `--config <dir>` (cluster); maintenance against a cluster-managed graph uses `--cluster <dir|s3://> --graph <id>`. Each command declares a **capability** — `any` / `served` / `direct` / `control` / `local` — shown in `omnigraph --help`; mis-addressing (e.g. `--server` on a `direct` verb, or a remote URI to `optimize`) fails loudly.
 

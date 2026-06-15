@@ -23,6 +23,7 @@ The rest of this skill teaches the **current 0.7.0 surface only**. Consult this 
 | positional `http(s)://` URL → a server | **removed** — address a remote with `--server <url>` |
 | `--as` on a served (remote) write | no-op — the server resolves the actor from the bearer token (`--as` applies to direct `--store` writes) |
 | `--cluster-graph <id>` | **removed** — `--cluster <dir\|uri>` is a global scope; pick the graph with `--graph <id>`. `--graph` now selects within a `--server` *or* `--cluster` scope |
+| `query`/`mutate` `--name <q>` + positional graph URI / `--uri` | **removed** — the query name is the **positional** (`omnigraph query <name>`): a bare `<name>` invokes a served stored query (kind-asserted), `--query`/`-e` is the ad-hoc lane. Address the graph via `--server`/`--store`/`--profile` (not a positional URI on query/mutate) |
 
 The `omnigraph-server --target` **boot** flag is a different flag and is unchanged.
 

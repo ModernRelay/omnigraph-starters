@@ -82,9 +82,10 @@ omnigraph load --data delta.jsonl --from main --branch review --mode merge $GRAP
 ### Dispatching
 
 ```bash
-omnigraph alias  signal sig-foo                  # invoke an operator alias (a bound stored query — read or write)
-omnigraph query  -e 'query q() { match { $s: Signal } return { $s.slug } limit 5 }'   # ad-hoc/inline; or --query file.gq --name get_signal
-omnigraph mutate --query mutations.gq --name add_signal --params '{"slug":"sig-foo", ...}'
+omnigraph alias  signal sig-foo                  # operator alias → its bound stored query (read or write)
+omnigraph query  get_signal --params '{"slug":"sig-foo"}'   # served stored query by name (verb asserts read vs write)
+omnigraph query  -e 'query q() { match { $s: Signal } return { $s.slug } limit 5 }'   # ad-hoc/inline (or: --query f.gq <name>)
+omnigraph mutate add_signal --query mutations.gq --params '{"slug":"sig-foo", ...}'   # name positional; ad-hoc file source
 omnigraph lint   --schema schema.pg --query queries/foo.gq    # after EVERY .gq/.pg edit (no server needed)
 ```
 
@@ -228,8 +229,8 @@ Notation: `<x>` required · `[x]` optional · `<a|b>` choice · `…` repeatable
 **Global addressing flags**: `--as <actor>` (direct/`--store` writes only — a server resolves the actor from its token), `--server <name|url>`, `--cluster <dir|uri>` (cluster-managed storage, for maintenance), `--graph <id>` (selects the graph within a `--server` or `--cluster` scope), `--profile <name>` (`$OMNIGRAPH_PROFILE`), `--store <uri>`. Plus a positional `file://`/`s3://` URI and `--config <path>` on most graph commands. Output: `--json`, or reads take `--format <json|jsonl|csv|kv|table>`. **Write guards:** `--yes` skips the confirm prompt for a destructive write (`cleanup`, overwrite `load`, `branch delete`) against a non-local scope (it *refuses* without it when non-TTY or `--json`); `--quiet` suppresses the resolved-target echo.
 
 **Data plane** — `any` (served via `--server`/`--profile`, or direct via `--store`/URI):
-- `query` (alias `read`) `(--query <f.gq> --name <n> | -e '<GQ>')` `[--params <json> | --params-file <p>] [--branch <b> | --snapshot <id>] [--format <fmt> | --json]`
-- `mutate` (alias `change`) — same source + `--params` flags; `[--branch <b>] [--json]`
+- `query` (alias `read`) `<name>` — a **served stored query** by name (via `--server`/`--profile`); or ad-hoc `[<name>] (--query <f.gq> | -e '<GQ>')` where `<name>` picks which query in the source. `[--params <json> | --params-file <p>] [--branch <b> | --snapshot <id>] [--format <fmt> | --json]`. No positional URI — address via `--server`/`--store`/`--profile`.
+- `mutate` (alias `change`) — same shape (served stored mutation by `<name>`, or ad-hoc `--query`/`-e`); `[--params …] [--branch <b>] [--json]`. The verb asserts kind: `query`→read, `mutate`→write (400 on mismatch).
 - `alias <name> [args…]` — invoke an operator alias's bound stored query (read or write); `[--params … | --params-file <p>] [--format <fmt> | --json]` (server/graph/query come from the binding)
 - `load --data <f.jsonl> --mode <overwrite|append|merge> [--branch <b>] [--from <base>] [--json]` — `--mode` required; `--from` forks a missing `--branch`
 - `snapshot [--branch <b>] [--json]`
@@ -332,8 +333,8 @@ servers:
     url: https://graph.example.com    # no tokens here, ever
 defaults:
   output: table              # read-format default
-  server: intel-dev          # the everyday scope when no address is given
-  default_graph: spike       # graph selected within a server/cluster scope
+  server: intel-dev          # default served scope (or `store: file://…/g.omni` for a local default — mutually exclusive)
+  default_graph: spike       # graph within a server/cluster scope
 profiles:                    # optional named scope bundles — pick with --profile <name>
   staging: { server: intel-staging, default_graph: spike }
 aliases:                     # personal bindings to TEAM stored queries (see references/aliases.md)

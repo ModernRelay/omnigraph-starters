@@ -53,7 +53,7 @@ query get_signal($slug: String) {
 Never string-interpolate values into query bodies. Pass them via `--params`:
 
 ```bash
-omnigraph query --query signals.gq --name get_signal --params '{"slug":"sig-foo"}'
+omnigraph query get_signal --query signals.gq --params '{"slug":"sig-foo"}'
 ```
 
 The compiler typechecks parameter values against declared types.
