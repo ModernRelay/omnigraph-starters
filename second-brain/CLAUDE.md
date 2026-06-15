@@ -14,17 +14,25 @@ The reference seed is **Alex Chen**, a fictional 36-year-old senior product desi
 - `README.md` — Layered architecture, reference seed description, schema essentials, wow queries.
 - `seed.md` / `seed.jsonl` — Seed dataset (human-readable / loadable).
 - `queries/*.gq` — Read and mutation queries.
-- `omnigraph.yaml` — CLI config with aliases.
+- `cluster.yaml` — Deployment declaration (graph `brain`, schema, stored queries).
+- `omnigraph.yaml` — Per-operator CLI config with aliases.
 
-Omnigraph CLI/schema reference: [ModernRelay/omnigraph](https://github.com/ModernRelay/omnigraph).
+For general Omnigraph ops — schema language, queries, loading, branches,
+cluster commands, CLI — see the **omnigraph-best-practices** skill and
+`../CLAUDE.md`. This file covers only what's specific to Second Brain.
 
-## Schema Language (`.pg`)
+## Cluster control plane (two-file model)
 
-- `node` defines entity types; `edge` defines typed relationships (`edge Name: Source -> Target`)
-- `@key` marks external identity (always `slug` here)
-- `@index`, `@unique`, `@card(min..max)`, `@range(lo..hi)`, `@embed("prop")`
-- `?` = optional, `[Type]` = list, `enum(...)` = inline closed set
-- Comments use `//` not `#`
+This cookbook is a **filesystem-backed cluster** — no object store, no
+credentials. `cluster.yaml` is the deployment: graph `brain`, `schema.pg`, and
+every stored query, converged with `omnigraph cluster import|plan|apply
+--config .` (apply creates `graphs/brain.omni`; schema edits show migration
+previews in plan; graph deletion is approval-gated). `omnigraph.yaml` is
+per-operator only — aliases, CLI defaults, identity for `--as` attribution.
+Serve with `omnigraph-server --cluster .` (never reads omnigraph.yaml). Data
+flows through `omnigraph load` / `omnigraph mutate` against `graphs/brain.omni`;
+invoke aliases with `omnigraph alias <name> [args]`. Never commit `__cluster/`
+or `graphs/` (gitignored — local state).
 
 ## Domain Model
 
@@ -75,7 +83,7 @@ loader and reviewer — add the constraint if you want the schema to enforce ded
 
 - **`Note.kind=decision` is not traceable through edges.** A decision-Note can attach to a project via `NoteAboutProject`, but there's no `DecisionRegardingProject` / `DecisionBasedOnBelief` chain. By design (no SPIKE/strategy layer) — but if you later need decision provenance, add explicit edges rather than relying on `kind`.
 - **`Chunk` is declared but the seed has zero.** Embeddings come from a separate ingest pipeline; the static seed can't generate them. Semantic search is a future capability, not a demo today.
-- **Edge-property projections aren't supported in queries.** This means `Knows.context` and `RelatedToPerson.relation` are stored but can't be returned in `read` results. Filter against them in the writer; surface them via dedicated read-side helpers if needed.
+- **Edge-property projections aren't supported in queries.** This means `Knows.context` and `RelatedToPerson.relation` are stored but can't be returned in query results. Filter against them in the writer; surface them via dedicated read-side helpers if needed.
 
 ## The Demo "Wow" Queries
 
@@ -116,15 +124,13 @@ For longer captures, chunk into `Chunk` records linked via `ChunkOf` — semanti
 
 ## Validation
 
-```bash
-omnigraph lint --schema ./schema.pg --query ./queries/people.gq
-```
-
-The `lint` command validates both queries and schema against each other — use it after any schema or query edit.
+After any schema or query edit, lint before applying — e.g. `omnigraph lint
+--schema schema.pg --query queries/people.gq`. The lint/plan/apply/load loop and
+cluster ops are covered in the **omnigraph-best-practices** skill and
+`../CLAUDE.md`; don't repeat them here.
 
 ## When Editing
 
-- Consult [Omnigraph schema principles](https://github.com/ModernRelay/omnigraph) for design guidance
 - Use `@rename_from(...)` on property/type renames for migration support
 - Keep README.md in sync with schema.pg
 - Prefer semantic edge names over generic ones (`MediaRecommendedBy` not `RelatedTo`)

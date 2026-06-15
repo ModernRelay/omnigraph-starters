@@ -2,6 +2,8 @@
 
 Opinionated Omnigraph cookbook for venture-capital firms. Built on [Omnigraph](https://github.com/ModernRelay/omnigraph), shaped from a first-principles teardown of how a token-maxxing VC should work. Covers pipeline, diligence, decisions, portfolio, network, audit, and learning - all in one typed graph.
 
+> For operating Omnigraph — schema authoring, queries, loading, branches, cluster ops, the CLI — see the **omnigraph-best-practices** skill. This README covers only what's specific to VC OS. No object store needed — this is a filesystem-backed cluster.
+
 ## Why a graph, not another tool
 
 A modern VC's stack typically contains 8–12 systems: a CRM (Affinity / Airtable ), a wiki (Notion), chat (Slack), a call-recording tool (Granola), spreadsheets and drives (Drive / Excel), portfolio modeling (Tactyc), an outbound platform (Lemlist), and per-firm bespoke hacks - a sightings / prospect databases enriched via Spectre/Harmonic, a third-party vector store for semantic search, local notes for firm memory, a cross-session memory daemon, a homegrown audit log.
@@ -161,15 +163,15 @@ The seed populates a fictional Berlin-based AI-infra fund running Fund III ($250
 
 ## Example queries - with live output
 
-The seed is shaped to light these up. Each is a single graph traversal that would otherwise require hand-stitching across 4+ systems. Output below is verbatim from `omnigraph query --alias <name> [args]` against the loaded seed.
+The seed is shaped to light these up. Each is a single graph traversal that would otherwise require hand-stitching across 4+ systems. Output below is verbatim from `omnigraph alias <name> [args]` against the loaded seed.
 
 ### Pre-IC brief for a deal
 
 ```bash
-omnigraph query --alias pre-ic-brief-thesis    deal-helix-series-a
-omnigraph query --alias pre-ic-brief-evidence  deal-helix-series-a
-omnigraph query --alias pre-ic-brief-questions deal-helix-series-a
-omnigraph query --alias debate-stances         deal-helix-series-a
+omnigraph alias pre-ic-brief-thesis    deal-helix-series-a
+omnigraph alias pre-ic-brief-evidence  deal-helix-series-a
+omnigraph alias pre-ic-brief-questions deal-helix-series-a
+omnigraph alias debate-stances         deal-helix-series-a
 ```
 
 **`pre-ic-brief-thesis`** - relevant thesis + grounding assumptions:
@@ -208,7 +210,7 @@ ins-helix-bear | memo   | bear     | AWS Bedrock on-prem appliance launched in M
 ### Post-signal portfolio impact
 
 ```bash
-omnigraph query --alias signal-portfolio-impact sig-vector-forge-aws-deal
+omnigraph alias signal-portfolio-impact sig-vector-forge-aws-deal
 ```
 
 Walks `Signal → contradicts → Assumption → basedOn(inv) → Decision → regarding → Deal → forOrganization(status=portfolio)`. A new external signal arrives - which committed portfolio decisions just got destabilized?
@@ -222,8 +224,8 @@ org-aetherbrick | Aetherbrick | dec-aetherbrick-follow-on-eval | follow-on | Ver
 ### Exit landscape for a portfolio organization
 
 ```bash
-omnigraph query --alias exit-landscape                  org-pinion-infer
-omnigraph query --alias exit-landscape-decision-makers  org-pinion-infer
+omnigraph alias exit-landscape                  org-pinion-infer
+omnigraph alias exit-landscape-decision-makers  org-pinion-infer
 ```
 
 **`exit-landscape`** - plausible acquirers:
@@ -246,11 +248,11 @@ org-microsoft | Microsoft | per-acq-microsoft-priti | Priti Joshi
 ### Board-prep pack
 
 ```bash
-omnigraph query --alias board-prep-pack                  org-aetherbrick
-omnigraph query --alias board-prep-open-questions        org-aetherbrick
-omnigraph query --alias board-prep-commitments           org-aetherbrick
-omnigraph query --alias board-prep-meeting-history       org-aetherbrick   # prior board meetings
-omnigraph query --alias board-prep-next-meeting          org-aetherbrick   # scheduled next board
+omnigraph alias board-prep-pack                  org-aetherbrick
+omnigraph alias board-prep-open-questions        org-aetherbrick
+omnigraph alias board-prep-commitments           org-aetherbrick
+omnigraph alias board-prep-meeting-history       org-aetherbrick   # prior board meetings
+omnigraph alias board-prep-next-meeting          org-aetherbrick   # scheduled next board
 ```
 
 **`board-prep-pack`** - recent signals since last board:
@@ -278,9 +280,9 @@ mtg-aetherbrick-board-q2-2026 | Aetherbrick - Q2 2026 board | 2026-07-09T15:00:0
 ### Meeting history with a deal or organization
 
 ```bash
-omnigraph query --alias meetings-with-deal               deal-helix-series-a
-omnigraph query --alias ic-prep-meeting-history          deal-helix-series-a
-omnigraph query --alias ic-prep-open-commitments         deal-helix-series-a
+omnigraph alias meetings-with-deal               deal-helix-series-a
+omnigraph alias ic-prep-meeting-history          deal-helix-series-a
+omnigraph alias ic-prep-open-commitments         deal-helix-series-a
 ```
 
 **`ic-prep-open-commitments`** - what's still owed before Helix IC:
@@ -294,8 +296,8 @@ cmt-helix-customer-refs  | Helix - 3 customer reference calls | high         | 2
 ### Intro path to a founder
 
 ```bash
-omnigraph query --alias direct-team-knowers     per-helix-elena   # 1-hop
-omnigraph query --alias intro-path-to-founder   per-helix-yuki    # 2-hop via bridge
+omnigraph alias direct-team-knowers     per-helix-elena   # 1-hop
+omnigraph alias intro-path-to-founder   per-helix-yuki    # 2-hop via bridge
 ```
 
 **`direct-team-knowers per-helix-elena`** - who on the firm already knows her:
@@ -317,7 +319,7 @@ CJ → Jens (Aetherbrick founder + Quito portfolio board member) → Yuki. The s
 ### Contradicted theses
 
 ```bash
-omnigraph query --alias contradicted-active-theses
+omnigraph alias contradicted-active-theses
 ```
 ```
 t.slug                   | t.name                                     | t.confidence | s.slug                         | s.date     | s.brief
@@ -331,7 +333,7 @@ Run weekly to catch belief drift before a quarterly review.
 ### Reserve pressure check
 
 ```bash
-omnigraph query --alias reserve-pressure fund-iii
+omnigraph alias reserve-pressure fund-iii
 ```
 ```
 c.slug           | d.slug               | q.slug                 | q.name                                          | q.description
@@ -344,11 +346,11 @@ Tactyc says *how much* dry powder; the graph says *which organizations are about
 ### Source-reliability revalidation
 
 ```bash
-omnigraph query --alias publishers                                # TechCrunch, anon blog
-omnigraph query --alias databases                                 # PitchBook
-omnigraph query --alias expert-networks                           # Tegus
-omnigraph query --alias sources-by-reliability low                # who to flag
-omnigraph query --alias source-downstream-signals org-techcrunch  # what to revalidate
+omnigraph alias publishers                                # TechCrunch, anon blog
+omnigraph alias databases                                 # PitchBook
+omnigraph alias expert-networks                           # Tegus
+omnigraph alias sources-by-reliability low                # who to flag
+omnigraph alias source-downstream-signals org-techcrunch  # what to revalidate
 ```
 
 **`publishers`**:
@@ -374,7 +376,7 @@ That walk - `Organization{reliability=low/medium} ← publishedByOrganization �
 ### Active lessons (firm protocols)
 
 ```bash
-omnigraph query --alias lessons-active
+omnigraph alias lessons-active
 ```
 ```
 l.slug                         | l.name                                                            | l.kind        | l.confidence
@@ -387,8 +389,8 @@ lsn-vertical-data-moat-eval    | Score vertical data moat with 5 customer interv
 ### Team + recent decisions
 
 ```bash
-omnigraph query --alias team
-omnigraph query --alias decisions-recent
+omnigraph alias team
+omnigraph alias decisions-recent
 ```
 
 **`team`** - 5 partners + 2 VPs, all derived from `WorksAt org-quito`:
@@ -513,10 +515,11 @@ For each agent below: the natural-language **prompt** you'd send it, concrete **
 vc-os/
 ├── README.md          # this file
 ├── CLAUDE.md          # scoped agent guidance
+├── cluster.yaml       # deployment: graph vcos + schema + stored queries
 ├── schema.pg          # 17 nodes, ~62 edges, ~19 enums - source of truth
 ├── seed.md            # human-readable narrative (twin of seed.jsonl)
 ├── seed.jsonl         # loadable seed
-├── omnigraph.yaml     # CLI config + 294 aliases
+├── omnigraph.yaml     # per-operator CLI config + 294 aliases
 └── queries/
     ├── beliefs.gq        # 23 reads
     ├── deals.gq          # 20 reads
@@ -536,61 +539,39 @@ Total: 289 named queries, 294 aliases.
 
 ## Quick Start
 
-All commands run from `vc-os/`:
+This cookbook is a **filesystem-backed cluster** — no object store, no
+credentials. `cluster.yaml` declares the graph (`vcos`), its schema, and all
+stored queries; `omnigraph cluster apply` converges it (creating the graph at
+`graphs/vcos.omni`); the server serves the applied state. All commands run
+from `vc-os/`:
 
 ```bash
 cd vc-os
+omnigraph cluster import --config .   # one-time: create the state ledger
+omnigraph cluster plan   --config .
+omnigraph cluster apply  --config .   # creates graphs/vcos.omni, applies schema, publishes queries
+omnigraph load --data seed.jsonl --mode overwrite graphs/vcos.omni   # one-time seed
+omnigraph-server --cluster . --bind 127.0.0.1:8080 --unauthenticated  # serve (local dev)
+```
 
-# 1. Bring up RustFS via Docker (one-time)
-docker run -d --name omnigraph-rustfs-vcos \
-  -p 127.0.0.1:9000:9000 -p 127.0.0.1:9001:9001 \
-  -e RUSTFS_ACCESS_KEY=rustfsadmin -e RUSTFS_SECRET_KEY=rustfsadmin \
-  -e RUSTFS_VOLUMES=/data \
-  -e RUSTFS_ALLOW_INSECURE_DEFAULT_CREDENTIALS=true \
-  -e RUSTFS_ADDRESS=0.0.0.0:9000 -e RUSTFS_CONSOLE_ADDRESS=0.0.0.0:9001 \
-  -v /tmp/rustfs-vcos:/data \
-  rustfs/rustfs:1.0.0-beta.4   # pinned: ':latest' floats; beta.4 is the image RUSTFS_ALLOW_INSECURE_DEFAULT_CREDENTIALS targets
+Then query through the server via aliases (in a separate terminal):
 
-# 2. Create .env.omni (these are the local RustFS dev creds; .env.omni is gitignored)
-cat > .env.omni <<'EOF'
-AWS_ACCESS_KEY_ID=rustfsadmin
-AWS_SECRET_ACCESS_KEY=rustfsadmin
-AWS_REGION=us-east-1
-AWS_ENDPOINT_URL=http://127.0.0.1:9000
-AWS_ENDPOINT_URL_S3=http://127.0.0.1:9000
-AWS_ALLOW_HTTP=true
-AWS_S3_FORCE_PATH_STYLE=true
-EOF
-set -a && source ./.env.omni && set +a
-
-# 3. Lint the schema and queries (pure file check - no server needed)
-omnigraph lint --schema ./schema.pg --query ./queries/deals.gq
-
-# 4. Create the bucket, init the repo, load the seed
-curl -s -X PUT http://127.0.0.1:9000/omnigraph-local/ -H 'Host: omnigraph-local.localhost' \
-     --user 'rustfsadmin:rustfsadmin' --aws-sigv4 'aws:amz:us-east-1:s3'
-omnigraph init --schema ./schema.pg s3://omnigraph-local/repos/vc-os
-omnigraph load --data ./seed.jsonl --mode overwrite s3://omnigraph-local/repos/vc-os
-
-# 5. Start the local HTTP server (keep it running - separate terminal)
-omnigraph-server --config ./omnigraph.yaml --unauthenticated   # local dev; v0.6.0+ refuses to start without auth/policy or this flag
-
-# 6. Query through the server via aliases
-omnigraph query --alias team
-omnigraph query --alias founders-enriched
-omnigraph query --alias pre-ic-brief-thesis      deal-helix-series-a
-omnigraph query --alias signal-portfolio-impact  sig-vector-forge-aws-deal
-omnigraph query --alias exit-landscape           org-pinion-infer
-omnigraph query --alias debate-stances           deal-helix-series-a
-omnigraph query --alias board-prep-pack          org-aetherbrick
-omnigraph query --alias contradicted-active-theses
-omnigraph query --alias intro-path-to-founder    per-helix-yuki
-omnigraph query --alias reserve-pressure         fund-iii
-omnigraph query --alias lessons-active
-omnigraph query --alias publishers                                  # publisher/database/expert-network sources
-omnigraph query --alias source-downstream-signals org-techcrunch    # downstream-signal revalidation
-omnigraph query --alias person-insights          per-helix-yuki     # founder assessment
-omnigraph query --alias observed-organizations                      # PitchBook-imported (no Quito engagement)
+```bash
+omnigraph alias team
+omnigraph alias founders-enriched
+omnigraph alias pre-ic-brief-thesis      deal-helix-series-a
+omnigraph alias signal-portfolio-impact  sig-vector-forge-aws-deal
+omnigraph alias exit-landscape           org-pinion-infer
+omnigraph alias debate-stances           deal-helix-series-a
+omnigraph alias board-prep-pack          org-aetherbrick
+omnigraph alias contradicted-active-theses
+omnigraph alias intro-path-to-founder    per-helix-yuki
+omnigraph alias reserve-pressure         fund-iii
+omnigraph alias lessons-active
+omnigraph alias publishers                                  # publisher/database/expert-network sources
+omnigraph alias source-downstream-signals org-techcrunch    # downstream-signal revalidation
+omnigraph alias person-insights          per-helix-yuki     # founder assessment
+omnigraph alias observed-organizations                      # PitchBook-imported (no Quito engagement)
 ```
 
 The aliases are also grouped by meeting view in `omnigraph.yaml` - `VIEW: IC Meeting`, `VIEW: Weekly Pipeline Meeting`, `VIEW: Portfolio Support Meeting`, `VIEW: LPAC / Fund Reporting` - so dashboards map 1:1 to alias bundles.

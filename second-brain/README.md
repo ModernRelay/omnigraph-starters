@@ -4,6 +4,10 @@ A minimal-but-comprehensive Omnigraph cookbook for individuals. Built on [Omnigr
 
 This cookbook is opinionated for personal life: people, places, projects, notes, tasks, habits, media - plus the provenance layer needed to capture from any channel. **13 node types, 43 edge types**, designed to feel light when you start and scale up gracefully.
 
+> For operating Omnigraph — schema authoring, queries, loading, branches, cluster ops, CLI — see the **omnigraph-best-practices** skill. This README covers only what's specific to Second Brain.
+>
+> No object store needed — this is a filesystem-backed cluster.
+
 ## What This Is
 
 A graph schema for the things people actually want their second brain to answer:
@@ -116,41 +120,41 @@ Full property tables and constraints in [`schema.pg`](./schema.pg).
 
 ```bash
 # Close friends and their preferred cadence
-omnigraph query --alias close-friends
+omnigraph alias close-friends
 
 # What did Theo and I do recently, and what do I owe him
-omnigraph query --alias person-recent-events per-theo
-omnigraph query --alias person-tasks-i-owe per-theo
-omnigraph query --alias preferences-for-person per-theo
+omnigraph alias person-recent-events per-theo
+omnigraph alias person-tasks-i-owe per-theo
+omnigraph alias preferences-for-person per-theo
 
 # Open relationship debts across everyone
-omnigraph query --alias tasks-i-owe
-omnigraph query --alias tasks-they-owe
+omnigraph alias tasks-i-owe
+omnigraph alias tasks-they-owe
 
 # My operating principles + the habits motivated by them
-omnigraph query --alias principles
-omnigraph query --alias habit-principle hab-morning-pages
+omnigraph alias principles
+omnigraph alias habit-principle hab-morning-pages
 
 # What's on my mind right now
-omnigraph query --alias open-questions
-omnigraph query --alias notes-by-kind reflection
+omnigraph alias open-questions
+omnigraph alias notes-by-kind reflection
 
 # Project rollups: what tasks are open for Quiet Coach, what events are coming up
-omnigraph query --alias project-tasks proj-quietcoach
-omnigraph query --alias project-events proj-quietcoach
+omnigraph alias project-tasks proj-quietcoach
+omnigraph alias project-events proj-quietcoach
 
 # Area drill-down: everything attached to Family
-omnigraph query --alias area-projects area-family
-omnigraph query --alias area-tasks area-family
-omnigraph query --alias area-habits area-family
+omnigraph alias area-projects area-family
+omnigraph alias area-tasks area-family
+omnigraph alias area-habits area-family
 
 # Reading queue + who recommended what
-omnigraph query --alias reading-queue
-omnigraph query --alias person-recommendations per-kenji
+omnigraph alias reading-queue
+omnigraph alias person-recommendations per-kenji
 
 # Life events affecting people I care about
-omnigraph query --alias person-recent-events per-maya
-omnigraph query --alias events-recent
+omnigraph alias person-recent-events per-maya
+omnigraph alias events-recent
 ```
 
 ## Files
@@ -158,39 +162,39 @@ omnigraph query --alias events-recent
 - `schema.pg` — Executable Omnigraph schema (source of truth)
 - `seed.md` / `seed.jsonl` — Reference seed (human-readable / loadable)
 - `queries/*.gq` — Read queries (8 files) + mutations (`mutations.gq`)
-- `omnigraph.yaml` — CLI config with aliases for all wow queries
-- `.env.omni.example` — RustFS credential template
+- `cluster.yaml` — Deployment declaration (graph `brain`, schema, stored queries)
+- `omnigraph.yaml` — Per-operator CLI config with aliases for all wow queries
 
 ## Quick Start
 
-All commands run from `second-brain/`:
+This cookbook is a **filesystem-backed cluster directory** — no object store,
+no credentials. `cluster.yaml` declares the graph (`brain`), its schema, and
+all stored queries; `omnigraph cluster apply` converges it (creating the graph
+at `graphs/brain.omni`); the server serves the applied state. All commands run
+from `second-brain/`:
 
 ```bash
 cd second-brain
-
-# Source RustFS credentials
-cp .env.omni.example .env.omni
-set -a && source ./.env.omni && set +a
-
-# Lint the schema and queries (pure file check)
-omnigraph lint --schema ./schema.pg --query ./queries/people.gq
-
-# Init the repo (one-time — writes to storage)
-omnigraph init --schema ./schema.pg s3://omnigraph-local/repos/second-brain
-
-# Load the seed (one-time)
-omnigraph load --data ./seed.jsonl --mode overwrite s3://omnigraph-local/repos/second-brain
-
-# Start the local HTTP server (keep running)
-omnigraph-server --config ./omnigraph.yaml --unauthenticated   # local dev; v0.6.0+ refuses to start without auth/policy or this flag
-
-# Query through the server via aliases
-omnigraph query --alias close-friends
-omnigraph query --alias person-recent-events per-theo
-omnigraph query --alias tasks-i-owe
+omnigraph cluster import --config .   # one-time: create the state ledger
+omnigraph cluster plan   --config .
+omnigraph cluster apply  --config .   # creates graphs/brain.omni, applies schema, publishes queries
+omnigraph load --data seed.jsonl --mode overwrite graphs/brain.omni   # one-time seed
+omnigraph-server --cluster . --bind 127.0.0.1:8080 --unauthenticated  # serve (local dev)
 ```
 
-See the [Omnigraph](https://github.com/ModernRelay/omnigraph) repo for full CLI reference.
+Then query through the server via aliases:
+
+```bash
+omnigraph alias close-friends
+omnigraph alias person-recent-events per-theo
+omnigraph alias tasks-i-owe
+```
+
+Day-2 changes are declarative: edit `schema.pg` / a `.gq` file / `cluster.yaml`,
+then `cluster plan` (schema edits show real migration steps) → `cluster apply`
+→ restart the server. Data still flows through `omnigraph load` / `omnigraph
+mutate` against `graphs/brain.omni`. See the **omnigraph-best-practices** skill
+for the full ops loop.
 
 ## Extending
 

@@ -1,0 +1,10 @@
+version: 1
+metadata:
+  name: vc-os
+state:
+  backend: cluster
+  lock: true
+graphs:
+  vcos:
+    schema: schema.pg
+    queries: queries/

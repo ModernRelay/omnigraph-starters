@@ -1,6 +1,6 @@
 # CLAUDE.md — vc-os
 
-Scoped guidance for the `vc-os/` cookbook. Repo-wide conventions live in `../CLAUDE.md`.
+Scoped guidance for the `vc-os/` cookbook. Repo-wide conventions live in `../CLAUDE.md`. For general Omnigraph ops — schema authoring, queries, loading, branches, cluster commands, the CLI — use the **omnigraph-best-practices** skill rather than re-deriving them here; this file covers only what's specific to VC OS.
 
 ## What This Is
 
@@ -14,17 +14,23 @@ The reference seed is a **fictional Berlin-based AI-infra fund** ("Quito Capital
 - `README.md` — Design rationale, collapsed stack analysis, killer queries.
 - `seed.md` / `seed.jsonl` — Reference seed (human-readable / loadable).
 - `queries/*.gq` — Read and mutation queries. One file per domain.
-- `omnigraph.yaml` — CLI config with 294 aliases.
+- `cluster.yaml` — Deployment declaration (graph `vcos`, schema, stored queries).
+- `omnigraph.yaml` — Per-operator CLI config with 294 aliases.
 
 Omnigraph CLI/schema reference: [ModernRelay/omnigraph](https://github.com/ModernRelay/omnigraph).
 
+## Cluster control plane (two-file model)
+
+This cookbook is a **filesystem-backed cluster** — no object store, no S3 creds.
+
+- `cluster.yaml` is the **deployment**: graph `vcos`, `schema.pg`, and every stored query. Converge it with `omnigraph cluster import|plan|apply --config .` — `apply` creates the graph at `graphs/vcos.omni`, applies the schema (plan previews migration steps), and publishes the queries.
+- `omnigraph.yaml` is **per-operator only** — aliases, CLI defaults, identity. A cluster-booted server (`omnigraph-server --cluster .`) never reads it.
+- **Data** flows through `omnigraph load` / `omnigraph mutate` against `graphs/vcos.omni`; invoke aliases with `omnigraph alias <name> [args]`.
+- Never commit `__cluster/` or `graphs/` (gitignored — local state).
+
 ## Schema Language (`.pg`)
 
-- `node` defines entity types; `edge` defines typed relationships (`edge Name: Source -> Target`)
-- `@key` marks external identity (always `slug` here)
-- `@index`, `@unique`, `@card(min..max)`, `@embed("prop")`
-- `?` = optional, `[Type]` = list of scalar (no lists of enum), `enum(...)` = inline closed set
-- Comments use `//` not `#`
+Schema-language reference (node/edge syntax, `@key`/`@index`/`@unique`/`@embed`, `?`/`[Type]`/`enum(...)`) lives in the **omnigraph-best-practices** skill. VC-OS-specific note: comments use `//` not `#`, and `[Type]` lists hold scalars only (no lists of enum).
 
 ## Domain Model
 
@@ -94,8 +100,7 @@ As of MR-983 (PR #133, engine v0.6.3+), `@unique(src, dst)` enforces pair-unique
 - **Edge-property projections aren't supported in queries** — `Knows.strength`, `WorksAt.role`, `RoleInDeal.role`, `BoardMemberAt.role`, etc. are stored but cannot be returned in `read` results. Filter in the writer; surface via dedicated read-side helpers if needed.
 - **`Chunk` is declared but the seed has zero.** Embeddings come from a separate ingest pipeline (`omnigraph embed --reembed_all`); the static seed can't generate them. Hybrid search is a v1-deferred capability.
 - **Alias args bind to query parameters by *name*, not position.** An alias `args: [slug]` only binds to a query that declares `$slug`. Renaming the alias arg to `[deal_slug]` without also renaming `$slug → $deal_slug` in the query silently drops the filter — the query then matches every row instead of one. If you want clearer arg names, rename in *both* places; otherwise add a comment block above the alias group explaining the input semantics.
-- **Adding values to an existing enum requires a wipe + re-init + reload (still true as of Omnigraph 0.6.1).** `schema apply` (even with `--allow-data-loss`) rejects enum extensions as destructive type changes (`OG-MF-106` — "changing property type ... not supported in schema migration v1"; `SCHEMA_IR_VERSION` is still 1 in 0.6.1). The migration path is: kill the server, `aws s3 rm s3://<bucket>/repos/<name>/ --recursive` (run twice — first pass leaves a handful of files), `omnigraph init --schema schema.pg`, `omnigraph load --data <stripped-seed>.jsonl --mode overwrite`. Reload takes ~10–15 min for a 200-node / 400-edge seed. Batch multiple enum or property-type changes into one wipe-reload cycle — single-change wipes aren't worth the cost.
-- **`omnigraph-server` (v0.6.0+) requires auth or explicit `--unauthenticated`.** Cedar policy enforcement is now engine-wide and the server refuses to start without bearer tokens, a policy file, or `--unauthenticated` (env: `OMNIGRAPH_UNAUTHENTICATED=1`). For local dev, set the env var. For Railway/production, configure a Cedar policy YAML. Note (v0.6.1): with a **named** graph, the policy file must be nested under `graphs.<name>.policy`, not top-level, or the server refuses to boot.
+- **Adding values to an existing enum is a destructive type change.** `cluster apply` / `schema apply` reject in-place enum extensions, so widening an enum means rebuilding the graph: stop the server, delete `graphs/vcos.omni`, re-run `omnigraph cluster apply --config .`, then `omnigraph load --data seed.jsonl --mode overwrite graphs/vcos.omni`. Batch multiple enum/property-type changes into one rebuild — single-change rebuilds aren't worth the cost. (General migration mechanics live in the **omnigraph-best-practices** skill.)
 - **`Artifact.blob` is declared but the seed uses none.** Same status as Chunks — populate via separate ingest.
 
 ## The Demo "Wow" Queries
