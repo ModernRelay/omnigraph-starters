@@ -163,7 +163,7 @@ omnigraph queries validate              # type-check the stored-query registry v
 omnigraph queries list                  # list registry query names, MCP exposure, and typed params
 ```
 
-`validate` opens the selected graph and type-checks every query in the `queries:` block — catches schema drift without restarting the server. `list` prints the selected registry. Select the graph with `--store <uri>` or a positional URI; with no graph selected, `list` shows only the top-level `queries:` block. Distinct from `lint` (which validates a single `.gq` file). See `references/stored-queries.md`.
+`validate` opens the addressed graph and type-checks every applied stored query against the live schema — catches drift without restarting the server. `list` prints that graph's registry. Address the graph with `--store <uri>` or a positional URI. Distinct from `lint` (which validates a single `.gq` file). See `references/stored-queries.md`.
 
 ## Operator Config & Credentials
 
@@ -230,8 +230,8 @@ omnigraph cluster refresh      --config <dir>          # re-observe live graphs;
 omnigraph cluster force-unlock <LOCK_ID> --config <dir>  # clear a crashed run's lock (exact id from status)
 ```
 
-Topology rule: `omnigraph schema apply` and `omnigraph init` are single-graph
-commands; in cluster mode their jobs belong to `cluster apply`. Data commands
-(`load`, `mutate`, branches) are identical in both — point them at the derived
-root (`<dir>/graphs/<id>.omni`, or `<storage>/graphs/<id>.omni` for an
+Topology rule: `omnigraph schema apply` and `omnigraph init` **refuse a
+cluster-managed graph** — in a cluster their jobs belong to `cluster apply`.
+Data commands (`load`, `mutate`, branches) work either way — point them at the
+derived root (`<dir>/graphs/<id>.omni`, or `<storage>/graphs/<id>.omni` for an
 S3-backed cluster). See `references/cluster.md`.

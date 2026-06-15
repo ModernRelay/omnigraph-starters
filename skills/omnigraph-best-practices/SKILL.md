@@ -1,6 +1,6 @@
 ---
 name: omnigraph-best-practices
-description: Operate a locally or remotely deployed Omnigraph graph database. Use whenever you see Omnigraph CLI commands (omnigraph init/query/mutate/load/schema/lint/embed/branch/commit/login/config migrate/cluster), .pg schema files, .gq query files, S3 graph URIs (s3://...), bearer-authed graph endpoints, 504 errors, or a folder with cluster.yaml, omnigraph.yaml, or ~/.omnigraph/config.yaml. Covers cluster-mode declarative deployments (cluster.yaml plan/apply, S3 object storage, omnigraph-server --cluster), the two config surfaces (team cluster.yaml + operator ~/.omnigraph/config.yaml — identity, servers, login, --server), schema evolution, query linting, data writes (mutate for edits; load with required --mode + --from for branches), branches, embeddings, Cedar policy, and remote ops (504 verification, version drift). Especially important before schema apply (plan first), any load (--mode required), any .gq/.pg edit (lint after), or any remote write (verify via commit list).
+description: Operate a locally or remotely deployed Omnigraph graph database. Use whenever you see Omnigraph CLI commands (omnigraph init/query/mutate/load/schema/lint/embed/branch/commit/login/profile/cluster), .pg schema files, .gq query files, S3 graph URIs (s3://...), bearer-authed graph endpoints, 504 errors, or a folder with cluster.yaml, omnigraph.yaml, or ~/.omnigraph/config.yaml. Covers cluster-mode declarative deployments (cluster.yaml plan/apply, S3 object storage, omnigraph-server --cluster), the two config surfaces (team cluster.yaml + operator ~/.omnigraph/config.yaml — identity, servers, login, --server), schema evolution, query linting, data writes (mutate for edits; load with required --mode + --from for branches), branches, embeddings, Cedar policy, and remote ops (504 verification, version drift). Especially important before schema apply (plan first), any load (--mode required), any .gq/.pg edit (lint after), or any remote write (verify via commit list).
 license: MIT (see LICENSE at repo root)
 compatibility: Requires omnigraph CLI >= 0.7.0 — the unified `load`, the two config surfaces (cluster.yaml + ~/.omnigraph/config.yaml), and cluster apply/serve all require 0.7.0.
 metadata:
@@ -17,7 +17,7 @@ This skill captures the operational rules for working with a locally or remotely
 
 1. **Lint before commit** — `omnigraph lint --schema schema.pg --query queries/foo.gq` validates both sides against each other. No running repo required.
 2. **Plan before apply** — never run `schema apply` without a successful `schema plan` first. Apply is destructive; plan is free. (Cluster mode has the same rule with different verbs: `cluster plan` before `cluster apply` — the plan embeds the engine's real migration steps.)
-3. **Branches are for data; apply is for schema** — review bulk data loads on a feature branch then merge. Schema changes go straight to `main` (single-graph: `omnigraph schema apply`; cluster mode: edit the `.pg` and run `cluster apply` — there is no direct `schema apply` in cluster deployments).
+3. **Branches are for data; apply is for schema** — review bulk data loads on a feature branch then merge. Schema changes go straight to `main`: in cluster mode edit the `.pg` and run `cluster apply` (a direct `schema apply` **refuses** a cluster-managed graph); `schema plan`/`apply` is for a non-cluster store.
 4. **Pick the right write command** — `mutate` for edits (typechecked, parameterized); `load` for bulk JSONL, local **or** remote, with a **required** `--mode` (`merge` upsert · `append` strict-insert · `overwrite` clean-slate). `load --from <base>` forks a review branch in one shot; bare `load` needs an existing target branch.
 5. **Parameterize everything** — never string-interpolate values into `.gq` bodies or `--params`. Declare `$var: Type` and pass via `--params`.
 6. **Expose agent operations as aliases** — not raw CLI invocations. Aliases decouple the operation name from the query implementation.
@@ -226,7 +226,7 @@ bool_lit = { "true" | "false" }
 
 Notation: `<x>` required · `[x]` optional · `<a|b>` choice · `…` repeatable.
 
-**Global addressing flags**: `--as <actor>` (direct/`--store` writes only — a server resolves the actor from its token), `--server <name|url>`, `--cluster <dir|uri>` (cluster-managed storage, for maintenance), `--graph <id>` (selects the graph within a `--server` or `--cluster` scope), `--profile <name>` (`$OMNIGRAPH_PROFILE`), `--store <uri>`. Plus a positional `file://`/`s3://` URI and `--config <path>` on most graph commands. Output: `--json`, or reads take `--format <json|jsonl|csv|kv|table>`. **Write guards:** `--yes` skips the confirm prompt for a destructive write (`cleanup`, overwrite `load`, `branch delete`) against a non-local scope (it *refuses* without it when non-TTY or `--json`); `--quiet` suppresses the resolved-target echo.
+**Global addressing flags**: `--as <actor>` (direct/`--store` writes only — a server resolves the actor from its token), `--server <name|url>`, `--cluster <dir|uri>` (cluster-managed storage, for maintenance), `--graph <id>` (selects the graph within a `--server` or `--cluster` scope), `--profile <name>` (`$OMNIGRAPH_PROFILE`), `--store <uri>`. Data commands also take a positional `file://`/`s3://` URI (`--config <dir>` is for `cluster` commands only). Output: `--json`, or reads take `--format <json|jsonl|csv|kv|table>`. **Write guards:** `--yes` skips the confirm prompt for a destructive write (`cleanup`, overwrite `load`, `branch delete`) against a non-local scope (it *refuses* without it when non-TTY or `--json`); `--quiet` suppresses the resolved-target echo.
 
 **Data plane** — `any` (served via `--server`/`--profile`, or direct via `--store`/URI):
 - `query` (alias `read`) `<name>` — a **served stored query** by name (via `--server`/`--profile`); or ad-hoc `[<name>] (--query <f.gq> | -e '<GQ>')` where `<name>` picks which query in the source. `[--params <json> | --params-file <p>] [--branch <b> | --snapshot <id>] [--format <fmt> | --json]`. No positional URI — address via `--server`/`--store`/`--profile`.
@@ -237,7 +237,7 @@ Notation: `<x>` required · `[x]` optional · `<a|b>` choice · `…` repeatable
 - `export [--branch <b>] [--type <T>…] [--table <K>…]` (streams JSONL)
 - `branch <create <name> [--from <base>] | list | delete <name> | merge <source> --into <target>> [--json]`
 - `commit <list [--branch <b>] | show <commit_id>> [--json]`
-- `schema <plan | apply> --schema <f.pg> [--allow-data-loss] [--json]` · `schema show` (alias `get`)
+- `schema <plan | apply> --schema <f.pg> [--allow-data-loss] [--json]` · `schema show` (alias `get`) — `apply` **refuses a cluster-managed graph** (evolve those via `cluster apply`)
 
 **Served only** (needs `--server`/`--profile`): `graphs list [--json]`
 
@@ -252,9 +252,9 @@ Notation: `<x>` required · `[x]` optional · `<a|b>` choice · `…` repeatable
 - `cluster approve <resource> --as <actor> [--config <dir>] [--json]` · `cluster force-unlock <lock_id> [--config <dir>] [--json]`
 
 **Local** (no graph):
-- `policy <validate | test | explain --actor <a> --action <act> [--branch <b> | --target-branch <b>]> [--config <p>]`
+- `policy <validate | test --tests <f> | explain --actor <a> --action <act> [--branch <b> | --target-branch <b>]> --cluster <dir> [--graph <id>]`
 - `embed --seed <embed.yaml> [--reembed_all | --clean | --select "<Type>:<field>=<value>"]`
-- `login <server> [--token <t>]` (prefer piping the token on stdin) · `logout <server>` · `config migrate [--write]` · `version`
+- `login <server> [--token <t>]` (prefer piping the token on stdin) · `logout <server>` · `profile <list | show [<name>]>` · `version`
 
 Pre-0.7.0 spellings (`read`/`change`/`ingest`, `--target`, positional `http://`) → [`references/migrations.md`](references/migrations.md).
 
@@ -299,19 +299,16 @@ set -a && source .env.omni && set +a
 
 ## Project Layout
 
-### Two deployment models — pick one per project
+### Deployment & access (omnigraph >= 0.7.0)
 
-- **Cluster mode** (omnigraph >= 0.7.0, recommended for new projects): a
-  `cluster.yaml` declares the whole deployment (graphs, schemas, stored
-  queries, policies, and optionally an S3 `storage:` root);
-  `omnigraph cluster apply` converges it and `omnigraph-server --cluster .`
-  (or `--cluster s3://bucket/prefix` for config-free serving) serves it. See
-  `references/cluster.md`.
-- **Single-graph mode** (classic): one server, one graph, selected by a bare
-  URI or a named graph. Fully supported; the only path for an individually
-  S3-hosted graph today.
-
-A server boots from one source or the other — never a merge of both.
+- **Cluster deployment — the only way to serve.** A `cluster.yaml` declares the
+  whole deployment (graphs, schemas, stored queries, policies, optional S3
+  `storage:` root); `omnigraph cluster apply` converges it and
+  `omnigraph-server --cluster .` (or `--cluster s3://bucket/prefix`,
+  config-free) serves it. See `references/cluster.md`.
+- **Direct / embedded access — no server.** Address a graph's storage directly
+  with `--store <file://|s3:// uri>` or a positional URI for one-off CLI ops.
+  There is **no single-graph server mode** — the server is cluster-only.
 
 ### The two config surfaces (omnigraph >= 0.7.0)
 
@@ -393,7 +390,7 @@ These are the traps most likely to bite. Scan this table before debugging any pa
 | Blind retry after 504 | Duplicate Signal/Decision/Claim (append-only types lack `@key` dedup) | `commit list --branch main --json` first; head advanced means it landed; only retry if unchanged |
 | `sync_branch()` mentioned in version-drift error | Searching for nonexistent CLI command | Server-internal directive in error text; just retry — the next call re-pins to the new head |
 | Stale empty branches at `main`'s head | 504-orphaned forks from a timed-out `load --from`; eventually block writes | List branches, find ones at `main`'s `graph_commit_id`, `omnigraph branch delete --config X <name>` |
-| Top-level `policy:`/`queries:` with a **named** graph (`server.graph`) | server refuses to boot with migration guidance (v0.6.1) | Nest under `graphs.<name>.policy` / `graphs.<name>.queries`. Top-level is valid **only** for an anonymous bare-URI single-graph server |
+| `omnigraph schema apply` / `init` on a cluster-managed graph | refused — bypasses the cluster ledger | Evolve cluster graphs via `omnigraph cluster apply --config .`; `schema apply`/`init` are for a non-cluster store |
 | `omnigraph optimize` against a table with a `Blob` property | table is **skipped**, not failed (Lance blob-v2 compaction bug) | Expected — `--json` reports it under `skipped`; non-blob tables still compact |
 | `@unique` on a `[List]`/`Blob` column | `load` now errors loudly (was silently un-enforced before #160) | Use `@unique` only on scalar columns (and composite `@unique(a, b)`, now keyed as a true tuple) — uniqueness needs a type that reduces to a scalar key |
 
@@ -411,7 +408,7 @@ For anything beyond the basics, load the relevant reference file. Each is self-c
 | [`references/remote-ops.md`](references/remote-ops.md) | Operating against a remote/CloudFront-fronted graph: 504 verification ritual, version drift, fork-branch 504 fingerprints, append-only retry safety, operator `--server`/`login` targeting |
 | [`references/search.md`](references/search.md) | Embeddings, `@embed`, vector/text ranking, scope-then-rank pattern |
 | [`references/aliases.md`](references/aliases.md) | Defining aliases for agents, structured output, JSON args |
-| [`references/stored-queries.md`](references/stored-queries.md) | Server-side stored-query registry (v0.6.1): `queries:` config, `omnigraph queries validate/list`, `GET /queries` + `POST /queries/{name}`, `invoke_query` Cedar gating, MCP exposure |
+| [`references/stored-queries.md`](references/stored-queries.md) | Server-side stored-query registry: declared in `cluster.yaml`, `omnigraph queries validate/list`, `GET /graphs/{id}/queries` + `POST /graphs/{id}/queries/{name}`, `invoke_query` Cedar gating |
 | [`references/server-policy.md`](references/server-policy.md) | Starting the HTTP server, routes, bearer auth, Cedar policy gating, multi-graph mode |
 | [`references/commands.md`](references/commands.md) | `snapshot`, `export`, `commit list/show`, addressing & resolution |
 | [`references/migrations.md`](references/migrations.md) | Migrating a pre-0.7.0 setup, or you hit an old config/command/flag/route/error and need its current form |

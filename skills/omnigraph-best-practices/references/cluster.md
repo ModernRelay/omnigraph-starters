@@ -9,9 +9,9 @@
 
 The cluster control plane (omnigraph >= 0.7.0) manages a whole deployment —
 graphs, schemas, stored queries, Cedar policies — as **declared files in one
-directory**, converged Terraform-style. It is
-opt-in: everything in the other references (single-graph `omnigraph.yaml`
-deployments, data-plane operations) remains fully supported.
+directory**, converged Terraform-style. It is the **only way to serve** a
+graph (the server is cluster-only); the data-plane operations in the other
+references work against the cluster's graphs unchanged.
 
 ## The model
 

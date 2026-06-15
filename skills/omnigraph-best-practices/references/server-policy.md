@@ -14,32 +14,34 @@ How to run `omnigraph-server` and gate operations with Cedar policies.
 
 ## Starting the Server
 
-The server is the canonical runtime entry point. Start it once per deployment and keep it running — all CLI queries, mutations, and admin ops go through it.
+The server is the canonical runtime entry point — all CLI queries, mutations, and admin ops go through it. **Boot is cluster-only** (RFC-011): the server boots from a cluster and serves N graphs (N ≥ 1) under nested routes. There is **no** single-graph / bare-URI / `omnigraph.yaml` boot.
 
 ```bash
-omnigraph-server --cluster ./company-brain     # boots an applied cluster (or `--cluster s3://bucket/prefix`)
-omnigraph-server s3://my-bucket/repos/spike    # a single bare graph URI
+omnigraph-server --cluster ./company-brain --bind 127.0.0.1:8080   # a config directory …
+omnigraph-server --cluster s3://bucket/prefix --bind 0.0.0.0:8080  # … or a storage-root URI (config-free)
 ```
 
-A server boots from one source — `--cluster` reads the applied ledger (see *Cluster-Booted Servers* below); a bare URI serves that one graph. Run the server in a separate terminal or background process.
+`--cluster` boots from the cluster's applied revision (see *Cluster-Booted Servers* below). Run it in a separate terminal or background process.
 
 ## HTTP Routes
 
+All per-graph routes are nested under `/graphs/{id}/...` (`{id}` = a graph id from the applied cluster); bare flat paths (`/query`, `/snapshot`, …) return **404**. `/healthz` and `/graphs` stay flat.
+
 | Route | Purpose |
 |-------|---------|
-| `GET /healthz` | liveness probe |
-| `GET /snapshot` | table state + row counts |
-| `GET /export` | JSONL stream of a branch |
-| `POST /query` | read query execution |
-| `POST /mutate` | mutation execution |
-| `POST /load` | bulk JSONL load into a branch (32 MB body limit); branch creation opt-in via `from` |
-| `GET /queries` | stored-query catalog (v0.6.1) — lists `mcp.expose` queries as a typed tool catalog; **read**-gated |
-| `POST /queries/{name}` | invoke a named stored query (v0.6.1); **`invoke_query`**-gated (+ `change` for a stored mutation); never accepts ad-hoc `.gq` from the client; deny == 404 |
-| `POST /schema/apply` | schema migration |
-| `GET /branches` | branch list |
-| `GET /commits` | commit history |
+| `GET /healthz` | liveness probe (flat) |
+| `GET /graphs` | enumerate served graphs (flat; `graph_list`-gated) |
+| `GET /graphs/{id}/snapshot?branch=` | table state + row counts |
+| `POST /graphs/{id}/query` | read query (canonical; `/read` = deprecated alias) |
+| `POST /graphs/{id}/mutate` | mutation (`/change` = deprecated alias) |
+| `POST /graphs/{id}/load` | bulk JSONL load, 32 MB; branch creation opt-in via `from` (`/ingest` = deprecated alias) |
+| `POST /graphs/{id}/export` | NDJSON stream of a branch |
+| `GET /graphs/{id}/queries` · `POST /graphs/{id}/queries/{name}` | stored-query catalog (`read`) + invocation (`invoke_query`, +`change` for a stored mutation; deny == 404) |
+| `GET /graphs/{id}/schema` · `POST /graphs/{id}/schema/apply` | read `.pg` · migrate (`schema_apply`) |
+| `GET/POST /graphs/{id}/branches` · `DELETE …/branches/{b}` · `POST …/branches/merge` | branch ops |
+| `GET /graphs/{id}/commits?branch=` · `…/commits/{commit_id}` | history |
 
-Query params for read routes: `?branch=main` or `?snapshot=<id>`. Writes publish directly and commit atomically via the `__manifest` table; use `GET /commits` for write/audit history.
+Read routes take `?branch=main` or `?snapshot=<id>`. Writes publish directly and commit atomically via `__manifest`; use the commits route for write/audit history.
 
 ## Auth
 
@@ -106,33 +108,19 @@ Per-graph actions (evaluated against the graph being addressed):
 | `read` | query execution |
 | `export` | data export |
 | `change` | mutations |
-| `invoke_query` | stored-query invocation via `POST /queries/{name}` (v0.6.1; graph-scoped, not branch-scoped). A stored **mutation** is double-gated — it also passes `change`. For a caller without the grant, a denial and an unknown query name both return the same **404** so the catalog can't be probed. |
+| `invoke_query` | stored-query invocation via `POST /graphs/{id}/queries/{name}` (graph-scoped, not branch-scoped). A stored **mutation** is double-gated — it also passes `change`. For a caller without the grant, a denial and an unknown query name both return the same **404** so the catalog can't be probed. |
 | `schema_apply` | schema migrations |
 | `branch_create` | branch creation |
 | `branch_delete` | branch deletion |
 | `branch_merge` | merges (especially into protected branches) |
 
-`admin` exists but is reserved (no call site yet — don't write rules for it). In multi-graph deployments there is also a server-scoped `graph_list` action gating `GET /graphs`; it lives in a separate `server.policy.file`.
+`admin` exists but is reserved (no call site yet — don't write rules for it). A server-scoped `graph_list` action gates `GET /graphs`; declare it in a `[cluster]`-scoped bundle.
 
 For any shared repo, gate at least `schema_apply` and `branch_merge`.
 
 ### Where policy is declared
 
-Cedar bundles are declared in `cluster.yaml` and attach via `applies_to` (`[cluster]` server-level, `[<graph-id>]` per graph) — see *Cluster-Booted Servers* below. The `policy.yaml` rule format (below) is the same everywhere; a classic single-graph server points its config at the policy file:
-
-> **Config-follows-identity (v0.6.1, breaking).** A top-level `policy:` (and `queries:`) block applies **only** to an anonymous bare-URI single-graph server. A graph served **by name** — `server.graph: <name>` (or the `omnigraph-server` `--target <name>` boot flag) — must nest its policy under that graph:
->
-> ```yaml
-> graphs:
->   local_s3:
->     uri: s3://my-bucket/repos/spike-intel
->     policy:
->       file: policy.yaml          # per-graph; required when the graph is named
-> server:
->   graph: local_s3
-> ```
->
-> Leaving `policy:` (or `queries:`) at the top level while selecting a named graph now makes the server **refuse to boot** with migration guidance (it used to be silently accepted in v0.6.0). The multi-graph layout below already nests correctly.
+Cedar bundles are declared in `cluster.yaml` and attach via `applies_to`: `[cluster]` is the server-level engine (gates `graph_list` / `GET /graphs`); `[<graph-id>]` is that graph's engine (gates `invoke_query`, `read`, `change`, `branch_*`, `schema_apply`). `cluster apply` publishes them and the `--cluster` server enforces the applied revision. The `policy.yaml` rule format (below) is the bundle content.
 
 ### `policy.yaml` shape
 
@@ -178,18 +166,18 @@ Scope rules (a rule's `allow` block may use **at most one**):
 ### Validate, test, explain
 
 ```bash
-# Compile Cedar + check syntax
-omnigraph policy validate --config omnigraph.yaml
+# Compile Cedar + check the cluster's applied policies
+omnigraph policy validate --cluster .
 
-# Run declarative test cases from policy.tests.yaml
-omnigraph policy test --config omnigraph.yaml
+# Run declarative test cases
+omnigraph policy test --cluster . --tests policy.tests.yaml
 
 # Debug a single decision
 omnigraph policy explain \
   --actor act-alice \
   --action schema_apply \
   --target-branch main \
-  --config omnigraph.yaml
+  --cluster .
 ```
 
 ### Test cases (`policy.tests.yaml`)
@@ -212,36 +200,15 @@ cases:
 
 Run `policy test` after every policy edit. Tests are cheap.
 
-## Multi-graph mode (v0.6.0+)
+## Multi-graph serving
 
-One `omnigraph-server` process can serve up to 10 graphs at once. Mode is inferred from config: a non-empty `graphs:` map **with no single-mode selector** (`server.graph`, a positional `<URI>`, or `--target`) starts the server in multi mode.
+A `--cluster` server serves every graph in the applied cluster, each under `/graphs/{id}/...`. `GET /graphs` enumerates them (sorted by id), gated by the cluster-level `graph_list` action — even under `--unauthenticated`, topology stays closed until a `[cluster]` policy grants it. `omnigraph graphs list` mirrors it (remote servers only).
 
-```yaml
-server:
-  bind: 0.0.0.0:8080
-  policy:
-    file: server-policy.yaml          # server-level Cedar (graph_list)
+Policy attaches at two levels via `cluster.yaml` `applies_to`:
+- `[<graph-id>]` — per-graph rules (`read`, `change`, `branch_*`, `schema_apply`, `invoke_query`).
+- `[cluster]` — server-level rules (`graph_list`).
 
-graphs:
-  alpha:
-    uri: s3://tenant-bucket/alpha
-    policy:
-      file: policies/alpha.yaml       # per-graph Cedar
-  beta:
-    uri: s3://tenant-bucket/beta
-    # no per-graph policy → engine-layer enforcement is a no-op for beta
-```
-
-**Routes are namespaced per graph.** Every per-graph route moves under `/graphs/{graph_id}/...` (`/graphs/alpha/query`, `/graphs/alpha/branches`, …). The bare flat routes (`/query`, `/snapshot`, …) return **404** in multi mode; conversely the cluster routes return **405** in single mode. SDK clients generated against a single-mode spec must regenerate.
-
-**`GET /graphs`** lists the registered graphs (sorted by `graph_id`). It's gated by the server-scoped `graph_list` action and requires `server.policy.file` to be exposed — even under `--unauthenticated`, server topology stays closed until you explicitly authorize it. `omnigraph graphs list` mirrors it (remote servers only; rejects local URIs).
-
-**Policy attaches at two levels:**
-- `graphs.<id>.policy.file` — per-graph rules (`read`, `change`, `branch_*`, `schema_apply`). Each graph flows through its own policy.
-- `server.policy.file` — server-level rules (`graph_list`).
-- Top-level `policy.file` is **rejected** in multi mode (ambiguous across graphs); it stays valid for single-graph / CLI-local use. The loaders reject a `graph_list` rule in a per-graph file (or a `read` rule in the server file) at startup.
-
-Runtime add/remove of graphs is **not** in v0.6.0 — operators edit the config and restart.
+There is no runtime add/remove of graphs — edit `cluster.yaml`, `cluster apply`, restart.
 
 ## Server + Policy Together
 
@@ -254,13 +221,4 @@ Setup ops (`init`, `load`) write storage directly. With a policy configured they
 
 ## Cluster-Booted Servers
 
-`omnigraph-server --cluster <dir>` serves a cluster directory's **applied
-revision** — an exclusive boot source (cannot combine with a URI, `--target`,
-or `--config`; `omnigraph.yaml` is never read). Always multi-graph routing
-(`/graphs/{id}/...`). Policies are declared in `cluster.yaml` with the same
-Cedar YAML format and attach via `applies_to`: `[cluster]` becomes the
-server-level engine (gates `graph_list` / `GET /graphs`), `[<graph-id>]`
-becomes that graph's engine (gates `invoke_query`, `read`, `change`, …).
-Bearer tokens stay process-level (same env vars as below). Applied changes
-serve on the next restart; boot is fail-fast with named remedies. See
-`references/cluster.md`.
+`omnigraph-server --cluster <dir|s3://>` is the only boot source (covered above). It serves the cluster's **applied revision**: `cluster apply` changes take effect on the next restart (no hot reload), and boot is fail-fast with named remedies for missing/pending/tampered state. Bearer tokens and bind stay process-level (env/flags). See `references/cluster.md`.

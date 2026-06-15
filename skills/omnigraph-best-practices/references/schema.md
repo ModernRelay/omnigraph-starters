@@ -183,8 +183,9 @@ omnigraph cluster apply --config . --as <you>
 # restart the --cluster server to serve the new shape
 ```
 
-Differences from the single-graph path: **soft drops only** (`--allow-data-loss`
-is not reachable from cluster apply — prior versions retain dropped columns),
+Differences from direct `schema apply` (on a non-cluster store): **soft drops
+only** (`--allow-data-loss` is not reachable from cluster apply — prior versions
+retain dropped columns),
 and out-of-band schema changes on the live graph are *drift* — `cluster
 refresh` flags them and the next `apply` converges the graph back to the
 declared schema. Everything else in this file (`@rename_from`, backfills,

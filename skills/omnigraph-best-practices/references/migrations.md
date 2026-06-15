@@ -12,8 +12,7 @@ The rest of this skill teaches the **current 0.7.0 surface only**. Consult this 
 | `targets:` / `target:` | `graphs:` / `graph:` |
 | `omnigraph init` scaffolds `omnigraph.yaml` | `init` scaffolds nothing — start a `cluster.yaml` from [`cluster.md`](cluster.md) |
 
-- **Migrate:** `omnigraph config migrate [--write]` splits a legacy `omnigraph.yaml` — team half → `cluster.yaml`, personal half → `~/.omnigraph/config.yaml`.
-- The legacy file still loads (printing a per-key deprecation notice; silence with `OMNIGRAPH_SUPPRESS_YAML_DEPRECATION=1`, or hard-fail with `OMNIGRAPH_NO_LEGACY_CONFIG=1`).
+- **`omnigraph.yaml` is fully removed in 0.7.0** — no CLI command or server reads it, and there is **no `config migrate`**. Move team settings to `cluster.yaml` and personal settings (identity, `servers:`, `defaults:`, `aliases:`) to `~/.omnigraph/config.yaml` by hand.
 
 ## CLI addressing (RFC-011)
 
@@ -25,7 +24,13 @@ The rest of this skill teaches the **current 0.7.0 surface only**. Consult this 
 | `--cluster-graph <id>` | **removed** — `--cluster <dir\|uri>` is a global scope; pick the graph with `--graph <id>`. `--graph` now selects within a `--server` *or* `--cluster` scope |
 | `query`/`mutate` `--name <q>` + positional graph URI / `--uri` | **removed** — the query name is the **positional** (`omnigraph query <name>`): a bare `<name>` invokes a served stored query (kind-asserted), `--query`/`-e` is the ad-hoc lane. Address the graph via `--server`/`--store`/`--profile` (not a positional URI on query/mutate) |
 
-The `omnigraph-server --target` **boot** flag is a different flag and is unchanged.
+## Server boot & schema (RFC-011)
+
+| Before | Now |
+|---|---|
+| `omnigraph-server <URI>` / `--config omnigraph.yaml` / `--target` / single-graph flat routes | **removed** — the server is **cluster-only**: `omnigraph-server --cluster <dir\|s3://>`; all HTTP is nested under `/graphs/<id>/...` (flat routes → 404) |
+| `omnigraph schema apply` on a cluster-managed graph | **refused** — evolve cluster graphs via `cluster apply` (the ledger). `schema apply` still works on a non-cluster store or via `--server` |
+| `policy …` / `queries validate` via `--config omnigraph.yaml` | `policy validate\|test\|explain` reads `--cluster <dir>` (+ `--graph`); `queries validate` takes the store URI |
 
 ## CLI verbs
 
@@ -53,7 +58,7 @@ The old routes remain as **deprecated aliases** (retained indefinitely), carryin
 |---|---|
 | `graphs.<name>.bearer_token_env` in `omnigraph.yaml` | `omnigraph login <server>` → `~/.omnigraph/credentials`, or `OMNIGRAPH_TOKEN_<NAME>` |
 
-The legacy `bearer_token_env` chain is still honored as a fallback for a URL that matches no operator `servers:` entry.
+The client bearer token now comes only from `OMNIGRAPH_TOKEN_<NAME>` or the credentials file — the `omnigraph.yaml` `bearer_token_env` chain is gone with the file.
 
 ## Older removals (still worth knowing)
 
