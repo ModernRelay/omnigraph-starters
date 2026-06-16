@@ -4,7 +4,7 @@ A minimal-but-comprehensive Omnigraph cookbook for individuals. Built on [Omnigr
 
 This cookbook is opinionated for personal life: people, places, projects, notes, tasks, habits, media - plus the provenance layer needed to capture from any channel. **13 node types, 43 edge types**, designed to feel light when you start and scale up gracefully.
 
-> For operating Omnigraph — schema authoring, queries, loading, branches, cluster ops, CLI — see the **omnigraph-best-practices** skill. This README covers only what's specific to Second Brain.
+> For operating Omnigraph — schema authoring, queries, loading, branches, cluster ops, CLI — see the **omnigraph** skill. This README covers only what's specific to Second Brain.
 >
 > No object store needed — this is a filesystem-backed cluster.
 
@@ -198,7 +198,7 @@ omnigraph alias tasks-i-owe
 Day-2 changes are declarative: edit `schema.pg` / a `.gq` file / `cluster.yaml`,
 then `cluster plan` (schema edits show real migration steps) → `cluster apply`
 → restart the server. Data still flows through `omnigraph load` / `omnigraph
-mutate` against `graphs/brain.omni`. See the **omnigraph-best-practices** skill
+mutate` against `graphs/brain.omni`. See the **omnigraph** skill
 for the full ops loop.
 
 ## Extending

@@ -11,7 +11,7 @@ For schema **design** principles (identity, types, edges, constraints) see [`omn
 > `omnigraph.yaml` deployments. Per-operator settings (identity, named servers,
 > credentials, aliases) live in `~/.omnigraph/config.yaml` (RFC-007/008;
 > `omnigraph.yaml` is the deprecated combined file). See the omnigraph repo's
-> `docs/user/clusters/index.md` and the `omnigraph-best-practices` skill's
+> `docs/user/clusters/index.md` and the `omnigraph` skill's
 > `references/cluster.md`. Everything below remains valid for the classic
 > single-graph path and for all data-plane operations.
 

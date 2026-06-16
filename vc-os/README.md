@@ -2,7 +2,7 @@
 
 Opinionated Omnigraph cookbook for venture-capital firms. Built on [Omnigraph](https://github.com/ModernRelay/omnigraph), shaped from a first-principles teardown of how a token-maxxing VC should work. Covers pipeline, diligence, decisions, portfolio, network, audit, and learning - all in one typed graph.
 
-> For operating Omnigraph — schema authoring, queries, loading, branches, cluster ops, the CLI — see the **omnigraph-best-practices** skill. This README covers only what's specific to VC OS. No object store needed — this is a filesystem-backed cluster.
+> For operating Omnigraph — schema authoring, queries, loading, branches, cluster ops, the CLI — see the **omnigraph** skill. This README covers only what's specific to VC OS. No object store needed — this is a filesystem-backed cluster.
 
 ## Why a graph, not another tool
 
