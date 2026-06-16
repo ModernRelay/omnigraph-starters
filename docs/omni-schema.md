@@ -8,7 +8,7 @@ These 12 practical principles instantiate the five canonical ontology design
 criteria from Gruber 1993 — **Clarity, Coherence, Extendibility, Minimal
 encoding bias, Minimal ontological commitment**. The criteria (with
 Omnigraph-specific examples and tradeoffs) live in
-[`skills/omnigraph-best-practices/SKILL.md`](../skills/omnigraph-best-practices/SKILL.md#five-ontology-design-criteria-gruber-1993).
+[the `omnigraph` skill's `SKILL.md`](https://github.com/ModernRelay/omnigraph/blob/main/skills/omnigraph/SKILL.md#five-ontology-design-criteria-gruber-1993).
 Each principle below tags the Gruber criteria it expresses.
 
 ## 1. Schema Is The Contract

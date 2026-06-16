@@ -1,6 +1,6 @@
 # CLAUDE.md — vc-os
 
-Scoped guidance for the `vc-os/` cookbook. Repo-wide conventions live in `../CLAUDE.md`. For general Omnigraph ops — schema authoring, queries, loading, branches, cluster commands, the CLI — use the **omnigraph-best-practices** skill rather than re-deriving them here; this file covers only what's specific to VC OS.
+Scoped guidance for the `vc-os/` cookbook. Repo-wide conventions live in `../CLAUDE.md`. For general Omnigraph ops — schema authoring, queries, loading, branches, cluster commands, the CLI — use the **omnigraph** skill rather than re-deriving them here; this file covers only what's specific to VC OS.
 
 ## What This Is
 
@@ -30,7 +30,7 @@ This cookbook is a **filesystem-backed cluster** — no object store, no S3 cred
 
 ## Schema Language (`.pg`)
 
-Schema-language reference (node/edge syntax, `@key`/`@index`/`@unique`/`@embed`, `?`/`[Type]`/`enum(...)`) lives in the **omnigraph-best-practices** skill. VC-OS-specific note: comments use `//` not `#`, and `[Type]` lists hold scalars only (no lists of enum).
+Schema-language reference (node/edge syntax, `@key`/`@index`/`@unique`/`@embed`, `?`/`[Type]`/`enum(...)`) lives in the **omnigraph** skill. VC-OS-specific note: comments use `//` not `#`, and `[Type]` lists hold scalars only (no lists of enum).
 
 ## Domain Model
 
@@ -100,7 +100,7 @@ As of MR-983 (PR #133, engine v0.6.3+), `@unique(src, dst)` enforces pair-unique
 - **Edge-property projections aren't supported in queries** — `Knows.strength`, `WorksAt.role`, `RoleInDeal.role`, `BoardMemberAt.role`, etc. are stored but cannot be returned in `read` results. Filter in the writer; surface via dedicated read-side helpers if needed.
 - **`Chunk` is declared but the seed has zero.** Embeddings come from a separate ingest pipeline (`omnigraph embed --reembed_all`); the static seed can't generate them. Hybrid search is a v1-deferred capability.
 - **Alias args bind to query parameters by *name*, not position.** An alias `args: [slug]` only binds to a query that declares `$slug`. Renaming the alias arg to `[deal_slug]` without also renaming `$slug → $deal_slug` in the query silently drops the filter — the query then matches every row instead of one. If you want clearer arg names, rename in *both* places; otherwise add a comment block above the alias group explaining the input semantics.
-- **Adding values to an existing enum is a destructive type change.** `cluster apply` / `schema apply` reject in-place enum extensions, so widening an enum means rebuilding the graph: stop the server, delete `graphs/vcos.omni`, re-run `omnigraph cluster apply --config .`, then `omnigraph load --data seed.jsonl --mode overwrite graphs/vcos.omni`. Batch multiple enum/property-type changes into one rebuild — single-change rebuilds aren't worth the cost. (General migration mechanics live in the **omnigraph-best-practices** skill.)
+- **Adding values to an existing enum is a destructive type change.** `cluster apply` / `schema apply` reject in-place enum extensions, so widening an enum means rebuilding the graph: stop the server, delete `graphs/vcos.omni`, re-run `omnigraph cluster apply --config .`, then `omnigraph load --data seed.jsonl --mode overwrite graphs/vcos.omni`. Batch multiple enum/property-type changes into one rebuild — single-change rebuilds aren't worth the cost. (General migration mechanics live in the **omnigraph** skill.)
 - **`Artifact.blob` is declared but the seed uses none.** Same status as Chunks — populate via separate ingest.
 
 ## The Demo "Wow" Queries

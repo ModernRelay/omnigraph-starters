@@ -122,7 +122,7 @@ Plus 148 edges wiring the graph together.
 
 - **Explore queries** in `queries/*.gq`
 - **Try aliases**: see `omnigraph.yaml` under `aliases:`
-- **For day-to-day ops** (adding signals, evolving schema, branches, embeddings): switch to the `omnigraph-best-practices` skill
+- **For day-to-day ops** (adding signals, evolving schema, branches, embeddings): switch to the `omnigraph` skill (`npx skills add ModernRelay/omnigraph@omnigraph`)
 
 ## Optional: Reset
 

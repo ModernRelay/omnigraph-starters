@@ -21,16 +21,16 @@ Packaged agent skills live under [`skills/`](skills) and can be installed with t
 | Skill | Description |
 |-------|-------------|
 | [`omnigraph-intel-bootstrap`](skills/omnigraph-intel-bootstrap) | Bootstrap a new SPIKE graph from scratch — choose demo or custom, elicit domain + sources, adapt schema, research seed content, init + load |
-| [`omnigraph-best-practices`](skills/omnigraph-best-practices) | Operate a locally or remotely deployed Omnigraph — cluster mode, the two config surfaces, schema evolution, query linting, data changes, branches, embeddings, aliases, server, policy, and common gotchas |
 
 Install:
 
 ```bash
 npx skills add ModernRelay/omnigraph-cookbooks@omnigraph-intel-bootstrap
-npx skills add ModernRelay/omnigraph-cookbooks@omnigraph-best-practices
 ```
 
-Typical flow: use `omnigraph-intel-bootstrap` once to set up a new graph, then `omnigraph-best-practices` for day-to-day operations.
+> **Day-to-day operations** are covered by the **`omnigraph` skill**, which now ships in the engine repo (co-versioned with the CLI): `npx skills add ModernRelay/omnigraph@omnigraph` ([ModernRelay/omnigraph](https://github.com/ModernRelay/omnigraph/tree/main/skills/omnigraph)).
+
+Typical flow: use `omnigraph-intel-bootstrap` once to set up a new graph, then the `omnigraph` skill for day-to-day operations.
 
 See [`docs/best-practices.md`](docs/best-practices.md) for the human-readable version of the ops content.
 
@@ -44,8 +44,7 @@ omnigraph-cookbooks/
 │   ├── best-practices.md      ← human-readable operational guide
 │   └── omni-schema.md         ← schema design principles
 ├── skills/
-│   ├── omnigraph-intel-bootstrap/   ← bootstrap a new SPIKE graph (elicitation + research)
-│   └── omnigraph-best-practices/    ← day-to-day ops (SKILL.md + references/)
+│   └── omnigraph-intel-bootstrap/   ← bootstrap a new SPIKE graph (elicitation + research)
 └── <cookbook>/
     ├── README.md
     ├── CLAUDE.md

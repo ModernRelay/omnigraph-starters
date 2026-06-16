@@ -18,7 +18,7 @@ The reference seed is **Alex Chen**, a fictional 36-year-old senior product desi
 - `omnigraph-config.example.yaml` — Example operator config; merge its aliases into your per-user `~/.omnigraph/config.yaml`.
 
 For general Omnigraph ops — schema language, queries, loading, branches,
-cluster commands, CLI — see the **omnigraph-best-practices** skill and
+cluster commands, CLI — see the **omnigraph** skill and
 `../CLAUDE.md`. This file covers only what's specific to Second Brain.
 
 ## Cluster control plane (two-file model)
@@ -129,7 +129,7 @@ For longer captures, chunk into `Chunk` records linked via `ChunkOf` — semanti
 
 After any schema or query edit, lint before applying — e.g. `omnigraph lint
 --schema schema.pg --query queries/people.gq`. The lint/plan/apply/load loop and
-cluster ops are covered in the **omnigraph-best-practices** skill and
+cluster ops are covered in the **omnigraph** skill and
 `../CLAUDE.md`; don't repeat them here.
 
 ## When Editing

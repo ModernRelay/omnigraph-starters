@@ -92,7 +92,7 @@ omnigraph-server --cluster . --bind 127.0.0.1:8080 --unauthenticated &   # local
 omnigraph query --config omnigraph.yaml --alias patterns disruption    # CLI alias sugar
 ```
 
-After this, point the user at the `omnigraph-best-practices` skill for day-to-day operations.
+After this, point the user at the `omnigraph` skill (`npx skills add ModernRelay/omnigraph@omnigraph`) for day-to-day operations.
 
 ## Path B: Custom Domain Setup
 
@@ -225,7 +225,7 @@ Tell the user:
   every declared query is served at `POST /graphs/<slug>/queries/<name>`
 - The day-2 loop: edit `.pg`/`.gq`/`cluster.yaml` → `cluster plan` →
   `cluster apply --as <you>` → restart the server
-- To use the `omnigraph-best-practices` skill for day-to-day ops (adding
+- To use the `omnigraph` skill for day-to-day ops (adding
   signals, schema evolution, branches; see its `references/cluster.md`)
 
 ## Deep Dives
