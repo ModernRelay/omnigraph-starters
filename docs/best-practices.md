@@ -35,16 +35,23 @@ A graph's bytes live in one of two backends:
 
 ### Local S3 dev with RustFS (optional)
 
-To rehearse the S3 path without a cloud account, run a local RustFS (S3-compatible) in Docker:
+To rehearse the S3 path without a cloud account, run a local RustFS (S3-compatible) — as a native binary or in Docker.
+
+**Native binary (no Docker).** On macOS, `brew install rustfs/tap/rustfs` (otherwise download from [rustfs.com](https://rustfs.com)), then:
+
+```bash
+rustfs server --address 127.0.0.1:9000 --access-key rustfsadmin --secret-key rustfsadmin ./data
+```
+
+**Docker:**
 
 ```bash
 docker run -d --name omnigraph-s3 -p 9000:9000 \
   -e RUSTFS_ACCESS_KEY=rustfsadmin -e RUSTFS_SECRET_KEY=rustfsadmin \
   -e RUSTFS_ALLOW_INSECURE_DEFAULT_CREDENTIALS=true rustfs/rustfs:latest /data
-aws --endpoint-url http://127.0.0.1:9000 s3 mb s3://omnigraph-local   # create the bucket once
 ```
 
-RustFS S3 listens on `127.0.0.1:9000`, bucket `omnigraph-local`. Put the matching creds in a git-ignored `.env.omni`:
+Either way, create the bucket once (`aws --endpoint-url http://127.0.0.1:9000 s3 mb s3://omnigraph-local`). RustFS S3 listens on `127.0.0.1:9000`, bucket `omnigraph-local`. Put the matching creds in a git-ignored `.env.omni`:
 
 ```bash
 AWS_ACCESS_KEY_ID=rustfsadmin

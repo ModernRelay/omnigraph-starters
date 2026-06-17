@@ -12,7 +12,7 @@ RustFS must be running locally on `127.0.0.1:9000`. Verify with:
 curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:9000/
 ```
 
-If you get `000` (no connection), start a RustFS. **Requires Docker** ([install](https://docs.docker.com/get-docker/)):
+If you get `000` (no connection), start a RustFS — as a native binary (macOS: `brew install rustfs/tap/rustfs`, then `rustfs server --address 127.0.0.1:9000 --access-key rustfsadmin --secret-key rustfsadmin ./data`) or in Docker ([install](https://docs.docker.com/get-docker/)):
 
 ```bash
 docker run -d --name omnigraph-s3 -p 9000:9000 \

@@ -18,7 +18,7 @@ This skill takes a user from zero to a populated, queryable SPIKE graph. Two pat
 
 **Prerequisites:**
 
-1. RustFS running on `127.0.0.1:9000`. If not, start one (**requires Docker** — install from https://docs.docker.com/get-docker/):
+1. RustFS running on `127.0.0.1:9000`. If not, start one — as a native binary (macOS: `brew install rustfs/tap/rustfs`, then `rustfs server --address 127.0.0.1:9000 --access-key rustfsadmin --secret-key rustfsadmin ./data`) or in Docker:
    ```bash
    docker run -d --name omnigraph-s3 -p 9000:9000 \
      -e RUSTFS_ACCESS_KEY=rustfsadmin -e RUSTFS_SECRET_KEY=rustfsadmin \
