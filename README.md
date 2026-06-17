@@ -16,36 +16,29 @@ Opinionated, ready-to-run graph cookbooks built on [Omnigraph](https://github.co
 
 ## Agent Skills
 
-Packaged agent skills live under [`skills/`](skills) and can be installed with the `npx skills` CLI:
+The bootstrap skill ships with the `industry-intel` cookbook it builds from, and installs with the `npx skills` CLI:
 
 | Skill | Description |
 |-------|-------------|
-| [`omnigraph-intel-bootstrap`](skills/omnigraph-intel-bootstrap) | Bootstrap a new SPIKE graph from scratch — choose demo or custom, elicit domain + sources, adapt schema, research seed content, init + load |
+| [`industry-intel/skill`](industry-intel/skill) | Bootstrap a new SPIKE graph from scratch — choose demo or custom, elicit domain + sources, adapt schema, research seed content, apply + load |
 
-Install:
+Install (direct-path form):
 
 ```bash
-npx skills add ModernRelay/omnigraph-cookbooks@omnigraph-intel-bootstrap
+npx skills add https://github.com/ModernRelay/omnigraph-cookbooks/tree/main/industry-intel/skill
 ```
 
-> **Day-to-day operations** are covered by the **`omnigraph` skill**, which now ships in the engine repo (co-versioned with the CLI): `npx skills add ModernRelay/omnigraph@omnigraph` ([ModernRelay/omnigraph](https://github.com/ModernRelay/omnigraph/tree/main/skills/omnigraph)).
+> **Day-to-day operations** are covered by the **`omnigraph` skill**, which ships in the engine repo (co-versioned with the CLI): `npx skills add ModernRelay/omnigraph@omnigraph` ([ModernRelay/omnigraph](https://github.com/ModernRelay/omnigraph/tree/main/skills/omnigraph)). The operating guide and schema-design docs live in that repo and on the docs site.
 
-Typical flow: use `omnigraph-intel-bootstrap` once to set up a new graph, then the `omnigraph` skill for day-to-day operations.
-
-See [`docs/best-practices.md`](docs/best-practices.md) for the human-readable version of the ops content.
+Typical flow: use the bootstrap skill once to set up a new graph, then the `omnigraph` skill for day-to-day operations.
 
 ## Repo Structure
 
 ```
 omnigraph-cookbooks/
-├── README.md
-├── CLAUDE.md
-├── docs/
-│   ├── best-practices.md      ← human-readable operational guide
-│   └── omni-schema.md         ← schema design principles
-├── skills/
-│   └── omnigraph-intel-bootstrap/   ← bootstrap a new SPIKE graph (elicitation + research)
-└── <cookbook>/
+├── README.md  CLAUDE.md  LICENSE
+├── railway.toml  deploy/railway/   ← container deploy (Dockerfile, config)
+└── <cookbook>/                     ← industry-intel, pharma-intel, second-brain, vc-os
     ├── README.md
     ├── CLAUDE.md
     ├── schema.pg
@@ -56,7 +49,9 @@ omnigraph-cookbooks/
     └── queries/*.gq
 ```
 
-Each cookbook is fully self-contained — `cd` in and follow its README.
+The `industry-intel` cookbook additionally ships the bootstrap skill at
+[`industry-intel/skill/`](industry-intel/skill). Each cookbook is fully
+self-contained — `cd` in and follow its README.
 
 ## Getting Started
 

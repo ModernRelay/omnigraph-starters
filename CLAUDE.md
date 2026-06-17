@@ -55,10 +55,8 @@ Leave it running in a separate terminal or background process.
 
 ## Skills and Docs
 
-- `skills/omnigraph-intel-bootstrap/` — bootstrap a new SPIKE graph (elicitation + research + init/load)
-- **`omnigraph` skill** (day-to-day ops) now lives in the engine repo — `npx skills add ModernRelay/omnigraph@omnigraph` ([ModernRelay/omnigraph](https://github.com/ModernRelay/omnigraph/tree/main/skills/omnigraph)); mirrored locally by `docs/best-practices.md`
-- `docs/best-practices.md` — operational guide (human-readable)
-- `docs/omni-schema.md` — schema design principles
+- `industry-intel/skill/` — bootstrap a new SPIKE graph (elicitation + research + apply/load); install with `npx skills add https://github.com/ModernRelay/omnigraph-cookbooks/tree/main/industry-intel/skill`
+- **`omnigraph` skill** (day-to-day ops) lives in the engine repo — `npx skills add ModernRelay/omnigraph@omnigraph` ([ModernRelay/omnigraph](https://github.com/ModernRelay/omnigraph/tree/main/skills/omnigraph)). The operational guide and schema-design docs live in that repo and on the docs site.
 
 When working on schema or ops questions, consult `docs/` directly rather than duplicating guidance here.
 
