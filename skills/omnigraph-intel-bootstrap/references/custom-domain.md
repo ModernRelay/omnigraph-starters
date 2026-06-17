@@ -41,7 +41,7 @@ Generate a project slug from the domain. Examples:
 This becomes:
 - The cookbook folder name: `<slug>/`
 - The graph root: `graphs/<slug>.omni` (derived — created by `cluster apply`)
-- The project name in `omnigraph.yaml`
+- The project name in `cluster.yaml` (`metadata.name`)
 
 Confirm with the user before proceeding.
 

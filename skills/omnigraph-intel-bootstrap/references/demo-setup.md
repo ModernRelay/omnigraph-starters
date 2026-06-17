@@ -12,14 +12,16 @@ RustFS must be running locally on `127.0.0.1:9000`. Verify with:
 curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:9000/
 ```
 
-If you get `000` (no connection), bootstrap RustFS. **Requires Docker** ([install](https://docs.docker.com/get-docker/)):
+If you get `000` (no connection), start a RustFS. **Requires Docker** ([install](https://docs.docker.com/get-docker/)):
 
 ```bash
-docker version >/dev/null 2>&1 || { echo "Install Docker first: https://docs.docker.com/get-docker/"; exit 1; }
-curl -fsSL https://raw.githubusercontent.com/ModernRelay/omnigraph/main/scripts/local-rustfs-bootstrap.sh | bash
+docker run -d --name omnigraph-s3 -p 9000:9000 \
+  -e RUSTFS_ACCESS_KEY=rustfsadmin -e RUSTFS_SECRET_KEY=rustfsadmin \
+  -e RUSTFS_ALLOW_INSECURE_DEFAULT_CREDENTIALS=true rustfs/rustfs:latest /data
+aws --endpoint-url http://127.0.0.1:9000 s3 mb s3://omnigraph-local   # create the bucket once
 ```
 
-Bootstrap installs `omnigraph` and `omnigraph-server` under `<workdir>/.omnigraph-rustfs-demo/bin/` — **not on PATH by default**. Add it or invoke by absolute path.
+See the omnigraph repo's `docs/user/deployment.md` → *Testing against S3 locally* for the full `AWS_*` contract.
 
 ### Existing server on :8080
 
@@ -80,8 +82,8 @@ loaded graphs/spike.omni on branch main with overwrite: 109 nodes across 9 node 
 omnigraph-server --cluster . --bind 127.0.0.1:8080 --unauthenticated
 ```
 
-`--cluster` serves the applied revision and never reads `omnigraph.yaml`
-(exclusive boot source). `--unauthenticated` is for local dev — the server
+`--cluster` serves the applied revision (the exclusive boot source).
+`--unauthenticated` is for local dev — the server
 refuses to start without bearer tokens, a policy, or this flag. Keep it
 running (separate terminal or background). Every declared query is also a
 direct HTTP endpoint: `POST /graphs/spike/queries/<name>`.
@@ -89,7 +91,7 @@ direct HTTP endpoint: `POST /graphs/spike/queries/<name>`.
 ### Verify
 
 ```bash
-omnigraph query --config omnigraph.yaml --alias patterns disruption
+omnigraph alias patterns disruption
 ```
 
 Should return 2 patterns: SaaSpocalypse, Sovereign AI.
@@ -97,7 +99,7 @@ Should return 2 patterns: SaaSpocalypse, Sovereign AI.
 Try a traversal:
 
 ```bash
-omnigraph query --config omnigraph.yaml --alias pattern-signals pat-sovereign-ai
+omnigraph alias pattern-signals pat-sovereign-ai
 ```
 
 Should return 3 signals.
@@ -121,7 +123,7 @@ Plus 148 edges wiring the graph together.
 ## Next Steps
 
 - **Explore queries** in `queries/*.gq`
-- **Try aliases**: see `omnigraph.yaml` under `aliases:`
+- **Try aliases**: merge the cookbook's `omnigraph-config.example.yaml` `aliases:` into `~/.omnigraph/config.yaml`
 - **For day-to-day ops** (adding signals, evolving schema, branches, embeddings): switch to the `omnigraph` skill (`npx skills add ModernRelay/omnigraph@omnigraph`)
 
 ## Optional: Reset

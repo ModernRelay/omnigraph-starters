@@ -1,4 +1,4 @@
-# Operator-config example for the Second Brain cookbook (RFC-007/008).
+# Operator-config example for the Second Brain cookbook.
 # Your operator config lives at ~/.omnigraph/config.yaml (per-user, NOT committed).
 # Merge the `aliases:` below into it for short names over this graph's stored
 # queries. Point `local` at your running cluster server (`omnigraph-server

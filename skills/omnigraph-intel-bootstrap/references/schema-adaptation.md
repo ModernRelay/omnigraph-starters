@@ -178,23 +178,18 @@ kind: enum(challenge, disruption, dynamic)
 
 This is intentionally abstract and works across domains. **Only change if the user has strong reasons.** Resist the urge to over-specify.
 
-## Update omnigraph.yaml
+## Update cluster.yaml
 
-After schema changes, update both config files for the new slug:
+After schema changes, update the deployment for the new slug:
 
 ```yaml
-# cluster.yaml — the deployment (graph id, schema, queries)
+# cluster.yaml — the deployment (name, graph id, schema, queries)
+metadata:
+  name: <slug>
 graphs:
   <slug>:
     schema: schema.pg
     queries: queries/    # every `query <name>` in queries/*.gq registers
-
-# omnigraph.yaml — per-operator CLI sugar only
-graphs:
-  local:
-    uri: graphs/<slug>.omni    # the derived root cluster apply creates
-  local_server:
-    uri: http://127.0.0.1:8080
 ```
 
 If the domain-specific enums changed, aliases referring to enum values (e.g., `patterns disruption`) still work since we kept Pattern.kind. But if you added kind-specific aliases (e.g., `elements product`), audit them for the new kinds.
@@ -222,6 +217,6 @@ Before moving to Phase 6:
 - [ ] Updated `ArtifactType` enum if needed
 - [ ] Replaced kind-specific Element properties
 - [ ] Kept Pattern.kind as-is (usually)
-- [ ] Updated `omnigraph.yaml` project name + graph URI
+- [ ] Updated `cluster.yaml` name + graph id
 - [ ] Deleted `industry-intel`'s `seed.jsonl` from the new folder (will regenerate in Phase 6)
 - [ ] `lint` passes with 0 errors

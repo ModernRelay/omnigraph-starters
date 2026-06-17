@@ -4,16 +4,14 @@ Operational guide for working with Omnigraph: project layout, schema evolution, 
 
 For schema **design** principles (identity, types, edges, constraints) see [`omni-schema.md`](omni-schema.md). This doc is about how to **operate** an Omnigraph project day-to-day.
 
-> **Cluster mode (omnigraph >= 0.7.0):** new projects should prefer the
-> declarative cluster control plane — `cluster.yaml` + `omnigraph cluster
-> plan/apply` + `omnigraph-server --cluster .` (or `--cluster s3://bucket/prefix`
-> for config-free serving from object storage) — over hand-managed
-> `omnigraph.yaml` deployments. Per-operator settings (identity, named servers,
-> credentials, aliases) live in `~/.omnigraph/config.yaml` (RFC-007/008;
-> `omnigraph.yaml` is the deprecated combined file). See the omnigraph repo's
-> `docs/user/clusters/index.md` and the `omnigraph` skill's
-> `references/cluster.md`. Everything below remains valid for the classic
-> single-graph path and for all data-plane operations.
+> **Cluster mode (omnigraph 0.7+):** a deployment is a declarative **cluster** —
+> `cluster.yaml` + `omnigraph cluster plan/apply` + `omnigraph-server --cluster .`
+> (or `--cluster s3://bucket/prefix` for config-free serving from object
+> storage). The deployment (graphs, schemas, stored queries, policies) lives in
+> `cluster.yaml`; per-operator settings (identity, named servers, credentials,
+> aliases) live in `~/.omnigraph/config.yaml`. The server boots only from a
+> cluster. See the omnigraph repo's `docs/user/clusters/index.md` and the
+> `omnigraph` skill's `references/cluster.md`.
 
 ## TL;DR
 
@@ -37,14 +35,16 @@ A graph's bytes live in one of two backends:
 
 ### Local S3 dev with RustFS (optional)
 
-For the classic single-graph S3 path, run a local RustFS (S3-compatible) in Docker:
+To rehearse the S3 path without a cloud account, run a local RustFS (S3-compatible) in Docker:
 
 ```bash
-docker version >/dev/null 2>&1 || { echo "Install Docker first: https://docs.docker.com/get-docker/"; exit 1; }
-curl -fsSL https://raw.githubusercontent.com/ModernRelay/omnigraph/main/scripts/local-rustfs-bootstrap.sh | bash
+docker run -d --name omnigraph-s3 -p 9000:9000 \
+  -e RUSTFS_ACCESS_KEY=rustfsadmin -e RUSTFS_SECRET_KEY=rustfsadmin \
+  -e RUSTFS_ALLOW_INSECURE_DEFAULT_CREDENTIALS=true rustfs/rustfs:latest /data
+aws --endpoint-url http://127.0.0.1:9000 s3 mb s3://omnigraph-local   # create the bucket once
 ```
 
-Defaults: RustFS S3 on `127.0.0.1:9000`, console on `:9001`, `omnigraph-server` on `:8080`, bucket `omnigraph-local`. Put the matching creds in a git-ignored `.env.omni`:
+RustFS S3 listens on `127.0.0.1:9000`, bucket `omnigraph-local`. Put the matching creds in a git-ignored `.env.omni`:
 
 ```bash
 AWS_ACCESS_KEY_ID=rustfsadmin
@@ -71,9 +71,9 @@ omnigraph snapshot <graph-uri> --json
 
 ## Project Setup
 
-### The two config surfaces (omnigraph >= 0.7.0)
+### The two config surfaces
 
-Configuration has two single-owner homes (RFC-007/008):
+Configuration has two single-owner homes:
 
 - **`cluster.yaml`** (the team, in the repo) — the deployment: graphs, schemas, stored queries, policies, and an optional S3 `storage:` root. Read by `cluster` commands and `omnigraph-server --cluster`.
 - **`~/.omnigraph/config.yaml`** (per operator) — identity (`operator.actor`), named `servers:`, output defaults, and personal aliases. Credentials go in `~/.omnigraph/credentials` via `omnigraph login <server>` (never in any config file).
@@ -90,11 +90,11 @@ aliases:
   triage: { server: intel-dev, graph: spike, query: weekly_triage, args: [since] }
 ```
 
-> **Legacy `omnigraph.yaml` (deprecated, RFC-008).** The old combined file still works through the deprecation window but prints a per-key notice on load (silence with `OMNIGRAPH_SUPPRESS_YAML_DEPRECATION=1`; `OMNIGRAPH_NO_LEGACY_CONFIG=1` hard-errors). `omnigraph config migrate [--write]` splits it into `cluster.yaml` + `~/.omnigraph/config.yaml`; `omnigraph init` no longer scaffolds it. Run data-plane CLI commands from a graph's project folder so relative `queries/`, `schema.pg`, `.env.omni` paths resolve. Field naming in the legacy file: `graphs:` (not `targets:`), `cli.graph`/`server.graph` (not `cli.target`/`server.target`).
+Run data-plane CLI commands from a graph's project folder so relative `queries/`, `schema.pg`, and `.env.omni` paths resolve. There is no `omnigraph.yaml`: 0.7+ never reads one, and `omnigraph init` does not scaffold a config file — start a `cluster.yaml` (see the omnigraph repo's `docs/user/clusters/index.md`).
 
 ### Commit these, not those
 
-**Commit:** `schema.pg`, `queries/*.gq`, `cluster.yaml`, the per-operator `omnigraph.yaml` (legacy, still shipped by the cookbooks), `seed.md`, `seed.jsonl`, per-cookbook `README.md` and `CLAUDE.md`.
+**Commit:** `schema.pg`, `queries/*.gq`, `cluster.yaml`, `omnigraph-config.example.yaml` (the operator-config alias snippet), `seed.md`, `seed.jsonl`, per-cookbook `README.md` and `CLAUDE.md`.
 
 **Ignore:** `.env.omni` (credentials), `.claude/` (local agent state), `*.omni/` (local graph artifacts), `__cluster/` and `graphs/` (cluster state + derived roots).
 
@@ -310,23 +310,18 @@ Omnigraph runs two distinct embedding clients: the **engine/ingest** client (def
 
 ### Every agent operation should be an alias
 
-Agents calling raw `omnigraph query --query ... --name ... --params ...` drift as queries evolve. Aliases decouple the operation name from the query implementation:
+Agents calling raw `omnigraph query <name> --params ...` drift as queries evolve. An alias decouples the operation name from the server, graph, and stored query it targets:
 
 ```yaml
 aliases:
-  signal:
-    command: query
-    query: signals.gq
-    name: get_signal
-    args: [slug]
-    format: kv
+  signal: { server: intel-dev, graph: spike, query: get_signal, args: [slug] }
 ```
 
-Agents call `omnigraph query --alias signal sig-kimi-k25`. When the query changes, the alias stays. (Operator aliases in `~/.omnigraph/config.yaml` are pure bindings to a server's stored queries — `{ server, graph, query }` — carrying no `.gq` content.)
+Agents call `omnigraph alias signal sig-kimi-k25`. When the underlying query changes, the alias stays. Operator aliases in `~/.omnigraph/config.yaml` are pure bindings to a server's stored queries — they carry no `.gq` content.
 
 ### Default to structured output
 
-For scripts and agents, use `--format jsonl` or `--format json`. `table` is for humans. Set `cli.output_format: jsonl` globally for an automation-first config.
+For scripts and agents, use `--format jsonl` or `--format json`. `table` is for humans. Set `defaults.output: jsonl` in `~/.omnigraph/config.yaml` for an automation-first config.
 
 ### Alias args are JSON-first
 
@@ -340,15 +335,14 @@ Remote bearer tokens go in `~/.omnigraph/credentials` via `omnigraph login <serv
 
 ### Start the server
 
-The server is the canonical runtime entry point — point the CLI, aliases, and agents at it. Start it once per deployment from one of the mutually-exclusive boot sources:
+The server is the canonical runtime entry point — point the CLI, aliases, and agents at it. Start it once per deployment; the only boot source is `--cluster`:
 
 ```bash
-omnigraph-server --cluster . --unauthenticated               # cluster mode (or --cluster s3://bucket/prefix for config-free serving)
-omnigraph-server s3://my-bucket/repos/<name> --unauthenticated   # a single bare graph URI
-omnigraph-server --config omnigraph.yaml --unauthenticated   # legacy combined file (deprecated)
+omnigraph-server --cluster . --unauthenticated                   # cluster dir (storage resolves via cluster.yaml)
+omnigraph-server --cluster s3://bucket/prefix --unauthenticated   # config-free from object storage
 ```
 
-`--unauthenticated` is required for local dev: since v0.6.0 the server refuses to start without bearer tokens or a policy file. Drop the flag once you've configured auth (see below). `--config` reads `server.graph`/`server.bind`; `--cluster` reads the applied ledger. Keep the server running in a separate terminal or background process.
+`--cluster` takes a cluster directory or a storage-root URI and serves the applied ledger. `--unauthenticated` is required for local dev: the server refuses to start without bearer tokens or a policy file. Drop the flag once you've configured auth (see below). Keep the server running in a separate terminal or background process.
 
 ### HTTP routes
 
@@ -359,17 +353,17 @@ omnigraph-server --config omnigraph.yaml --unauthenticated   # legacy combined f
 | `GET /export` | JSONL stream of a branch |
 | `POST /query` | read query execution |
 | `POST /mutate` | mutation execution |
-| `POST /load` | bulk JSONL load (canonical, RFC-009 Phase 5); supersedes deprecated `POST /ingest` |
-| `GET /queries`, `POST /queries/{name}` | stored-query catalog + invocation (v0.6.1) |
+| `POST /load` | bulk JSONL load (canonical); supersedes the deprecated `POST /ingest` |
+| `GET /queries`, `POST /queries/{name}` | stored-query catalog + invocation |
 | `POST /schema/apply` | schema migration |
 | `GET /branches` | branch list |
 | `GET /commits` | write/audit history |
 
-> There is **no `/runs` endpoint** — the transactional Run state machine was removed in v0.4.0. Use `GET /commits` for write history; a request to `/runs` returns 404.
+> There is **no `/runs` endpoint** — the transactional Run state machine was removed. Use `GET /commits` for write history; a request to `/runs` returns 404.
 
 ### Auth
 
-Set bearer tokens on the server process — `OMNIGRAPH_SERVER_BEARER_TOKENS_JSON='{"act-reader":"…"}'` (actor-keyed) or the single-token `OMNIGRAPH_SERVER_BEARER_TOKEN`. On the client side (0.7.0), register the server once with `omnigraph login <server>` (token → `~/.omnigraph/credentials`, `0600`) and target it with `--server <server>`; the token resolves via `OMNIGRAPH_TOKEN_<NAME>` → the credentials file → the legacy `bearer_token_env` chain. **Since v0.6.0 the server refuses to start** with neither bearer tokens nor a policy file — for pure local dev pass `--unauthenticated` (or `OMNIGRAPH_UNAUTHENTICATED=1`) deliberately.
+Set bearer tokens on the server process — `OMNIGRAPH_SERVER_BEARER_TOKENS_JSON='{"act-reader":"…"}'` (actor-keyed) or the single-token `OMNIGRAPH_SERVER_BEARER_TOKEN`. On the client side, register the server once with `omnigraph login <server>` (token → `~/.omnigraph/credentials`, `0600`) and target it with `--server <server>`; the token resolves via `OMNIGRAPH_TOKEN_<NAME>` then the credentials file. **The server refuses to start** with neither bearer tokens nor a policy file — for pure local dev pass `--unauthenticated` (or `OMNIGRAPH_UNAUTHENTICATED=1`) deliberately.
 
 ### Setup operations (`init`, `load`) write directly to storage
 
@@ -386,21 +380,29 @@ Everything else — `query`, `mutate`, `snapshot`, `schema plan/apply`, `branch`
 
 ### Gate the dangerous actions
 
-Cedar policies can gate `schema_apply`, `branch_merge`, `change`, `export`, `invoke_query`, etc. For any shared repo, gate at least `schema_apply` and `branch_merge`. (`invoke_query`, v0.6.1, gates the stored-query surface — stored mutations are double-gated with `change`.)
+Cedar policies can gate `schema_apply`, `branch_merge`, `change`, `export`, `invoke_query`, etc. For any shared repo, gate at least `schema_apply` and `branch_merge`. (`invoke_query` gates the stored-query surface — stored mutations are double-gated with `change`.)
 
-### Config follows identity (v0.6.1)
+### Policies live in the cluster
 
-A top-level `policy:` (and `queries:`) block applies **only** to an anonymous bare-URI single-graph server. A graph served **by name** (`server.graph`, or the `omnigraph-server --target` boot flag) must nest them under `graphs.<name>.policy` / `graphs.<name>.queries`. Leaving them at the top level with a named graph makes the server **refuse to boot** with migration guidance.
+Declare policy bundles in `cluster.yaml` under `policies:`, each naming the graphs (or the literal `cluster`) it `applies_to`. `cluster apply` publishes them into the applied catalog and the server enforces them per graph; a graph with no bundle bound to it has no engine-layer Cedar enforcement.
+
+```yaml
+# cluster.yaml
+policies:
+  base:
+    file: base.policy.yaml
+    applies_to: [knowledge]      # a graph id, or `cluster` for server-level rules
+```
 
 ### Validate, test, explain
 
 ```bash
-omnigraph policy validate --config omnigraph.yaml
-omnigraph policy test --config omnigraph.yaml
-omnigraph policy explain --actor act-alice --action schema_apply --branch main
+omnigraph policy validate --cluster .
+omnigraph policy test --cluster . --tests policy.tests.yaml
+omnigraph policy explain --cluster . --actor act-alice --action schema_apply --branch main
 ```
 
-`validate` checks Cedar syntax; `test` runs cases from `policy.tests.yaml`; `explain` debugs a single decision.
+`validate` checks Cedar syntax; `test` runs cases from the `--tests` file; `explain` debugs a single decision.
 
 ## Reference Commands
 
@@ -415,7 +417,7 @@ omnigraph export $REPO --branch main > graph.jsonl    # stream JSONL dump
 
 `export` is the right tool for large snapshots — don't try to page through the whole graph via read queries.
 
-### Maintenance & stored queries (v0.6.1)
+### Maintenance & stored queries
 
 ```bash
 omnigraph optimize $REPO --json                      # non-destructive Lance compaction (skips Blob-column tables; see --json "skipped")
@@ -433,18 +435,18 @@ omnigraph commit show $REPO <id>
 
 ### Init
 
-`omnigraph init --schema schema.pg $REPO` creates a graph at `$REPO`. **It no longer scaffolds a config file** (RFC-008) — start a `cluster.yaml` from the omnigraph repo's `docs/user/clusters/index.md`, or run `omnigraph config migrate` against an existing legacy `omnigraph.yaml`. `init` does not accept `--json`.
+`omnigraph init --schema schema.pg $REPO` creates a graph at `$REPO`. **It does not scaffold a config file** — start a `cluster.yaml` from the omnigraph repo's `docs/user/clusters/index.md`. `init` does not accept `--json`.
 
-### Addressing a graph (RFC-011)
+### Addressing a graph
 
-`--target` was **removed from the CLI** (the `omnigraph-server --target` boot flag is unchanged); a positional `http(s)://` URL no longer dispatches to a server. Precedence:
+`--target` was **removed**; a positional `http(s)://` URL no longer dispatches to a server. Precedence:
 
 1. `--store <uri>` or a positional `file://`/`s3://` URI — direct storage (no catalog)
 2. `--server <name|url>` (+ `--graph <id>`) — served/remote (a remote **must** use `--server`)
 3. `--profile <name>` / `$OMNIGRAPH_PROFILE` — a named scope bundle from `profiles:`
-4. operator `defaults.server` + `default_graph`, then legacy `cli.graph` (deprecated)
+4. operator `defaults.server` + `default_graph`
 
-Maintenance against a cluster-managed graph: `--cluster <dir|s3://> --cluster-graph <id>`. Each command declares a capability (`any`/`served`/`direct`/`control`/`local`, shown in `omnigraph --help`).
+Maintenance against a cluster-managed graph: `--cluster <dir|s3://> --graph <id>`. Each command declares a capability (`any`/`served`/`direct`/`control`/`local`, shown in `omnigraph --help`).
 
 ## Common Mistakes
 
@@ -459,15 +461,13 @@ Maintenance against a cluster-managed graph: `--cluster <dir|s3://> --cluster-gr
 | `schema apply` with feature branches open | rejected | Merge or delete branches first |
 | `nearest(...)` without `limit` | compile error | Add `limit N` |
 | Adding required property without backfill | unsupported migration | Make optional first, backfill, then tighten |
-| `targets:` in `omnigraph.yaml` | `graph 'X' not found in omnigraph.yaml` | Rename to `graphs:`, `target:` → `graph:` |
 | `omnigraph load` without `--mode` | `--mode` is required | Pass `--mode merge\|append\|overwrite` (no default; overwrite is destructive) |
-| `omnigraph init` writes no config file | expected (RFC-008) — `init` stopped scaffolding it | Start a `cluster.yaml`, or `config migrate` a legacy `omnigraph.yaml` |
+| `omnigraph init` writes no config file | expected — `init` does not scaffold config | Start a `cluster.yaml` (see clusters/index.md) |
 | `@unique` on a `[List]`/`Blob` column | `load` errors loudly (was silently un-enforced) | `@unique` needs a scalar (or composite-scalar) key |
 | `omnigraph init --json` | `unexpected argument --json` | `init` doesn't accept `--json` |
 | Committing `.env.omni` | credential leak | Add `.env*` to `.gitignore` |
 | Non-parameterized values in queries | typecheck surprise, injection risk | Declare `$param: Type` and pass via `--params` |
 | Long-lived feature branches | merge conflicts, schema apply blocked | Merge promptly; delete when done |
-| Top-level `policy:`/`queries:` with a named graph (v0.6.1) | server refuses to boot | Nest under `graphs.<name>.policy` / `.queries` |
 | `omnigraph optimize` "skipping" a Blob table | not an error — Lance blob-v2 limitation | Expected; non-blob tables still compact |
 
 ## See Also
