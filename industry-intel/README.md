@@ -147,21 +147,21 @@ anonymous 401; stored reads → reader 200; stored mutations (`add_signal`,
 (`invoke_query` at the boundary, `change` inside the engine).
 
 <details>
-<summary><strong>RustFS / S3 alternative (classic single-graph mode)</strong></summary>
+<summary><strong>RustFS / S3 alternative (cluster on object storage)</strong></summary>
 
-To demo S3-compatible storage instead, skip the cluster flow and run the
-classic path against RustFS (start it via the omnigraph repo's
-`scripts/local-rustfs-bootstrap.sh`):
+To demo S3-compatible storage, start a local RustFS (see the omnigraph repo's
+`docs/user/deployment.md` → *Testing against S3 locally*), root the cluster on
+S3 with `storage: s3://omnigraph-local/clusters/spike` in `cluster.yaml`, then
+serve config-free from the bucket:
 
 ```bash
 set -a && source .env.omni && set +a
-omnigraph init --schema schema.pg s3://omnigraph-local/repos/spike-intel
-omnigraph load --data seed.jsonl --mode overwrite s3://omnigraph-local/repos/spike-intel
-omnigraph-server --graph s3://omnigraph-local/repos/spike-intel --unauthenticated
+omnigraph cluster apply --config . --as <you>
+omnigraph load --data seed.jsonl --mode overwrite s3://omnigraph-local/clusters/spike/graphs/spike.omni
+omnigraph-server --cluster s3://omnigraph-local/clusters/spike --unauthenticated
 ```
 
-This classic single-graph path serves an S3-backed graph directly, with no
-cluster state involved.
+The cluster's ledger, catalog, and graph data all live under the S3 root.
 
 </details>
 

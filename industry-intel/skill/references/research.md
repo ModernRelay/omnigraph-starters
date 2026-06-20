@@ -231,8 +231,8 @@ If load fails (missing required field, invalid enum value, unknown type), fix se
 ### Step 11 — Smoke test
 
 ```bash
-omnigraph query --config omnigraph.yaml --alias patterns disruption
-omnigraph query --config omnigraph.yaml --alias signals
+omnigraph alias patterns disruption
+omnigraph alias signals
 ```
 
 Should return the patterns and signals you seeded.
@@ -240,7 +240,7 @@ Should return the patterns and signals you seeded.
 Try a traversal:
 
 ```bash
-omnigraph query --config omnigraph.yaml --alias pattern-signals pat-<your-pattern>
+omnigraph alias pattern-signals pat-<your-pattern>
 ```
 
 ## Common Pitfalls

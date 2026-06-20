@@ -12,7 +12,7 @@ A collection of Omnigraph graph cookbooks plus packaged agent skills. Each cookb
 
 - **Storage**: all four cookbooks are **filesystem-backed cluster** deployments — `cluster apply` creates the derived root `graphs/<id>.omni`; **no object store / RustFS needed**. (S3-compatible storage, `s3://bucket/prefix`, is supported for production; the SPIKE cookbooks document an optional S3 path.) `init` and `load` write storage directly — one-time setup ops that bypass the server.
 - **Runtime**: `omnigraph-server` reads from storage at startup and exposes HTTP on `127.0.0.1:8080`. Day-to-day CLI calls (`query`, `mutate`) go through the server.
-- **CLI config**: Per-operator settings (identity, named servers, defaults, **aliases**) live in `~/.omnigraph/config.yaml` (per-user, never committed; RFC-007/008). Each cookbook ships an `omnigraph-config.example.yaml` whose `aliases:` you merge in — short names binding to the graph's stored queries, invoked with `omnigraph alias <name> [args]` (e.g. `omnigraph alias pattern-signals pat-sovereign-ai`). Alias arg values are JSON-parsed first, then fall back to string — `29` is an integer, `"29"` is a string. Cookbooks do **not** ship the deprecated combined `omnigraph.yaml`.
+- **CLI config**: Per-operator settings (identity, named servers, defaults, **aliases**) live in `~/.omnigraph/config.yaml` (per-user, never committed). Each cookbook ships an `omnigraph-config.example.yaml` whose `aliases:` you merge in — short names binding to the graph's stored queries, invoked with `omnigraph alias <name> [args]` (e.g. `omnigraph alias pattern-signals pat-sovereign-ai`). Alias arg values are JSON-parsed first, then fall back to string — `29` is an integer, `"29"` is a string. Cookbooks ship no `omnigraph.yaml` (it is not read in 0.7+).
 - **Auth**: filesystem clusters need no credentials. For an optional S3 backend, `.env.omni` (git-ignored) holds the `AWS_*` creds; source it before CLI commands: `set -a && source .env.omni && set +a`.
 
 **Prerequisite**: just the `omnigraph`/`omnigraph-server` binaries — no object store. `lint` works with nothing running; once a server is up, verify with `curl http://127.0.0.1:8080/healthz`.
@@ -31,7 +31,7 @@ A collection of Omnigraph graph cookbooks plus packaged agent skills. Each cookb
 `graphs/<id>.omni`) and `omnigraph-server --cluster .` serves it. Per-operator
 settings (aliases, defaults, identity) live in `~/.omnigraph/config.yaml`
 (per-user); each cookbook ships an `omnigraph-config.example.yaml` to merge in.
-Never commit `graphs/`, `__cluster/`, or a local `omnigraph.yaml` (all gitignored).
+Never commit `graphs/` or `__cluster/` (gitignored).
 
 There are no repo-level build, test, or lint commands. Validation happens per-cookbook via `omnigraph lint`. CI is not configured in this repo.
 
@@ -48,17 +48,15 @@ Start the server once per session from inside the cookbook folder — `query`, `
 
 ```bash
 omnigraph-server --cluster . --unauthenticated   # every cookbook is a cluster directory
-# binds 127.0.0.1:8080; local dev — v0.6.0+ refuses to start without auth/policy or this flag
+# binds 127.0.0.1:8080; local dev — the server refuses to start without auth/policy or this flag
 ```
 
 Leave it running in a separate terminal or background process.
 
 ## Skills and Docs
 
-- `skills/omnigraph-intel-bootstrap/` — bootstrap a new SPIKE graph (elicitation + research + init/load)
-- **`omnigraph` skill** (day-to-day ops) now lives in the engine repo — `npx skills add ModernRelay/omnigraph@omnigraph` ([ModernRelay/omnigraph](https://github.com/ModernRelay/omnigraph/tree/main/skills/omnigraph)); mirrored locally by `docs/best-practices.md`
-- `docs/best-practices.md` — operational guide (human-readable)
-- `docs/omni-schema.md` — schema design principles
+- `industry-intel/skill/` — bootstrap a new SPIKE graph (elicitation + research + apply/load); install with `npx skills add https://github.com/ModernRelay/omnigraph-cookbooks/tree/main/industry-intel/skill`
+- **`omnigraph` skill** (day-to-day ops) lives in the engine repo — `npx skills add ModernRelay/omnigraph@omnigraph` ([ModernRelay/omnigraph](https://github.com/ModernRelay/omnigraph/tree/main/skills/omnigraph)). The operational guide and schema-design docs live in that repo and on the docs site.
 
 When working on schema or ops questions, consult `docs/` directly rather than duplicating guidance here.
 

@@ -64,7 +64,7 @@ stored query, converged with `omnigraph cluster import|plan|apply --config .`
 (apply creates `graphs/spike.omni`; schema edits show migration previews in
 plan; graph deletion is approval-gated). Operator settings (aliases, CLI
 defaults, actor for `--as` attribution) live in the per-user
-`~/.omnigraph/config.yaml` (RFC-007/008) — never committed; the cookbook ships
+`~/.omnigraph/config.yaml` — never committed; the cookbook ships
 `omnigraph-config.example.yaml` to merge in. Aliases bind to the stored
 queries declared in `cluster.yaml` and invoke them through a running server
 (`omnigraph alias <name> [args]`). Serve with `omnigraph-server --cluster .`

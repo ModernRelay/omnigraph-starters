@@ -66,7 +66,7 @@ load` / `omnigraph mutate` against `graphs/brain.omni`; invoke aliases with
 
 ## Conventions enforced by load discipline (not the schema)
 
-As of MR-983 (PR #133, engine v0.6.3+), `@unique(src, dst)` on an edge **is** enforced as a
+`@unique(src, dst)` on an edge **is** enforced as a
 true composite key — pair-uniqueness now works (it was previously degraded into two
 independent per-column checks). Enforcement covers single-batch `load` / `insert` / `update`
 and branch-merge, but **not** a duplicate written in a *separate* operation against

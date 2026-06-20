@@ -191,14 +191,16 @@ then `cluster plan` (schema edits show real migration steps) → `cluster apply`
 `omnigraph cluster approve graph.pharma --as <you>` first.
 
 <details>
-<summary><strong>RustFS / S3 alternative (classic single-graph mode)</strong></summary>
+<summary><strong>RustFS / S3 alternative (cluster on object storage)</strong></summary>
+
+Root the cluster on S3 by setting `storage: s3://omnigraph-local/clusters/pharma` in `cluster.yaml`, then serve config-free from the bucket:
 
 ```bash
 cp .env.omni.example .env.omni
 set -a && source .env.omni && set +a
-omnigraph init --schema schema.pg s3://omnigraph-local/repos/pharma-intel
-omnigraph load --data seed.jsonl --mode overwrite s3://omnigraph-local/repos/pharma-intel
-omnigraph-server --graph s3://omnigraph-local/repos/pharma-intel --unauthenticated
+omnigraph cluster apply --config . --as <you>
+omnigraph load --data seed.jsonl --mode overwrite s3://omnigraph-local/clusters/pharma/graphs/pharma.omni
+omnigraph-server --cluster s3://omnigraph-local/clusters/pharma --unauthenticated
 ```
 
 Point the server at the S3 graph URI directly (as above). The two boot sources

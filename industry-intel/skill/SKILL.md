@@ -18,12 +18,14 @@ This skill takes a user from zero to a populated, queryable SPIKE graph. Two pat
 
 **Prerequisites:**
 
-1. RustFS running on `127.0.0.1:9000`. If not, bootstrap with (**requires Docker** — install from https://docs.docker.com/get-docker/):
+1. RustFS running on `127.0.0.1:9000`. If not, start one — as a native binary (macOS: `brew install rustfs/tap/rustfs`, then `rustfs server --address 127.0.0.1:9000 --access-key rustfsadmin --secret-key rustfsadmin ./data`) or in Docker:
    ```bash
-   docker version >/dev/null 2>&1 || { echo "Install Docker first: https://docs.docker.com/get-docker/"; exit 1; }
-   curl -fsSL https://raw.githubusercontent.com/ModernRelay/omnigraph/main/scripts/local-rustfs-bootstrap.sh | bash
+   docker run -d --name omnigraph-s3 -p 9000:9000 \
+     -e RUSTFS_ACCESS_KEY=rustfsadmin -e RUSTFS_SECRET_KEY=rustfsadmin \
+     -e RUSTFS_ALLOW_INSECURE_DEFAULT_CREDENTIALS=true rustfs/rustfs:latest /data
+   aws --endpoint-url http://127.0.0.1:9000 s3 mb s3://omnigraph-local   # create the bucket once
    ```
-   The bootstrap installs `omnigraph` and `omnigraph-server` binaries under `<workdir>/.omnigraph-rustfs-demo/bin/` — **not on PATH by default**. Either add it to PATH or invoke binaries by absolute path.
+   See the omnigraph repo's `docs/user/deployment.md` → *Testing against S3 locally* for the full `AWS_*` contract.
 
 2. The `omnigraph-cookbooks` repo cloned somewhere on disk. Ask the user where (or default to the current directory):
    ```bash
@@ -89,7 +91,7 @@ omnigraph cluster apply  --config . --as <you>     # creates graphs/spike.omni +
 omnigraph load --data seed.jsonl --mode overwrite graphs/spike.omni
 # Serve the applied state (keep running), then query through it:
 omnigraph-server --cluster . --bind 127.0.0.1:8080 --unauthenticated &   # local dev
-omnigraph query --config omnigraph.yaml --alias patterns disruption    # CLI alias sugar
+omnigraph alias patterns disruption    # CLI alias sugar
 ```
 
 After this, point the user at the `omnigraph` skill (`npx skills add ModernRelay/omnigraph@omnigraph`) for day-to-day operations.
@@ -166,10 +168,10 @@ Update in `<slug>/schema.pg`:
 - `ArtifactType` enum — include domain-relevant formats
 - Kind-specific Element properties (biotech wants `phase`, `moa`; crypto wants `chain`, `token_symbol`; etc.)
 
-Update in `<slug>/omnigraph.yaml`:
+Update in `<slug>/cluster.yaml`:
 
-- `graphs.local_s3.uri` → `s3://omnigraph-local/repos/<slug>`
-- `project.name` → domain-appropriate name
+- `metadata.name` → domain-appropriate name
+- the `graphs:` entry id → `<slug>` (its derived root becomes `graphs/<slug>.omni`)
 - Optionally adjust aliases if query names change
 
 **Pattern.kind** (`challenge`, `disruption`, `dynamic`) is usually domain-agnostic. Don't change it unless the user has strong reasons.
@@ -211,7 +213,7 @@ omnigraph-server --cluster . --bind 127.0.0.1:8080 --unauthenticated &   # local
 8. Verify with a sample query (goes through the server):
 
 ```bash
-omnigraph query --config omnigraph.yaml --alias patterns <pattern-kind>
+omnigraph alias patterns <pattern-kind>
 ```
 
 ### Phase 7 — Hand-off
@@ -221,7 +223,7 @@ Tell the user:
 - What got created: the cookbook folder (a **cluster directory** —
   `cluster.yaml` declares graph + schema + queries; the graph lives at
   `graphs/<slug>.omni`, created by apply), the seed counts
-- How to query: CLI aliases (per-operator `omnigraph.yaml`), or HTTP —
+- How to query: CLI aliases (per-operator `~/.omnigraph/config.yaml`), or HTTP —
   every declared query is served at `POST /graphs/<slug>/queries/<name>`
 - The day-2 loop: edit `.pg`/`.gq`/`cluster.yaml` → `cluster plan` →
   `cluster apply --as <you>` → restart the server
