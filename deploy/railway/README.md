@@ -239,6 +239,42 @@ Schema changes are **not** auto-applied. After updating
 `omnigraph schema apply` against the running server from a workstation
 to migrate the live graph. See the engine docs.
 
+## Upgrading the engine (`OMNIGRAPH_REF` bumps)
+
+Omnigraph storage is **strict-single-version**: when a release changes the
+storage format (v0.8.0 did — internal schema v4, the first change since
+v0.4.0), the new binary refuses to open a graph created by the old one, and
+vice versa. There is no in-place migration.
+
+That means bumping `OMNIGRAPH_REF` across a format-changing release with an
+existing graph in the Bucket **breaks the next deploy — loudly, by design**:
+`init.sh`'s snapshot guard fails (the graph is refused on open), the script
+falls through to `omnigraph init`, and `init` refuses the non-empty URI
+rather than overwrite it. Nothing is corrupted; the deploy just fails until
+you rebuild.
+
+Rebuild as part of the bump:
+
+1. **With the old binary** (matching the currently deployed REF):
+   `omnigraph schema show` and `omnigraph export` the graph to local files
+   (data, vectors, and blobs are preserved; commit history and branches are
+   not — export each branch you need separately).
+2. Empty the graph's storage: `railway bucket -b graph-storage delete` and
+   recreate it (same region), or delete the graph prefix's objects.
+3. Deploy the new REF; first-boot `init.sh` re-applies the schema from
+   `OMNIGRAPH_SCHEMA_URL`.
+4. **With the new binary**, reload the data — `mutate` through the server
+   (batched), or an in-region `load --mode overwrite`.
+
+Verify with `GET /healthz`, which reports the storage-format version the
+server is serving. Releases that do **not** change the storage format (check
+the release notes) redeploy cleanly with no rebuild.
+
+Also pre-flight your data against v0.8.0's stricter write validation (see
+the engine's upgrade guide): duplicate keys within one load batch, `@unique`
+collisions with committed rows, and enum violations on merge now fail the
+write. A failed load publishes no commit.
+
 ## Loading data
 
 The deploy is schema-only; you fill the graph yourself. Two paths, with
@@ -253,13 +289,15 @@ sharp edges to know about:
   mutation with ~100 inserts can exceed Railway's request timeout and
   return 502 — batch into smaller chunks).
 - **Direct to the Bucket (`omnigraph load s3://…`): version-pinned and
-  in-region only.** Two hazards, both learned the hard way:
-  1. **Version skew corrupts the graph.** Your local CLI must match the
-     deployed `OMNIGRAPH_REF`. An older CLI writing a graph created by a
-     newer server writes Lance fragments and *then* aborts on the manifest
-     version check, leaving the graph inconsistent (`Lance HEAD … ahead of
-     manifest`, needs `omnigraph repair`). Always `omnigraph version`-check
-     against the server before a direct load.
+  in-region only.** Two hazards:
+  1. **Version skew fails the load.** Your local CLI must match the
+     deployed `OMNIGRAPH_REF`. Since v0.8.0 the storage-format gate is
+     enforced at open, in both directions, before anything is written — a
+     mismatched binary (older *or* newer) gets a hard refusal, not the
+     pre-0.8 partial-write corruption (`Lance HEAD … ahead of manifest`,
+     `omnigraph repair`). Still check up front: `omnigraph version` prints
+     the binary's format version (the `internal-schema` line) and
+     `omnigraph snapshot` / `GET /healthz` report the graph's.
   2. **Run it in-region.** A direct load from a laptop across the world to
      the Bucket pays the cross-region RTT on every one of its many
      sequential S3 calls — minutes-to-hours for a few hundred rows. Run the
@@ -306,8 +344,11 @@ docker run --rm \
 ## Pinning + maintenance
 
 The Dockerfile pins the omnigraph engine to a specific tag via
-`ARG OMNIGRAPH_REF=v0.7.0`. Bump that on every omnigraph release that
-changes server behavior, the policy schema, or the CLI surface. Schemas
+`ARG OMNIGRAPH_REF=v0.8.0`. Bump that on every omnigraph release that
+changes server behavior, the policy schema, or the CLI surface — and if
+the release changes the storage format, follow
+[Upgrading the engine](#upgrading-the-engine-omnigraph_ref-bumps) above:
+existing graphs must be rebuilt or the next deploy fails. Schemas
 are **not** baked into the image — `init.sh` fetches whatever
 `OMNIGRAPH_SCHEMA_URL` points at, so a new cookbook needs no image
 rebuild; just point a deploy at its `schema.pg` raw URL.
