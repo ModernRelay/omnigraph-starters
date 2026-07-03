@@ -2,10 +2,10 @@
 name: omnigraph-intel-bootstrap
 description: 'Bootstrap a new Omnigraph-based SPIKE industry intelligence graph from scratch. Use this skill whenever a user wants to set up a new SPIKE graph — either with the existing AI industry demo data or for a new domain (biotech, fintech, crypto, geopolitics, macroeconomics, SaaS, climate tech, etc.). The flow presents a demo-vs-custom decision, then for custom setups asks about domain scope, actors, cadence, and sources, adapts schema and enums for the target domain, runs initial web research to generate real seed content, and converges the cluster (apply creates the graph) + loads seed data. Apply aggressively when the user says any of: set up Omnigraph, bootstrap a new graph, create a new SPIKE cookbook, I want to track X industry, initialize intel for Y, new graph for Z domain, start a new context graph, or similar phrasing. This skill takes a user from zero to a populated, queryable graph.'
 license: MIT (see LICENSE at repo root)
-compatibility: Requires omnigraph CLI >= 0.7.0 (cluster control plane). Docker only for the optional RustFS/S3 path.
+compatibility: Requires omnigraph CLI >= 0.8.0 (cluster control plane; storage format v4 — graphs are format-locked to the binary that creates them). Docker only for the optional RustFS/S3 path.
 metadata:
   author: ModernRelay
-  version: "0.4.0"
+  version: "0.4.1"
   repository: https://github.com/ModernRelay/omnigraph-cookbooks
 ---
 
@@ -42,7 +42,8 @@ Before either path, run these checks (and act on the results):
 # Ensure omnigraph is on PATH
 command -v omnigraph >/dev/null || { echo "omnigraph not found — install via homebrew or the install script"; exit 1; }
 
-# Require omnigraph >= 0.7.0 (cluster control plane)
+# Require omnigraph >= 0.8.0 (cluster control plane + storage format v4 —
+# a graph created here can only be opened by binaries of the same format)
 omnigraph version
 ```
 
@@ -196,7 +197,11 @@ Use web research to build real seed content. **Do not fabricate signals or dates
 3. Cluster into 3–5 patterns (recurring themes)
 4. For each pattern, identify the Elements, Companies, Experts mentioned
 5. Write `<slug>/seed.md` (tabular, human-readable) — **present this to the user for review before generating JSONL**
-6. Generate `<slug>/seed.jsonl` from the confirmed seed.md
+6. Generate `<slug>/seed.jsonl` from the confirmed seed.md. **Every `slug`
+   must appear exactly once in the file** — since omnigraph 0.8.0 a `@key`
+   repeated within one load batch fails the whole load (nothing is
+   partially applied); dedupe and re-run if it does. Duplicate edge rows
+   on `@unique(src)` or `@unique(src,dst)` edges fail the same way.
 7. From `<clone>/<slug>/`, converge the cluster, load, then start the server
    (the `cluster.yaml` — copied from industry-intel and re-slugged — declares
    the graph, schema, and queries):
