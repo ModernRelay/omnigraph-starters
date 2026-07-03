@@ -5,7 +5,7 @@ license: MIT (see LICENSE at repo root)
 compatibility: Requires omnigraph CLI >= 0.8.0 (cluster control plane; storage format v4 — graphs are format-locked to the binary that creates them). Docker only for the optional RustFS/S3 path.
 metadata:
   author: ModernRelay
-  version: "0.4.0"
+  version: "0.4.1"
   repository: https://github.com/ModernRelay/omnigraph-cookbooks
 ---
 
@@ -201,7 +201,7 @@ Use web research to build real seed content. **Do not fabricate signals or dates
    must appear exactly once in the file** — since omnigraph 0.8.0 a `@key`
    repeated within one load batch fails the whole load (nothing is
    partially applied); dedupe and re-run if it does. Duplicate edge rows
-   on `@unique(src)` edges fail the same way.
+   on `@unique(src)` or `@unique(src,dst)` edges fail the same way.
 7. From `<clone>/<slug>/`, converge the cluster, load, then start the server
    (the `cluster.yaml` — copied from industry-intel and re-slugged — declares
    the graph, schema, and queries):
