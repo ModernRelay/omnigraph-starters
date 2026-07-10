@@ -186,6 +186,7 @@
 {"edge": "EpicParentChildIssue", "from": "epc-tenant-isolation", "to": "iss-tenant-migration", "data": {}}
 {"edge": "IssueWaitsForBlocker", "from": "iss-offline-queue", "to": "blk-crdt-lib", "data": {}}
 {"edge": "IssueWaitsForGate", "from": "iss-tenant-migration", "to": "gate-security-review", "data": {}}
+{"edge": "IssueWaitsForIssue", "from": "iss-offline-conflict-ui", "to": "iss-offline-replay-test", "data": {}}
 {"edge": "IssueDiscoveredFrom", "from": "iss-flaky-sync-test", "to": "iss-split-brain", "data": {}}
 {"edge": "IssueRelated", "from": "iss-presence-leak-fix", "to": "iss-presence-scale", "data": {}}
 {"edge": "IssueRelated", "from": "iss-dup-login-bug", "to": "iss-safari-login", "data": {}}

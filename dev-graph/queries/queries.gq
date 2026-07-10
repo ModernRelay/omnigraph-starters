@@ -59,7 +59,7 @@ query ready()
 }
 
 query blocked()
-    @description("Non-terminal issues blocked by another issue")
+    @description("Non-terminal issues blocked by another issue (incoming IssueBlocksIssue). ready() also excludes parent/gate/wait/upstream blocks — see blocked_by_parent, blocked_by_epic, blocked_by_gate, blocked_by_wait, blocked_on_upstream for those dimensions.")
 {
     match {
         $i: Issue
@@ -70,6 +70,67 @@ query blocked()
         $i.status != "duplicate"
     }
     return { $i.slug, $i.title, $i.status, $b.slug, $b.status }
+}
+
+// blocked() covers only IssueBlocksIssue. The four queries below cover the other
+// reasons ready() excludes an issue, so nothing is left "neither ready nor
+// blocked". GQ match is conjunctive (no OR), so each blocking dimension is its
+// own query. blocked_on_upstream (further down) covers the sixth: WaitsForBlocker.
+
+query blocked_by_parent()
+    @description("Non-terminal issues with a parent issue (incoming IssueParentChildIssue) — a child is blocked when its parent is")
+{
+    match {
+        $i: Issue
+        $p: Issue
+        $p issueParentChildIssue $i
+        $i.status != "done"
+        $i.status != "canceled"
+        $i.status != "duplicate"
+    }
+    return { $i.slug, $i.title, $i.status, $p.slug, $p.status }
+}
+
+query blocked_by_epic()
+    @description("Non-terminal issues gated by a parent epic (incoming EpicParentChildIssue — the blocking parent-child edge, distinct from EpicContainsIssue membership)")
+{
+    match {
+        $i: Issue
+        $e: Epic
+        $e epicParentChildIssue $i
+        $i.status != "done"
+        $i.status != "canceled"
+        $i.status != "duplicate"
+    }
+    return { $i.slug, $i.title, $i.status, $e.slug, $e.status }
+}
+
+query blocked_by_gate()
+    @description("Non-terminal issues waiting on a Gate (outgoing IssueWaitsForGate) — check the gate's status to see if it still blocks")
+{
+    match {
+        $i: Issue
+        $g: Gate
+        $i issueWaitsForGate $g
+        $i.status != "done"
+        $i.status != "canceled"
+        $i.status != "duplicate"
+    }
+    return { $i.slug, $i.title, $g.slug, $g.kind, $g.status }
+}
+
+query blocked_by_wait()
+    @description("Non-terminal issues waiting on another issue (outgoing IssueWaitsForIssue) — a soft aggregation dependency, distinct from a hard IssueBlocksIssue")
+{
+    match {
+        $i: Issue
+        $w: Issue
+        $i issueWaitsForIssue $w
+        $i.status != "done"
+        $i.status != "canceled"
+        $i.status != "duplicate"
+    }
+    return { $i.slug, $i.title, $w.slug, $w.status }
 }
 
 query blocked_on_upstream()

@@ -154,8 +154,7 @@ Shipped as stored queries in `queries/` and exposed as operator aliases in
 | Concept | Alias | What it answers |
 |---|---|---|
 | **Ready** | `ready` | Backlog/todo issues with no incoming block and no outgoing wait |
-| **Blocked** | `blocked` | Non-terminal issues blocked by another issue |
-| **Blocked on upstream** | `blocked-upstream` | Issues gated on an `ExternalBlocker`, with the version that ships the fix |
+| **Blocked** | `blocked` · `blocked-parent` · `blocked-epic` · `blocked-gate` · `blocked-wait` · `blocked-upstream` | One view per blocking dimension (`IssueBlocksIssue` / parent issue / parent epic / `Gate` / `WaitsForIssue` / `ExternalBlocker`), so every issue `ready` excludes shows up in exactly one — GQ has no `OR`, so the dimensions are separate queries |
 | **Stale** | `stale` | Non-terminal issues, oldest-updated first (threshold client-side) |
 | **Epic completion** | `epic-open` | Open issues remaining in an epic |
 | **Release diff** | `release-prs` | PRs in a release (the changeset) |
@@ -174,7 +173,7 @@ Plus a per-issue triage set in `queries/issues-dashboard.gq`
 ## The reference seed — "Meridian"
 
 A fabricated collaborative-document platform. **102 nodes across all 22 types,
-238 edges across 82 edge types.** It's built so every killer query returns
+239 edges across 83 edge types.** It's built so every killer query returns
 something interesting:
 
 - **Team (`Actor`):** Nadia (eng lead), Ravi (backend), Mei (frontend), Tomas

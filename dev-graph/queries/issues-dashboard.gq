@@ -91,13 +91,33 @@ query issue_labels($issue: String)
 }
 
 query issue_blockers($issue: String)
-    @description("Issues blocking this one (incoming IssueBlocksIssue), with status")
+    @description("Issues blocking this one via incoming IssueBlocksIssue, with status. This is only the hard issue-blocks-issue dimension — for parent/gate/upstream blocks see issue_parents, issue_parent_epic, issue_gates, issue_waits_on.")
 {
     match {
         $i: Issue { slug: $issue }
         $b issueBlocksIssue $i
     }
     return { $b.slug, $b.title, $b.status }
+}
+
+query issue_parents($issue: String)
+    @description("Parent issues of this one (incoming IssueParentChildIssue) — this issue is blocked when a parent is. The inverse of issue_children.")
+{
+    match {
+        $i: Issue { slug: $issue }
+        $p issueParentChildIssue $i
+    }
+    return { $p.slug, $p.title, $p.status }
+}
+
+query issue_parent_epic($issue: String)
+    @description("Parent epic gating this issue via EpicParentChildIssue (the blocking parent-child edge, distinct from EpicContainsIssue membership)")
+{
+    match {
+        $i: Issue { slug: $issue }
+        $e epicParentChildIssue $i
+    }
+    return { $e.slug, $e.title, $e.status }
 }
 
 query issue_related($issue: String)

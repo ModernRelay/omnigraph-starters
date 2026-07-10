@@ -25,6 +25,10 @@ aliases:
   # ── Work state (beads-style, derived) ────────────────────────
   ready:            { server: local, graph: dev, query: ready }
   blocked:          { server: local, graph: dev, query: blocked }
+  blocked-parent:   { server: local, graph: dev, query: blocked_by_parent }
+  blocked-epic:     { server: local, graph: dev, query: blocked_by_epic }
+  blocked-gate:     { server: local, graph: dev, query: blocked_by_gate }
+  blocked-wait:     { server: local, graph: dev, query: blocked_by_wait }
   blocked-upstream: { server: local, graph: dev, query: blocked_on_upstream }
   stale:            { server: local, graph: dev, query: stale_candidates }
 
@@ -55,9 +59,11 @@ aliases:
   # ── Issue-triage dashboard (queries/issues-dashboard.gq) ─────
   open-epics:      { server: local, graph: dev, query: open_epics }
   epic-counts:     { server: local, graph: dev, query: epic_issue_counts, args: [epic] }
-  issue-detail:    { server: local, graph: dev, query: issue_detail,    args: [issue] }
-  issue-blockers:  { server: local, graph: dev, query: issue_blockers,  args: [issue] }
-  issue-comments:  { server: local, graph: dev, query: issue_comments,  args: [issue] }
+  issue-detail:    { server: local, graph: dev, query: issue_detail,     args: [issue] }
+  issue-blockers:  { server: local, graph: dev, query: issue_blockers,   args: [issue] }
+  issue-parents:   { server: local, graph: dev, query: issue_parents,    args: [issue] }
+  issue-epic-parent: { server: local, graph: dev, query: issue_parent_epic, args: [issue] }
+  issue-comments:  { server: local, graph: dev, query: issue_comments,   args: [issue] }
 
   # ── Semantic search (needs an embedding provider + populated embeddings; see README) ──
   sem-issue:     { server: local, graph: dev, query: search_issues,       args: [q] }
