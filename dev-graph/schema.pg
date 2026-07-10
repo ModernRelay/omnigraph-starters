@@ -51,7 +51,7 @@ node Epic
     status: enum(shaping, active, done, abandoned)
     businessValue: String?
     legacyRef: String? @description("Id from a prior tracker, e.g. LIN-482")
-    embedding: Vector(3072)?
+    embedding: Vector(3072)? @embed("title") @index
     createdAt: Date
     createdBy: String? @description("Actor slug that created the record")
     updatedAt: Date
@@ -68,7 +68,7 @@ node SpecFile
     version: String?
     url: String? @description("Link to the canonical doc, if it lives outside the graph")
     legacyRef: String?
-    embedding: Vector(3072)?
+    embedding: Vector(3072)? @embed("title") @index
     createdAt: Date
     createdBy: String? @description("Actor slug that created the record")
     updatedAt: Date
@@ -115,7 +115,7 @@ node PR
     invariantReviewDone: Bool? @description("Whether the PR was reviewed against the invariant/principle set")
     githubRef: String @description("PR number or URL, e.g. meridian#128")
     legacyRef: String?
-    embedding: Vector(3072)?
+    embedding: Vector(3072)? @embed("title") @index
     createdAt: Date
     createdBy: String? @description("Actor slug that created the record")
     updatedAt: Date
@@ -151,7 +151,7 @@ node Incident
     startedAt: Date
     mitigatedAt: Date?
     resolvedAt: Date?
-    embedding: Vector(3072)?
+    embedding: Vector(3072)? @embed("title") @index
     createdAt: Date
     createdBy: String? @description("Actor slug that created the record")
     updatedAt: Date
@@ -172,7 +172,7 @@ node Issue
     acceptanceCriteria: String?
     designNotes: String?
     legacyRef: String? @description("Id from a prior tracker, e.g. LIN-903")
-    embedding: Vector(3072)?
+    embedding: Vector(3072)? @embed("title") @index
     createdAt: Date
     createdBy: String? @description("Actor slug that created the record")
     updatedAt: Date
@@ -233,7 +233,7 @@ node Invariant
     status: enum(holds, violated)
     guardRef: String? @description("Path to the test/check that enforces it; null = unguarded")
     specRef: String?
-    embedding: Vector(3072)?
+    embedding: Vector(3072)? @embed("statement") @index
     createdAt: Date
     createdBy: String? @description("Actor slug that created the record")
     updatedAt: Date
@@ -250,7 +250,7 @@ node Principle
     correctAlternative: String? @description("For forbids: the right thing to do instead")
     status: enum(proposed, active, relaxed, retired)
     specRef: String?
-    embedding: Vector(3072)?
+    embedding: Vector(3072)? @embed("statement") @index
     createdAt: Date
     createdBy: String? @description("Actor slug that created the record")
     updatedAt: Date
@@ -265,7 +265,7 @@ node Gap
     currentBehavior: String?
     targetBehavior: String?
     state: enum(narrowing, widened, closed)
-    embedding: Vector(3072)?
+    embedding: Vector(3072)? @embed("title") @index
     createdAt: Date
     createdBy: String? @description("Actor slug that created the record")
     updatedAt: Date
@@ -296,7 +296,7 @@ node Assumption
     status: enum(holds, violated)
     guardRef: String? @description("Compile/runtime test pinning the assumption; null = silent dependency")
     assumptionKind: enum(compile, runtime, manual)
-    embedding: Vector(3072)?
+    embedding: Vector(3072)? @embed("statement") @index
     createdAt: Date
     createdBy: String? @description("Actor slug that created the record")
     updatedAt: Date
@@ -311,7 +311,7 @@ node Capability
     summary: String?
     tier: enum(owned, inherited) @description("owned = we build it (L2); inherited = from substrate (L1)")
     status: enum(planned, shipped, deprecated)
-    embedding: Vector(3072)?
+    embedding: Vector(3072)? @embed("name") @index
     createdAt: Date
     createdBy: String? @description("Actor slug that created the record")
     updatedAt: Date
@@ -332,7 +332,7 @@ node Decision
     consequences: String?
     status: enum(proposed, accepted, rejected, superseded)
     legacyRef: String?
-    embedding: Vector(3072)?
+    embedding: Vector(3072)? @embed("title") @index
     createdAt: Date
     createdBy: String? @description("Actor slug that created the record")
 }
@@ -368,7 +368,7 @@ node Learning
     title: String
     body: String?
     learningKind: enum(incident_review, retro, gotcha, hindsight)?
-    embedding: Vector(3072)?
+    embedding: Vector(3072)? @embed("title") @index
     createdAt: Date
     createdBy: String? @description("Actor slug that created the record")
 }
@@ -378,7 +378,7 @@ node Comment
 {
     slug: String @key
     body: String
-    embedding: Vector(3072)?
+    embedding: Vector(3072)? @embed("body") @index
     createdAt: Date
     createdBy: String? @description("Actor slug that created the record")
 }

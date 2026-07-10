@@ -19,7 +19,7 @@ All names are fabricated; the seed exists to shape the demo queries.
 ## Key Files
 
 - `schema.pg` — executable schema. Source of truth. **22 node classes** (17
-  pointer, 5 append-only), ~70 edge types. Comments are `//`, never `#`.
+  pointer, 5 append-only), 92 edge types. Comments are `//`, never `#`.
 - `README.md` — design rationale, the ontology, killer queries, quick start.
 - `seed.jsonl` / `seed.md` — reference seed (loadable / human-readable). Keep in sync.
 - `queries/queries.gq` — derived reads (ready/blocked/stale, incident root-cause,

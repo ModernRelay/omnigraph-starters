@@ -220,6 +220,7 @@ query gaps_undermining_invariants()
     match {
         $g: Gap
         $g gapUnderminesInvariant $inv
+        $g.state != "closed"
     }
     return { $g.slug, $g.title, $g.state, $inv.slug, $inv.statement, $inv.status }
 }
@@ -257,6 +258,7 @@ query decisions_for_component($component: String)
 {
     match {
         $c: Component { slug: $component }
+        $d: Decision { status: "accepted" }
         $d decisionAppliesToComponent $c
     }
     return { $d.slug, $d.title, $d.status }

@@ -121,7 +121,7 @@ different schema.
 
 ## Edge classes
 
-~70 edge types, grouped by intent (full list in `schema.pg`):
+92 edge types, grouped by intent (full list in `schema.pg`):
 
 - **Containment** — `RepoHasComponent`, `ComponentHasSubcomponent`,
   `EpicContainsIssue`, `ReleaseIncludesPr` (single-direction/canonical; traverse
@@ -244,11 +244,26 @@ omnigraph query ready --server http://127.0.0.1:8080 --graph dev
 
 The prose-bearing nodes (`Issue`, `Epic`, `SpecFile`, `Decision`, `Learning`,
 `Invariant`, `Principle`, `Gap`, `Capability`, `Incident`, `PR`, `Assumption`,
-`Comment`) carry an optional `embedding: Vector(3072)?`. The seed ships **no
-embeddings**, so the `search_*` stored queries / `sem-*` aliases return nothing
-until you populate them. To turn semantic search on: uncomment the `providers:`
-block in `cluster.yaml`, export `GEMINI_API_KEY`, run `omnigraph embed`, and
-re-serve. Everything else works with nothing extra.
+`Comment`) declare an embedding column with its source and index:
+`embedding: Vector(3072)? @embed("title"|"statement"|"name"|"body") @index`. The
+column stays **null until an embedding provider is configured** — so the seed
+loads with zero dependencies (no API key) and the `search_*` stored queries /
+`sem-*` aliases simply return nothing.
+
+To turn semantic search on:
+
+1. Uncomment the `providers:` block **and** the `embedding_provider: default`
+   line under `graphs.dev` in `cluster.yaml`, then `omnigraph cluster apply --config .`.
+2. `export GEMINI_API_KEY=…` (the embedder + the server's query-time embedding
+   both use `gemini-embedding-2-preview`, keeping stored and query vectors in the
+   same 3072-dim space — a dimension mismatch returns garbage).
+3. Re-embed the data. Either re-load the seed — `omnigraph load --data seed.jsonl
+   --mode overwrite graphs/dev.omni` re-triggers embedding at load because the
+   columns carry `@embed(...)` — or run `omnigraph embed --reembed_all`.
+4. Restart `omnigraph-server --cluster .`.
+
+Now `omnigraph alias sem-issue "tenant isolation"` (etc.) ranks by
+`nearest($x.embedding, $q)`. Everything structural works without any of this.
 
 ## Identifier scheme
 
