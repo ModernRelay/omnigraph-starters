@@ -1,0 +1,516 @@
+// dev-graph — a software-development knowledge graph
+//
+// A graph of software-development work spanning planning, code, release,
+// operations, and the governance/substrate rules that constrain them. It is a
+// tracker replacement: Issue, Epic, Decision, SpecFile, and the whole
+// governance layer are native here, while the VCS host (GitHub/GitLab) stays
+// authoritative for code — PR/Commit/Release carry a `githubRef`, and items
+// migrated out of a prior tracker keep `legacyRef` (e.g. "LIN-123") so old
+// commits/branches/PR bodies that cite it stay traceable.
+//
+// Authoritative companion to README.md (read it for the "why" — what's a node,
+// what's an edge, and which design decisions are load-bearing). The reference
+// seed (seed.jsonl / seed.md) is a fictional real-time-collaboration product,
+// "Meridian" — every name is fabricated; it exists to make the queries land.
+//
+// 22 node classes (17 pointer, 5 append-only) across layers:
+//   Planning   — Epic, SpecFile, Decision
+//   Work       — Issue, Comment
+//   Code       — Repo, Component, PR, Commit
+//   Release    — Release, Deployment
+//   Operations — Incident, Learning
+//   People     — Actor
+//   Governance — Invariant, Principle, Gap, ExternalBlocker, Assumption, Capability
+//   Cross      — Label, Gate
+//
+// Conventions:
+//   • slug: String @key — native slugged hash id (iss-a1b2, epc-…, pr-…).
+//   • Provenance on every node: createdAt + createdBy (actor slug). Pointer nodes
+//     also carry updatedAt + updatedBy. There is no separate Event/audit node —
+//     the domain already has event-like nodes (Deployment, Commit, a Release cut)
+//     and last-touched provenance covers field changes. Full per-field history is
+//     intentionally not retained.
+//   • githubRef — VCS-host identity (PR number, commit SHA, release tag/URL).
+//   • legacyRef — id from a prior tracker (e.g. LIN-123) on migrated nodes.
+//   • Enum tokens are snake_case; "In Progress" → in_progress.
+//   • Ownership/authorship/targets are EDGES, not fields.
+//   • Polymorphic relations are split per target (CommentOnIssue, CommentOnPr…).
+
+// ═══════════════════════════════════════════════════════════════
+// POINTER NODES (mutable, updated in place)
+// ═══════════════════════════════════════════════════════════════
+
+// ---- Planning ----
+
+node Epic
+    @description("Multi-issue scope of work. Owner and target release are edges.")
+{
+    slug: String @key
+    title: String
+    summary: String?
+    status: enum(shaping, active, done, abandoned)
+    businessValue: String?
+    legacyRef: String? @description("Id from a prior tracker, e.g. LIN-482")
+    embedding: Vector(3072)?
+    createdAt: Date
+    createdBy: String? @description("Actor slug that created the record")
+    updatedAt: Date
+    updatedBy: String? @description("Actor slug of the last editor")
+}
+
+node SpecFile
+    @description("Design doc / RFC. Mutable until approved; edits bump version.")
+{
+    slug: String @key
+    title: String
+    body: String?
+    status: enum(draft, under_review, approved, superseded, retired)
+    version: String?
+    url: String? @description("Link to the canonical doc, if it lives outside the graph")
+    legacyRef: String?
+    embedding: Vector(3072)?
+    createdAt: Date
+    createdBy: String? @description("Actor slug that created the record")
+    updatedAt: Date
+    updatedBy: String? @description("Actor slug of the last editor")
+}
+
+node Component
+    @description("Logical unit of code (service, module, top-level package). Owner is an edge; repo via RepoHasComponent.")
+{
+    slug: String @key
+    name: String @unique
+    summary: String?
+    criticality: enum(low, medium, high, critical)?
+    createdAt: Date
+    createdBy: String? @description("Actor slug that created the record")
+    updatedAt: Date
+    updatedBy: String? @description("Actor slug of the last editor")
+}
+
+node Repo
+    @description("VCS unit.")
+{
+    slug: String @key
+    name: String @unique
+    defaultBranch: String?
+    host: enum(github, gitlab, other)?
+    visibility: enum(public, private)?
+    githubRef: String? @description("owner/name on GitHub")
+    createdAt: Date
+    createdBy: String? @description("Actor slug that created the record")
+    updatedAt: Date
+    updatedBy: String? @description("Actor slug of the last editor")
+}
+
+node PR
+    @description("Proposed change set. GitHub-authoritative. Branches are strings; commits via PrIncludesCommit.")
+{
+    slug: String @key
+    title: String
+    body: String?
+    status: enum(draft, open, merged, closed)
+    sourceBranch: String?
+    targetBranch: String?
+    invariantReviewDone: Bool? @description("Whether the PR was reviewed against the invariant/principle set")
+    githubRef: String @description("PR number or URL, e.g. meridian#128")
+    legacyRef: String?
+    embedding: Vector(3072)?
+    createdAt: Date
+    createdBy: String? @description("Actor slug that created the record")
+    updatedAt: Date
+    updatedBy: String? @description("Actor slug of the last editor")
+}
+
+node Release
+    @description("Versioned bundle. GitHub-authoritative. Coherence checklist + breaking changes as JSON strings.")
+{
+    slug: String @key
+    versionTag: String @unique @description("e.g. v0.5.0")
+    status: enum(planned, cut, released, yanked)
+    releaseNotes: String?
+    releaseNotesDoc: String? @description("Link to docs/releases/<version>.md (a SpecFile)")
+    breakingChanges: String? @description("Markdown list of behavior changes")
+    artifactsChecklist: String? @description("JSON array of {path, done} — artifacts that must move atomically on the bump")
+    githubRef: String?
+    createdAt: Date
+    createdBy: String? @description("Actor slug that created the record")
+    updatedAt: Date
+    updatedBy: String? @description("Actor slug of the last editor")
+}
+
+node Incident
+    @description("Production issue. Commander is an edge.")
+{
+    slug: String @key
+    title: String
+    summary: String?
+    status: enum(open, mitigated, resolved)
+    severity: enum(s1, s2, s3, s4)?
+    env: enum(dev, staging, prod)?
+    startedAt: Date
+    mitigatedAt: Date?
+    resolvedAt: Date?
+    embedding: Vector(3072)?
+    createdAt: Date
+    createdBy: String? @description("Actor slug that created the record")
+    updatedAt: Date
+    updatedBy: String? @description("Actor slug of the last editor")
+}
+
+// ---- Work ----
+
+node Issue
+    @description("Work item. Replaces a tracker issue. Owner is an edge. Terminal states: done, canceled, duplicate.")
+{
+    slug: String @key
+    title: String
+    description: String?
+    status: enum(backlog, todo, in_progress, needs_review, hold, done, canceled, duplicate)
+    priority: I32? @description("0=none, 1=urgent, 2=high, 3=medium, 4=low (tracker convention)")
+    issueType: enum(bug, feature, task, chore, question, risk)
+    acceptanceCriteria: String?
+    designNotes: String?
+    legacyRef: String? @description("Id from a prior tracker, e.g. LIN-903")
+    embedding: Vector(3072)?
+    createdAt: Date
+    createdBy: String? @description("Actor slug that created the record")
+    updatedAt: Date
+    updatedBy: String? @description("Actor slug of the last editor")
+}
+
+// ---- People ----
+
+node Actor
+    @description("Person or agent that creates, owns, reviews, or authors. agent slugs use 'agent:<name>'.")
+{
+    slug: String @key
+    name: String @unique
+    actorKind: enum(human, agent, service)
+    handle: String?
+    email: String?
+    createdAt: Date
+    createdBy: String? @description("Actor slug that created the record")
+    updatedAt: Date
+    updatedBy: String? @description("Actor slug of the last editor")
+}
+
+// ---- Cross-cutting ----
+
+node Gate
+    @description("External waitable. kind is a closed enum (queryable); externalRef is the free-form handle.")
+{
+    slug: String @key
+    kind: enum(pr_merge, ci_green, timer, manual_approval, feature_flag)
+    status: enum(pending, passed, failed, expired)
+    externalRef: String? @description("URL, CI run id, PR number, or flag name")
+    createdAt: Date
+    createdBy: String? @description("Actor slug that created the record")
+    updatedAt: Date
+    updatedBy: String? @description("Actor slug of the last editor")
+}
+
+node Label
+    @description("Cross-cutting tag.")
+{
+    slug: String @key
+    name: String @unique
+    color: String?
+    scope: String?
+    createdAt: Date
+    createdBy: String? @description("Actor slug that created the record")
+    updatedAt: Date
+    updatedBy: String? @description("Actor slug of the last editor")
+}
+
+// ---- Governance & substrate ----
+
+node Invariant
+    @description("Checkable property the system maintains. Violation = bug. Internal twin of Assumption.")
+{
+    slug: String @key
+    statement: String
+    status: enum(holds, violated)
+    guardRef: String? @description("Path to the test/check that enforces it; null = unguarded")
+    specRef: String?
+    embedding: Vector(3072)?
+    createdAt: Date
+    createdBy: String? @description("Actor slug that created the record")
+    updatedAt: Date
+    updatedBy: String? @description("Actor slug of the last editor")
+}
+
+node Principle
+    @description("Prescriptive design rule reviewed against on every PR. Violation = rejected PR. polarity prescribes|forbids.")
+{
+    slug: String @key
+    statement: String
+    rationale: String?
+    polarity: enum(prescribes, forbids)
+    correctAlternative: String? @description("For forbids: the right thing to do instead")
+    status: enum(proposed, active, relaxed, retired)
+    specRef: String?
+    embedding: Vector(3072)?
+    createdAt: Date
+    createdBy: String? @description("Actor slug that created the record")
+    updatedAt: Date
+    updatedBy: String? @description("Actor slug of the last editor")
+}
+
+node Gap
+    @description("Tracked architectural debt — a desired Invariant not yet held. Can be widened by a PR.")
+{
+    slug: String @key
+    title: String
+    currentBehavior: String?
+    targetBehavior: String?
+    state: enum(narrowing, widened, closed)
+    embedding: Vector(3072)?
+    createdAt: Date
+    createdBy: String? @description("Actor slug that created the record")
+    updatedAt: Date
+    updatedBy: String? @description("Actor slug of the last editor")
+}
+
+node ExternalBlocker
+    @description("External issue/PR/release gating internal work (e.g. an upstream library fix). Durable cousin of Gate.")
+{
+    slug: String @key
+    system: String @description("the upstream system we depend on, e.g. a library, service, or platform")
+    upstreamUrl: String?
+    status: enum(open, closed, shipped)
+    pinnedVersion: String?
+    shippedInVersion: String?
+    residualWorkaround: String?
+    createdAt: Date
+    createdBy: String? @description("Actor slug that created the record")
+    updatedAt: Date
+    updatedBy: String? @description("Actor slug of the last editor")
+}
+
+node Assumption
+    @description("Checkable belief about an EXTERNAL system's API/behavior, optionally guard-backed. External twin of Invariant.")
+{
+    slug: String @key
+    statement: String
+    status: enum(holds, violated)
+    guardRef: String? @description("Compile/runtime test pinning the assumption; null = silent dependency")
+    assumptionKind: enum(compile, runtime, manual)
+    embedding: Vector(3072)?
+    createdAt: Date
+    createdBy: String? @description("Actor slug that created the record")
+    updatedAt: Date
+    updatedBy: String? @description("Actor slug of the last editor")
+}
+
+node Capability
+    @description("Functional capability of the product, tagged by provenance. Different axis from Component; mapped M:N via CapabilityImplementedBy.")
+{
+    slug: String @key
+    name: String @unique
+    summary: String?
+    tier: enum(owned, inherited) @description("owned = we build it (L2); inherited = from substrate (L1)")
+    status: enum(planned, shipped, deprecated)
+    embedding: Vector(3072)?
+    createdAt: Date
+    createdBy: String? @description("Actor slug that created the record")
+    updatedAt: Date
+    updatedBy: String? @description("Actor slug of the last editor")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// APPEND-ONLY NODES (never overwritten; corrections use Supersedes)
+// ═══════════════════════════════════════════════════════════════
+
+node Decision
+    @description("Architecture Decision Record. Immutable once accepted; corrected via DecisionSupersedes.")
+{
+    slug: String @key
+    title: String
+    context: String?
+    decision: String
+    consequences: String?
+    status: enum(proposed, accepted, rejected, superseded)
+    legacyRef: String?
+    embedding: Vector(3072)?
+    createdAt: Date
+    createdBy: String? @description("Actor slug that created the record")
+}
+
+node Commit
+    @description("Immutable VCS point, modeled only when referenced by a PR or incident (no full commit DAG).")
+{
+    slug: String @key
+    sha: String @unique
+    message: String?
+    githubRef: String?
+    authoredAt: Date
+    createdAt: Date
+    createdBy: String? @description("Actor slug that created the record")
+}
+
+node Deployment
+    @description("Act of deploying a Release to an environment. env carries where; current-release-per-env is derived.")
+{
+    slug: String @key
+    env: enum(dev, staging, prod, preview)
+    outcome: enum(success, rolled_back, failed)
+    startedAt: Date
+    finishedAt: Date?
+    createdAt: Date
+    createdBy: String? @description("Actor slug that created the record")
+}
+
+node Learning
+    @description("Captured lesson: incident analysis, retro takeaway, discovered gotcha, or design hindsight.")
+{
+    slug: String @key
+    title: String
+    body: String?
+    learningKind: enum(incident_review, retro, gotcha, hindsight)?
+    embedding: Vector(3072)?
+    createdAt: Date
+    createdBy: String? @description("Actor slug that created the record")
+}
+
+node Comment
+    @description("Thread message on an artifact. Never edited; corrections are new Comments. Target via CommentOn*.")
+{
+    slug: String @key
+    body: String
+    embedding: Vector(3072)?
+    createdAt: Date
+    createdBy: String? @description("Actor slug that created the record")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EDGES
+// ═══════════════════════════════════════════════════════════════
+
+// ---- Containment ----
+edge RepoHasComponent: Repo -> Component
+edge ComponentHasSubcomponent: Component -> Component
+edge EpicContainsIssue: Epic -> Issue
+edge ReleaseIncludesPr: Release -> PR
+
+// ---- Specification & decisions ----
+edge SpecSpecifies: SpecFile -> Epic
+edge SpecDescribes: SpecFile -> Component
+edge SpecSupersedes: SpecFile -> SpecFile
+edge SpecReferences: SpecFile -> SpecFile
+edge DecisionAppliesToComponent: Decision -> Component
+edge DecisionAppliesToSpec: Decision -> SpecFile
+edge DecisionSupersedes: Decision -> Decision
+edge DecisionEmergedFromIssue: Decision -> Issue
+edge DecisionEmergedFromIncident: Decision -> Incident
+
+// ---- Work targeting ----
+edge IssueTargetsComponent: Issue -> Component
+edge EpicTargetsComponent: Epic -> Component
+edge EpicTargetsRelease: Epic -> Release
+edge IssueTargetsRelease: Issue -> Release
+    @description("Release the issue is slated for (planning intent; actual delivery is derivable via IssueImplementedBy → ReleaseIncludesPr)")
+
+// ---- Implementation ----
+edge IssueImplementedBy: Issue -> PR
+edge PrClosesIssue: PR -> Issue
+    @description("Takes effect on merge")
+edge PrTouchesComponent: PR -> Component
+edge PrIncludesCommit: PR -> Commit
+
+// ---- Release / deploy ----
+edge ReleaseInRepo: Release -> Repo
+edge ReleaseSupersedes: Release -> Release
+edge DeploymentOfRelease: Deployment -> Release
+
+// ---- Incident & learning ----
+edge IncidentAffectsComponent: Incident -> Component
+edge IncidentCausedByPr: Incident -> PR
+edge IncidentCausedByDeployment: Incident -> Deployment
+edge IncidentCausedByCommit: Incident -> Commit
+edge LearningAnalyzesIncident: Learning -> Incident
+edge LearningAboutComponent: Learning -> Component
+edge LearningAboutBlocker: Learning -> ExternalBlocker
+edge LearningAboutAssumption: Learning -> Assumption
+edge LearningAboutGap: Learning -> Gap
+edge LearningFromEpic: Learning -> Epic
+edge LearningReferencesDecision: Learning -> Decision
+
+// ---- Dependencies: blocking (affect ready-work) ----
+edge IssueBlocksIssue: Issue -> Issue
+edge EpicBlocksEpic: Epic -> Epic
+edge PrBlocksPr: PR -> PR
+edge EpicParentChildIssue: Epic -> Issue
+    @description("ParentChild: child blocked when parent blocked")
+edge IssueParentChildIssue: Issue -> Issue
+edge IssueConditionalBlocksIssue: Issue -> Issue
+    @description("Target runs only if source fails")
+edge IssueWaitsForIssue: Issue -> Issue
+edge IssueWaitsForGate: Issue -> Gate
+edge PrWaitsForGate: PR -> Gate
+edge IssueWaitsForBlocker: Issue -> ExternalBlocker
+edge PrWaitsForBlocker: PR -> ExternalBlocker
+
+// ---- Dependencies: non-blocking (annotations) ----
+edge IssueRelated: Issue -> Issue
+    @description("General-purpose informational link — the one escape hatch")
+edge IssueDiscoveredFrom: Issue -> Issue
+
+// ---- Component-to-component ----
+edge ComponentDependsOn: Component -> Component
+    @description("Architectural dependency, runtime or build-time")
+
+// ---- Ownership / authorship ----
+edge IssueOwnedBy: Issue -> Actor
+edge EpicOwnedBy: Epic -> Actor
+edge ComponentOwnedBy: Component -> Actor
+edge RepoOwnedBy: Repo -> Actor
+edge SpecAuthoredBy: SpecFile -> Actor
+edge DecisionAuthoredBy: Decision -> Actor
+edge PrAuthoredBy: PR -> Actor
+edge PrReviewedBy: PR -> Actor
+edge CommitAuthoredBy: Commit -> Actor
+edge IncidentCommandedBy: Incident -> Actor
+edge DeploymentTriggeredBy: Deployment -> Actor
+
+// ---- Discussion (Comment per target) ----
+edge CommentOnIssue: Comment -> Issue
+edge CommentOnPr: Comment -> PR
+edge CommentOnSpec: Comment -> SpecFile
+edge CommentOnDecision: Comment -> Decision
+edge CommentOnIncident: Comment -> Incident
+edge CommentOnEpic: Comment -> Epic
+edge CommentPostedBy: Comment -> Actor
+
+// ---- Tagging (per target) ----
+edge IssueTagged: Issue -> Label
+edge EpicTagged: Epic -> Label
+edge PrTagged: PR -> Label
+edge SpecTagged: SpecFile -> Label
+edge ComponentTagged: Component -> Label
+edge IncidentTagged: Incident -> Label
+edge LearningTagged: Learning -> Label
+
+// ---- Governance & substrate ----
+edge PrExceptionToPrinciple: Principle -> PR
+    @description("Justified-exception record, mostly for forbids principles")
+edge DecisionEstablishesInvariant: Decision -> Invariant
+edge DecisionEstablishesPrinciple: Decision -> Principle
+edge DecisionRelaxesInvariant: Decision -> Invariant
+edge DecisionRelaxesPrinciple: Decision -> Principle
+edge GapUnderminesInvariant: Gap -> Invariant
+edge IssueNarrowsGap: Issue -> Gap
+edge PrWidensGap: PR -> Gap
+    @description("A change that worsens known debt — flagged in review")
+edge PrNarrowsGap: PR -> Gap
+    @description("A PR that reduces known debt against a Gap (symmetric with IssueNarrowsGap)")
+edge InvariantAboutComponent: Invariant -> Component
+edge AssumptionCoversBlocker: Assumption -> ExternalBlocker
+    @description("A failing guard signals the blocker moved")
+edge AssumptionAboutComponent: Assumption -> Component
+edge CapabilityImplementedBy: Capability -> Component
+edge CapabilityTrackedBy: Capability -> Epic
+edge InvariantDescribedIn: Invariant -> SpecFile
+edge PrincipleDescribedIn: Principle -> SpecFile
+edge GapDescribedIn: Gap -> SpecFile
+edge CapabilityDescribedIn: Capability -> SpecFile

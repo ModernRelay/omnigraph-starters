@@ -1,0 +1,82 @@
+# Operator-config example for the dev-graph cookbook.
+# Your operator config lives at ~/.omnigraph/config.yaml (per-user, NOT committed).
+# Merge the `aliases:` below into it for short names over this graph's stored
+# queries. Point `local` at your running cluster server (`omnigraph-server
+# --cluster .`); alias invocation needs the server up.
+#
+# Read aliases bind to served stored queries by name; run with
+# `omnigraph alias <name> [args]`. Operator aliases are READ-ONLY — run stored
+# *mutations* with `omnigraph mutate <name> --params '{…}'` (see the bottom), not
+# via an alias.
+servers:
+  local:
+    url: http://127.0.0.1:8080
+defaults:
+  server: local
+  default_graph: dev
+  output: table
+
+aliases:
+  # ── Lookups ──────────────────────────────────────────────────
+  issue: { server: local, graph: dev, query: issue_lookup, args: [slug] }
+  epic:  { server: local, graph: dev, query: epic_lookup,  args: [slug] }
+  pr:    { server: local, graph: dev, query: pr_lookup,    args: [slug] }
+
+  # ── Work state (beads-style, derived) ────────────────────────
+  ready:            { server: local, graph: dev, query: ready }
+  blocked:          { server: local, graph: dev, query: blocked }
+  blocked-upstream: { server: local, graph: dev, query: blocked_on_upstream }
+  stale:            { server: local, graph: dev, query: stale_candidates }
+
+  # ── Epics ────────────────────────────────────────────────────
+  epic-issues: { server: local, graph: dev, query: epic_issues,      args: [epic] }
+  epic-open:   { server: local, graph: dev, query: epic_open_issues, args: [epic] }
+
+  # ── Code / release ───────────────────────────────────────────
+  release-prs: { server: local, graph: dev, query: release_prs,           args: [release] }
+  issue-prs:   { server: local, graph: dev, query: issue_implementations, args: [issue] }
+  prs-comp:    { server: local, graph: dev, query: prs_for_component,     args: [component] }
+  issues-comp: { server: local, graph: dev, query: issues_for_component,  args: [component] }
+
+  # ── Operations ───────────────────────────────────────────────
+  incident-cause:     { server: local, graph: dev, query: incident_root_cause,   args: [incident] }
+  incident-blast:     { server: local, graph: dev, query: incident_components,    args: [incident] }
+  learnings-incident: { server: local, graph: dev, query: learnings_for_incident, args: [incident] }
+
+  # ── Governance & substrate ───────────────────────────────────
+  unheld-invariants: { server: local, graph: dev, query: unheld_invariants }
+  gaps:              { server: local, graph: dev, query: gaps_undermining_invariants }
+  assumptions:       { server: local, graph: dev, query: assumptions }
+  caps-tier:         { server: local, graph: dev, query: capabilities_by_tier, args: [tier] }
+  decisions-comp:    { server: local, graph: dev, query: decisions_for_component, args: [component] }
+  no-spec:           { server: local, graph: dev, query: components_without_spec }
+  no-cap-impl:       { server: local, graph: dev, query: capabilities_without_component }
+
+  # ── Issue-triage dashboard (queries/issues-dashboard.gq) ─────
+  open-epics:      { server: local, graph: dev, query: open_epics }
+  epic-counts:     { server: local, graph: dev, query: epic_issue_counts, args: [epic] }
+  issue-detail:    { server: local, graph: dev, query: issue_detail,    args: [issue] }
+  issue-blockers:  { server: local, graph: dev, query: issue_blockers,  args: [issue] }
+  issue-comments:  { server: local, graph: dev, query: issue_comments,  args: [issue] }
+
+  # ── Semantic search (needs an embedding provider + populated embeddings; see README) ──
+  sem-issue:     { server: local, graph: dev, query: search_issues,       args: [q] }
+  sem-epic:      { server: local, graph: dev, query: search_epics,        args: [q] }
+  sem-spec:      { server: local, graph: dev, query: search_specs,        args: [q] }
+  sem-decision:  { server: local, graph: dev, query: search_decisions,    args: [q] }
+  sem-learning:  { server: local, graph: dev, query: search_learnings,    args: [q] }
+  sem-invariant: { server: local, graph: dev, query: search_invariants,   args: [q] }
+  sem-principle: { server: local, graph: dev, query: search_principles,   args: [q] }
+  sem-gap:       { server: local, graph: dev, query: search_gaps,         args: [q] }
+  sem-cap:       { server: local, graph: dev, query: search_capabilities, args: [q] }
+  sem-pr:        { server: local, graph: dev, query: search_prs,          args: [q] }
+  sem-incident:  { server: local, graph: dev, query: search_incidents,    args: [q] }
+
+# ── Mutations (served stored mutations; NOT aliasable) ───────────────────────
+# Run on a branch; the actor resolves server-side from your bearer token (or is
+# passed as the $actor param on a local unauthenticated server). Examples:
+#   omnigraph mutate create_issue --graph dev --branch review/x \
+#     --params '{"slug":"iss-new","title":"…","status":"todo","issueType":"task","actor":"act-you","at":"2026-07-09"}'
+#   omnigraph mutate update_issue_status --graph dev \
+#     --params '{"slug":"iss-new","status":"in_progress","actor":"act-you","at":"2026-07-09"}'
+# (with defaults.server/default_graph set, --server/--graph can be omitted.)

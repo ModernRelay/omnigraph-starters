@@ -1,0 +1,561 @@
+// dev-graph — named queries
+//
+// Implements the derived-query concepts from README.md ("State is queryable, not stored").
+// GQ syntax: query name($p: T) @description(...) { match { $v: Node { field: val }
+//   $src edgeVerb $dst  not { ... } } return { $v.field } order { $v.field desc } }
+// Edge verb = the schema edge name with a lowercased first letter
+//   (EpicContainsIssue → epicContainsIssue, IssueWaitsForBlocker → issueWaitsForBlocker).
+
+// ═══════════════════════════════════════════════════════════════
+// LOOKUP — single node by key
+// ═══════════════════════════════════════════════════════════════
+
+query issue_lookup($slug: String)
+    @description("Fetch an issue by slug")
+{
+    match { $i: Issue { slug: $slug } }
+    return { $i.slug, $i.title, $i.description, $i.status, $i.priority, $i.issueType, $i.legacyRef }
+}
+
+query epic_lookup($slug: String)
+    @description("Fetch an epic by slug")
+{
+    match { $e: Epic { slug: $slug } }
+    return { $e.slug, $e.title, $e.summary, $e.status, $e.legacyRef }
+}
+
+query pr_lookup($slug: String)
+    @description("Fetch a PR by slug")
+{
+    match { $p: PR { slug: $slug } }
+    return { $p.slug, $p.title, $p.status, $p.githubRef, $p.sourceBranch, $p.targetBranch }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// READY / BLOCKED / STALE — beads-style work state (derived)
+// ═══════════════════════════════════════════════════════════════
+
+query ready()
+    @description("Issues ready to pick up: backlog/todo, no incoming block, no outgoing wait")
+    @instruction("Excludes started + terminal states and any incoming Blocks/ParentChild or outgoing WaitsFor*. The strict 'blocking source must itself be non-terminal' / 'gate must be pending' refinement is left to the caller; this returns the structural candidates.")
+{
+    match {
+        $i: Issue
+        not { $_ issueBlocksIssue $i }
+        not { $_ issueParentChildIssue $i }
+        not { $_ epicParentChildIssue $i }
+        not { $i issueWaitsForIssue $_ }
+        not { $i issueWaitsForGate $_ }
+        not { $i issueWaitsForBlocker $_ }
+        $i.status != "in_progress"
+        $i.status != "needs_review"
+        $i.status != "hold"
+        $i.status != "done"
+        $i.status != "canceled"
+        $i.status != "duplicate"
+    }
+    return { $i.slug, $i.title, $i.priority, $i.issueType }
+    order { $i.priority }
+}
+
+query blocked()
+    @description("Non-terminal issues blocked by another issue")
+{
+    match {
+        $i: Issue
+        $b: Issue
+        $b issueBlocksIssue $i
+        $i.status != "done"
+        $i.status != "canceled"
+        $i.status != "duplicate"
+    }
+    return { $i.slug, $i.title, $i.status, $b.slug, $b.status }
+}
+
+query blocked_on_upstream()
+    @description("Issues gated on an external (upstream) blocker — the cross-system dependency view")
+{
+    match {
+        $i: Issue
+        $i issueWaitsForBlocker $blk
+    }
+    return { $i.slug, $i.title, $blk.slug, $blk.system, $blk.status, $blk.shippedInVersion, $blk.pinnedVersion, $blk.residualWorkaround }
+}
+
+query stale_candidates()
+    @description("Active (non-terminal) issues, oldest-updated first")
+    @instruction("Threshold updatedAt client-side (e.g. older than N days) to get the 'stale' set — a date-comparison filter is applied by the caller, not in the query.")
+{
+    match {
+        $i: Issue
+        $i.status != "done"
+        $i.status != "canceled"
+        $i.status != "duplicate"
+    }
+    return { $i.slug, $i.title, $i.status, $i.updatedAt }
+    order { $i.updatedAt }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EPIC — membership & completion
+// ═══════════════════════════════════════════════════════════════
+
+query epic_issues($epic: String)
+    @description("All issues contained by an epic")
+{
+    match {
+        $e: Epic { slug: $epic }
+        $e epicContainsIssue $i
+    }
+    return { $i.slug, $i.title, $i.status, $i.priority }
+    order { $i.priority }
+}
+
+query epic_open_issues($epic: String)
+    @description("Non-terminal issues remaining in an epic (completion = 1 - open/total)")
+{
+    match {
+        $e: Epic { slug: $epic }
+        $e epicContainsIssue $i
+        $i.status != "done"
+        $i.status != "canceled"
+        $i.status != "duplicate"
+    }
+    return { $i.slug, $i.title, $i.status }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CODE / RELEASE — what landed where
+// ═══════════════════════════════════════════════════════════════
+
+query release_prs($release: String)
+    @description("PRs included in a release (the per-release changeset)")
+{
+    match {
+        $r: Release { slug: $release }
+        $r releaseIncludesPr $p
+    }
+    return { $p.slug, $p.title, $p.githubRef, $p.status }
+}
+
+query issue_implementations($issue: String)
+    @description("PRs that implement an issue")
+{
+    match {
+        $i: Issue { slug: $issue }
+        $i issueImplementedBy $p
+    }
+    return { $p.slug, $p.title, $p.status, $p.githubRef }
+}
+
+query prs_for_component($component: String)
+    @description("PRs that touch a component — component churn input")
+{
+    match {
+        $c: Component { slug: $component }
+        $p prTouchesComponent $c
+    }
+    return { $p.slug, $p.title, $p.status }
+}
+
+query issues_for_component($component: String)
+    @description("Issues targeting a component")
+{
+    match {
+        $c: Component { slug: $component }
+        $i issueTargetsComponent $c
+    }
+    return { $i.slug, $i.title, $i.status }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// OPERATIONS — incident → root cause, blast radius, lessons
+// ═══════════════════════════════════════════════════════════════
+
+query incident_root_cause($incident: String)
+    @description("Multi-hop: incident → causing PR → its commits")
+{
+    match {
+        $inc: Incident { slug: $incident }
+        $inc incidentCausedByPr $pr
+        $pr prIncludesCommit $commit
+    }
+    return { $pr.slug, $pr.title, $commit.slug, $commit.sha }
+}
+
+query incident_components($incident: String)
+    @description("Components an incident affected — blast-radius first hop")
+{
+    match {
+        $inc: Incident { slug: $incident }
+        $inc incidentAffectsComponent $c
+    }
+    return { $c.slug, $c.name, $c.criticality }
+}
+
+query learnings_for_incident($incident: String)
+    @description("Learnings that analyze an incident")
+{
+    match {
+        $inc: Incident { slug: $incident }
+        $l learningAnalyzesIncident $inc
+    }
+    return { $l.slug, $l.title, $l.learningKind }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GOVERNANCE & SUBSTRATE — invariants, gaps, capabilities, assumptions
+// ═══════════════════════════════════════════════════════════════
+
+query unheld_invariants()
+    @description("Invariants currently violated (incl. aspirational ones not yet held)")
+{
+    match { $inv: Invariant { status: "violated" } }
+    return { $inv.slug, $inv.statement }
+}
+
+query gaps_undermining_invariants()
+    @description("Open gaps and the invariants they fall short of")
+{
+    match {
+        $g: Gap
+        $g gapUnderminesInvariant $inv
+    }
+    return { $g.slug, $g.title, $g.state, $inv.slug, $inv.statement, $inv.status }
+}
+
+query assumptions()
+    @description("All assumptions with their guard reference and status")
+    @instruction("Rows with an empty guardRef are the unguarded (silent-dependency) assumptions — filter client-side.")
+{
+    match { $a: Assumption }
+    return { $a.slug, $a.statement, $a.assumptionKind, $a.guardRef, $a.status }
+}
+
+query assumptions_for_blocker($blocker: String)
+    @description("Surface-guard assumptions covering an external blocker (failing guard ⇒ blocker moved)")
+{
+    match {
+        $b: ExternalBlocker { slug: $blocker }
+        $a assumptionCoversBlocker $b
+    }
+    return { $a.slug, $a.statement, $a.status, $a.guardRef }
+}
+
+query capabilities_by_tier($tier: String)
+    @description("Capabilities of a given provenance tier (owned/inherited) and their implementing components")
+{
+    match {
+        $cap: Capability { tier: $tier }
+        $cap capabilityImplementedBy $cmp
+    }
+    return { $cap.slug, $cap.name, $cap.status, $cmp.slug }
+}
+
+query decisions_for_component($component: String)
+    @description("Accepted decisions (ADRs) that apply to a component")
+{
+    match {
+        $c: Component { slug: $component }
+        $d decisionAppliesToComponent $c
+    }
+    return { $d.slug, $d.title, $d.status }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NEGATIVE — coverage gaps
+// ═══════════════════════════════════════════════════════════════
+
+query components_without_spec()
+    @description("Components with no SpecFile describing them — documentation gap")
+{
+    match {
+        $c: Component
+        not { $_ specDescribes $c }
+    }
+    return { $c.slug, $c.name }
+}
+
+query capabilities_without_component()
+    @description("Capabilities with no implementing component — planning gap")
+{
+    match {
+        $cap: Capability
+        not { $cap capabilityImplementedBy $_ }
+    }
+    return { $cap.slug, $cap.name, $cap.status }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SEMANTIC SEARCH — nearest() over the gemini-embedding-2-preview vectors
+// Requires GEMINI_API_KEY (the engine embeds $q at query time). Run
+// `omnigraph embed` first so the embedding columns are populated.
+// ═══════════════════════════════════════════════════════════════
+
+query search_issues($q: String)
+    @description("Semantic search over issues")
+{
+    match { $i: Issue }
+    return { $i.slug, $i.title, $i.status, $i.issueType }
+    order { nearest($i.embedding, $q) }
+    limit 10
+}
+
+query search_epics($q: String)
+    @description("Semantic search over epics")
+{
+    match { $e: Epic }
+    return { $e.slug, $e.title, $e.status }
+    order { nearest($e.embedding, $q) }
+    limit 10
+}
+
+query search_specs($q: String)
+    @description("Semantic search over spec/RFC docs")
+{
+    match { $s: SpecFile }
+    return { $s.slug, $s.title, $s.status }
+    order { nearest($s.embedding, $q) }
+    limit 10
+}
+
+query search_decisions($q: String)
+    @description("Semantic search over ADRs / decisions")
+{
+    match { $d: Decision }
+    return { $d.slug, $d.title, $d.status }
+    order { nearest($d.embedding, $q) }
+    limit 10
+}
+
+query search_learnings($q: String)
+    @description("Semantic search over learnings (incident reviews, gotchas, hindsight)")
+{
+    match { $l: Learning }
+    return { $l.slug, $l.title, $l.learningKind }
+    order { nearest($l.embedding, $q) }
+    limit 10
+}
+
+query search_invariants($q: String)
+    @description("Semantic search over invariants")
+{
+    match { $inv: Invariant }
+    return { $inv.slug, $inv.statement, $inv.status }
+    order { nearest($inv.embedding, $q) }
+    limit 10
+}
+
+query search_principles($q: String)
+    @description("Semantic search over principles")
+{
+    match { $p: Principle }
+    return { $p.slug, $p.statement, $p.polarity }
+    order { nearest($p.embedding, $q) }
+    limit 10
+}
+
+query search_gaps($q: String)
+    @description("Semantic search over architectural gaps")
+{
+    match { $g: Gap }
+    return { $g.slug, $g.title, $g.state }
+    order { nearest($g.embedding, $q) }
+    limit 10
+}
+
+query search_capabilities($q: String)
+    @description("Semantic search over product capabilities")
+{
+    match { $c: Capability }
+    return { $c.slug, $c.name, $c.tier, $c.status }
+    order { nearest($c.embedding, $q) }
+    limit 10
+}
+
+query search_prs($q: String)
+    @description("Semantic search over PRs")
+{
+    match { $p: PR }
+    return { $p.slug, $p.title, $p.status, $p.githubRef }
+    order { nearest($p.embedding, $q) }
+    limit 10
+}
+
+query search_incidents($q: String)
+    @description("Semantic search over incidents")
+{
+    match { $i: Incident }
+    return { $i.slug, $i.title, $i.status, $i.severity }
+    order { nearest($i.embedding, $q) }
+    limit 10
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MUTATIONS  (declared with `query`; the body is insert/update statements)
+// ═══════════════════════════════════════════════════════════════
+// Per the ontology's mutability model:
+//   • Pointer nodes (Issue, Epic, PR, …) update in place — `update … where slug`.
+//   • Append-only nodes (Comment, Decision, Deployment, Learning) are NEVER
+//     overwritten — they are inserted; corrections are new nodes linked by a
+//     Supersedes edge. There are intentionally no `delete` mutations: removal is
+//     modeled as a status transition (canceled/abandoned/superseded), and the
+//     single-predicate `delete … where` cannot target a specific edge endpoint
+//     pair anyway. Provenance lives in columns: createdAt/createdBy on every
+//     node, plus updatedAt/updatedBy on pointer nodes — every mutation stamps
+//     them: $actor is the acting Actor slug, and $at is the acting timestamp.
+// $at is a Date param the caller supplies (e.g. "2026-05-31"): schema timestamps
+// are day-granularity Date, not DateTime, so now() (a DateTime) can't be assigned.
+// $status/$state/etc. are passed as String (the snake_case enum token) and
+// validated against the schema enum at write time.
+
+// ---- Create pointer nodes ----
+
+query create_issue($slug: String, $title: String, $status: String, $issueType: String, $actor: String, $at: Date)
+    @description("Create a work item. status: backlog|todo|in_progress|needs_review|hold|done|canceled|duplicate; issueType: bug|feature|task|chore|question|risk.")
+{
+    insert Issue { slug: $slug, title: $title, status: $status, issueType: $issueType, createdAt: $at, createdBy: $actor, updatedAt: $at, updatedBy: $actor }
+}
+
+query create_epic($slug: String, $title: String, $status: String, $actor: String, $at: Date)
+    @description("Create an epic. status: shaping|active|done|abandoned.")
+{
+    insert Epic { slug: $slug, title: $title, status: $status, createdAt: $at, createdBy: $actor, updatedAt: $at, updatedBy: $actor }
+}
+
+query create_pr($slug: String, $title: String, $status: String, $githubRef: String, $actor: String, $at: Date)
+    @description("Create a PR record (VCS-host-authoritative). status: draft|open|merged|closed; githubRef required, e.g. meridian#128.")
+{
+    insert PR { slug: $slug, title: $title, status: $status, githubRef: $githubRef, createdAt: $at, createdBy: $actor, updatedAt: $at, updatedBy: $actor }
+}
+
+// ---- Update pointer-node status / fields ----
+
+query update_issue_status($slug: String, $status: String, $actor: String, $at: Date)
+    @description("Transition an issue's status.")
+{
+    update Issue set { status: $status, updatedAt: $at, updatedBy: $actor } where slug = $slug
+}
+
+query set_issue_priority($slug: String, $priority: I32, $actor: String, $at: Date)
+    @description("Set issue priority (0=none,1=urgent,2=high,3=medium,4=low).")
+{
+    update Issue set { priority: $priority, updatedAt: $at, updatedBy: $actor } where slug = $slug
+}
+
+query update_epic_status($slug: String, $status: String, $actor: String, $at: Date)
+    @description("Transition an epic's status.")
+{
+    update Epic set { status: $status, updatedAt: $at, updatedBy: $actor } where slug = $slug
+}
+
+query update_pr_status($slug: String, $status: String, $actor: String, $at: Date)
+    @description("Transition a PR's status (draft/open/merged/closed).")
+{
+    update PR set { status: $status, updatedAt: $at, updatedBy: $actor } where slug = $slug
+}
+
+query resolve_incident($slug: String, $status: String, $actor: String, $at: Date)
+    @description("Update an incident's status; stamps resolvedAt (use status=resolved).")
+{
+    update Incident set { status: $status, resolvedAt: $at, updatedAt: $at, updatedBy: $actor } where slug = $slug
+}
+
+query set_invariant_status($slug: String, $status: String, $actor: String, $at: Date)
+    @description("Flip an invariant between holds/violated.")
+{
+    update Invariant set { status: $status, updatedAt: $at, updatedBy: $actor } where slug = $slug
+}
+
+query update_gap_state($slug: String, $state: String, $actor: String, $at: Date)
+    @description("Move a gap through narrowing/widened/closed.")
+{
+    update Gap set { state: $state, updatedAt: $at, updatedBy: $actor } where slug = $slug
+}
+
+query mark_blocker_shipped($slug: String, $status: String, $shippedInVersion: String, $actor: String, $at: Date)
+    @description("Update an external blocker (status: open|closed|shipped); record shippedInVersion.")
+{
+    update ExternalBlocker set { status: $status, shippedInVersion: $shippedInVersion, updatedAt: $at, updatedBy: $actor } where slug = $slug
+}
+
+query update_capability_status($slug: String, $status: String, $actor: String, $at: Date)
+    @description("Move a capability through planned/shipped/deprecated.")
+{
+    update Capability set { status: $status, updatedAt: $at, updatedBy: $actor } where slug = $slug
+}
+
+// ---- Link edges (endpoints are node slugs) ----
+
+query add_issue_to_epic($epic: String, $issue: String)
+    @description("EpicContainsIssue: place an issue under an epic.")
+{
+    insert EpicContainsIssue { from: $epic, to: $issue }
+}
+
+query link_issue_blocks_issue($from: String, $to: String)
+    @description("IssueBlocksIssue: source blocks target (target has it incoming).")
+{
+    insert IssueBlocksIssue { from: $from, to: $to }
+}
+
+query link_pr_closes_issue($pr: String, $issue: String)
+    @description("PrClosesIssue: takes effect on merge.")
+{
+    insert PrClosesIssue { from: $pr, to: $issue }
+}
+
+query link_issue_implemented_by_pr($issue: String, $pr: String)
+    @description("IssueImplementedBy: a PR implements an issue.")
+{
+    insert IssueImplementedBy { from: $issue, to: $pr }
+}
+
+query link_issue_targets_component($issue: String, $component: String)
+    @description("IssueTargetsComponent: which component the issue touches.")
+{
+    insert IssueTargetsComponent { from: $issue, to: $component }
+}
+
+query assign_issue_owner($issue: String, $actor: String)
+    @description("IssueOwnedBy: set the issue owner (ownership is an edge, not a field).")
+{
+    insert IssueOwnedBy { from: $issue, to: $actor }
+}
+
+// ---- Append-only inserts (+ links; corrections via Supersedes) ----
+
+query add_comment_on_issue($slug: String, $body: String, $issue: String, $actor: String, $at: Date)
+    @description("Append a comment to an issue thread (Comment is never edited).")
+{
+    insert Comment { slug: $slug, body: $body, createdAt: $at, createdBy: $actor }
+    insert CommentOnIssue { from: $slug, to: $issue }
+    insert CommentPostedBy { from: $slug, to: $actor }
+}
+
+query record_decision($slug: String, $title: String, $decision: String, $status: String, $actor: String, $at: Date)
+    @description("Record an ADR (append-only). status: proposed|accepted|rejected|superseded.")
+{
+    insert Decision { slug: $slug, title: $title, decision: $decision, status: $status, createdAt: $at, createdBy: $actor }
+}
+
+query supersede_decision($newDecision: String, $oldDecision: String)
+    @description("DecisionSupersedes: a new decision replaces an earlier one (create the new Decision first).")
+{
+    insert DecisionSupersedes { from: $newDecision, to: $oldDecision }
+}
+
+query record_deployment($slug: String, $env: String, $outcome: String, $release: String, $actor: String, $at: Date)
+    @description("Record a deployment (append-only). env: dev|staging|prod|preview; outcome: success|rolled_back|failed.")
+{
+    insert Deployment { slug: $slug, env: $env, outcome: $outcome, startedAt: $at, createdAt: $at, createdBy: $actor }
+    insert DeploymentOfRelease { from: $slug, to: $release }
+    insert DeploymentTriggeredBy { from: $slug, to: $actor }
+}
+
+query add_learning($slug: String, $title: String, $incident: String, $actor: String, $at: Date)
+    @description("Capture a learning from an incident (append-only).")
+{
+    insert Learning { slug: $slug, title: $title, createdAt: $at, createdBy: $actor }
+    insert LearningAnalyzesIncident { from: $slug, to: $incident }
+}
