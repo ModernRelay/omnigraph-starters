@@ -134,11 +134,14 @@ query blocked_by_wait()
 }
 
 query blocked_on_upstream()
-    @description("Issues gated on an external (upstream) blocker — the cross-system dependency view")
+    @description("Non-terminal issues gated on an external (upstream) blocker — the cross-system dependency view")
 {
     match {
         $i: Issue
         $i issueWaitsForBlocker $blk
+        $i.status != "done"
+        $i.status != "canceled"
+        $i.status != "duplicate"
     }
     return { $i.slug, $i.title, $blk.slug, $blk.system, $blk.status, $blk.shippedInVersion, $blk.pinnedVersion, $blk.residualWorkaround }
 }

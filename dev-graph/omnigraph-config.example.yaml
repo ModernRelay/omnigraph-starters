@@ -63,6 +63,8 @@ aliases:
   issue-blockers:  { server: local, graph: dev, query: issue_blockers,   args: [issue] }
   issue-parents:   { server: local, graph: dev, query: issue_parents,    args: [issue] }
   issue-epic-parent: { server: local, graph: dev, query: issue_parent_epic, args: [issue] }
+  issue-gates:     { server: local, graph: dev, query: issue_gates,      args: [issue] }
+  issue-waits-on:  { server: local, graph: dev, query: issue_waits_on,   args: [issue] }
   issue-comments:  { server: local, graph: dev, query: issue_comments,   args: [issue] }
 
   # ── Semantic search (needs an embedding provider + populated embeddings; see README) ──
