@@ -1,0 +1,40 @@
+# dev-graph deployment, declared as code (omnigraph cluster model).
+#
+# Filesystem-backed cluster — no object store, no S3 creds. `storage:` is
+# omitted, so it defaults to this config directory: `omnigraph cluster apply
+# --config .` creates the graph at `graphs/dev.omni` and `omnigraph-server
+# --cluster .` serves it. Per-operator settings (identity, servers, aliases)
+# live per-user in `~/.omnigraph/config.yaml` — see omnigraph-config.example.yaml.
+version: 1
+
+metadata:
+  name: dev-graph
+
+state:
+  backend: cluster
+  lock: true
+
+graphs:
+  dev:
+    schema: schema.pg
+    queries: queries/        # registers every `query <name>` in queries/*.gq as a stored query
+    # embedding_provider: default   # uncomment WITH the `providers:` block below to enable semantic search
+
+# Semantic search (the search_* stored queries / sem-* aliases) needs an
+# embedding provider so the server can embed query strings in the SAME space as
+# the stored vectors (gemini-embedding-2-preview, 3072-dim — the columns in
+# schema.pg declare their source via @embed(...) @index). It's OPTIONAL: the seed
+# ships no embeddings, so the structural queries work with nothing extra. To turn
+# it on: (1) uncomment the `providers:` block below AND the `embedding_provider:
+# default` line under graphs.dev above (do NOT add a second `graphs:` key — YAML
+# would reject/override it); (2) export GEMINI_API_KEY; (3) re-load the seed with
+# `--mode overwrite` to embed at load; (4) re-serve. See README.md →
+# "Semantic search (optional)".
+#
+# providers:
+#   embedding:
+#     default:
+#       kind: gemini
+#       base_url: https://generativelanguage.googleapis.com/v1beta
+#       model: gemini-embedding-2-preview
+#       api_key: ${GEMINI_API_KEY}

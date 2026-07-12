@@ -1,0 +1,341 @@
+{"type": "Actor", "data": {"slug": "act-nadia", "name": "Nadia Okonkwo", "actorKind": "human", "handle": "nadia", "email": "nadia@meridian.example", "createdAt": "2025-09-01", "createdBy": "act-nadia", "updatedAt": "2025-09-01", "updatedBy": "act-nadia"}}
+{"type": "Actor", "data": {"slug": "act-ravi", "name": "Ravi Menon", "actorKind": "human", "handle": "ravi", "email": "ravi@meridian.example", "createdAt": "2025-09-01", "createdBy": "act-nadia", "updatedAt": "2025-09-01", "updatedBy": "act-nadia"}}
+{"type": "Actor", "data": {"slug": "act-mei", "name": "Mei Lin", "actorKind": "human", "handle": "mei", "email": "mei@meridian.example", "createdAt": "2025-09-01", "createdBy": "act-nadia", "updatedAt": "2025-09-01", "updatedBy": "act-nadia"}}
+{"type": "Actor", "data": {"slug": "act-tomas", "name": "Tomas Alvarez", "actorKind": "human", "handle": "tomas", "email": "tomas@meridian.example", "createdAt": "2025-09-01", "createdBy": "act-nadia", "updatedAt": "2025-09-01", "updatedBy": "act-nadia"}}
+{"type": "Actor", "data": {"slug": "act-priya", "name": "Priya Shah", "actorKind": "human", "handle": "priya", "email": "priya@meridian.example", "createdAt": "2025-09-01", "createdBy": "act-nadia", "updatedAt": "2025-09-01", "updatedBy": "act-nadia"}}
+{"type": "Actor", "data": {"slug": "agent:orion", "name": "Orion (triage agent)", "actorKind": "agent", "handle": "orion", "createdAt": "2025-11-01", "createdBy": "act-nadia", "updatedAt": "2025-11-01", "updatedBy": "act-nadia"}}
+{"type": "Actor", "data": {"slug": "svc-ci", "name": "CI Runner", "actorKind": "service", "handle": "ci", "createdAt": "2025-09-01", "createdBy": "act-nadia", "updatedAt": "2025-09-01", "updatedBy": "act-nadia"}}
+{"type": "Repo", "data": {"slug": "repo-meridian", "name": "meridian", "defaultBranch": "main", "host": "github", "visibility": "private", "githubRef": "meridian-labs/meridian", "createdAt": "2025-09-02", "createdBy": "act-nadia", "updatedAt": "2025-09-02", "updatedBy": "act-nadia"}}
+{"type": "Repo", "data": {"slug": "repo-infra", "name": "meridian-infra", "defaultBranch": "main", "host": "github", "visibility": "private", "githubRef": "meridian-labs/infra", "createdAt": "2025-09-02", "createdBy": "act-tomas", "updatedAt": "2025-09-02", "updatedBy": "act-tomas"}}
+{"type": "Component", "data": {"slug": "cmp-sync-core", "name": "sync-core", "summary": "CRDT convergence engine — merges concurrent edits into one document state.", "criticality": "critical", "createdAt": "2025-09-03", "createdBy": "act-nadia", "updatedAt": "2025-09-03", "updatedBy": "act-nadia"}}
+{"type": "Component", "data": {"slug": "cmp-api-gateway", "name": "api-gateway", "summary": "Public HTTP/WebSocket entrypoint; routes to sync, auth, presence.", "criticality": "high", "createdAt": "2025-09-03", "createdBy": "act-nadia", "updatedAt": "2025-09-03", "updatedBy": "act-nadia"}}
+{"type": "Component", "data": {"slug": "cmp-auth", "name": "auth", "summary": "Authentication, sessions, and tenant boundary enforcement.", "criticality": "critical", "createdAt": "2025-09-03", "createdBy": "act-nadia", "updatedAt": "2025-09-03", "updatedBy": "act-nadia"}}
+{"type": "Component", "data": {"slug": "cmp-presence", "name": "presence", "summary": "Live cursors, selections, and who's-online fan-out.", "criticality": "medium", "createdAt": "2025-09-03", "createdBy": "act-nadia", "updatedAt": "2025-09-03", "updatedBy": "act-nadia"}}
+{"type": "Component", "data": {"slug": "cmp-web-client", "name": "web-client", "summary": "Browser editor and offline cache.", "criticality": "high", "createdAt": "2025-09-03", "createdBy": "act-nadia", "updatedAt": "2025-09-03", "updatedBy": "act-nadia"}}
+{"type": "Component", "data": {"slug": "cmp-storage", "name": "storage", "summary": "Durable document + snapshot persistence over the storage engine.", "criticality": "high", "createdAt": "2025-09-03", "createdBy": "act-nadia", "updatedAt": "2025-09-03", "updatedBy": "act-nadia"}}
+{"type": "Component", "data": {"slug": "cmp-billing", "name": "billing", "summary": "Usage metering and subscription management.", "criticality": "medium", "createdAt": "2025-09-03", "createdBy": "act-nadia", "updatedAt": "2025-09-03", "updatedBy": "act-nadia"}}
+{"type": "Component", "data": {"slug": "cmp-webhooks", "name": "webhooks", "summary": "Outbound event delivery to customer endpoints.", "criticality": "low", "createdAt": "2025-09-03", "createdBy": "act-nadia", "updatedAt": "2025-09-03", "updatedBy": "act-nadia"}}
+{"type": "Epic", "data": {"slug": "epc-offline-sync", "title": "Offline editing & sync", "status": "active", "summary": "Let users edit disconnected and replay changes on reconnect without losing data.", "businessValue": "Top-3 churn reason in exit interviews; unlocks mobile.", "createdAt": "2025-10-05", "createdBy": "act-nadia", "updatedAt": "2026-06-28", "updatedBy": "act-nadia"}}
+{"type": "Epic", "data": {"slug": "epc-tenant-isolation", "title": "Hard tenant isolation", "status": "active", "summary": "Guarantee no document data crosses a tenant boundary, enforced in storage.", "businessValue": "Blocks two enterprise deals in security review.", "createdAt": "2025-11-10", "createdBy": "act-priya", "updatedAt": "2026-06-20", "updatedBy": "act-priya"}}
+{"type": "Epic", "data": {"slug": "epc-billing-v2", "title": "Usage-based billing v2", "status": "shaping", "summary": "Move from seat pricing to metered document-edit events.", "createdAt": "2026-05-01", "createdBy": "act-priya", "updatedAt": "2026-06-15", "updatedBy": "act-priya"}}
+{"type": "Epic", "data": {"slug": "epc-observability", "title": "Sync observability baseline", "status": "done", "summary": "Dashboards and traces for sync latency and convergence lag.", "createdAt": "2025-09-20", "createdBy": "act-tomas", "updatedAt": "2026-02-10", "updatedBy": "act-tomas"}}
+{"type": "Issue", "data": {"slug": "iss-split-brain", "title": "Split-brain writes under network partition", "status": "done", "priority": 1, "issueType": "bug", "description": "Two disconnected clients both accept writes; on reconnect the merge picks one and silently drops the other.", "legacyRef": "LIN-903", "createdAt": "2025-10-10", "createdBy": "act-ravi", "updatedAt": "2026-04-02", "updatedBy": "act-ravi"}}
+{"type": "Issue", "data": {"slug": "iss-tenant-check", "title": "Enforce tenant check on every storage read", "status": "done", "priority": 1, "issueType": "feature", "description": "Storage reads must filter by tenant_id at the query layer, not in application code.", "createdAt": "2025-11-12", "createdBy": "act-ravi", "updatedAt": "2026-03-18", "updatedBy": "act-ravi"}}
+{"type": "Issue", "data": {"slug": "iss-offline-queue", "title": "Offline edit queue with replay", "status": "in_progress", "priority": 2, "issueType": "feature", "description": "Buffer edits made while offline and replay them through the CRDT on reconnect.", "createdAt": "2026-02-01", "createdBy": "act-ravi", "updatedAt": "2026-07-01", "updatedBy": "act-ravi", "acceptanceCriteria": "Edits made offline replay to the same converged state as if made online; no data loss across 3-way partitions.", "designNotes": "Queue is an append-only op-log keyed by client; replay feeds ops into the CRDT in receipt order."}}
+{"type": "Issue", "data": {"slug": "iss-offline-conflict-ui", "title": "Conflict-resolution UI for offline edits", "status": "todo", "priority": 2, "issueType": "feature", "description": "Surface irreconcilable offline conflicts to the user for manual resolution.", "createdAt": "2026-02-05", "createdBy": "act-mei", "updatedAt": "2026-06-25", "updatedBy": "act-mei"}}
+{"type": "Issue", "data": {"slug": "iss-presence-leak-fix", "title": "Fix presence memory leak", "status": "done", "priority": 1, "issueType": "bug", "description": "Presence sessions were never evicted on disconnect, leaking memory in prod.", "createdAt": "2026-03-30", "createdBy": "act-tomas", "updatedAt": "2026-04-06", "updatedBy": "act-tomas"}}
+{"type": "Issue", "data": {"slug": "iss-presence-scale", "title": "Rework presence fan-out to O(n log n)", "status": "todo", "priority": 3, "issueType": "task", "description": "Presence fan-out is currently O(n^2) in room size; rework to a tree broadcast.", "createdAt": "2026-04-08", "createdBy": "act-mei", "updatedAt": "2026-06-30", "updatedBy": "act-mei"}}
+{"type": "Issue", "data": {"slug": "iss-billing-metering", "title": "Meter document-edit events", "status": "backlog", "priority": 3, "issueType": "feature", "description": "Emit a metered event per document-edit for usage-based billing.", "createdAt": "2026-05-02", "createdBy": "act-priya", "updatedAt": "2026-05-02", "updatedBy": "act-priya"}}
+{"type": "Issue", "data": {"slug": "iss-billing-webhooks", "title": "Stripe metered-usage webhook handler", "status": "backlog", "priority": 3, "issueType": "feature", "description": "Handle Stripe usage-record webhooks idempotently.", "createdAt": "2026-05-03", "createdBy": "act-ravi", "updatedAt": "2026-05-03", "updatedBy": "act-ravi"}}
+{"type": "Issue", "data": {"slug": "iss-tenant-migration", "title": "Backfill tenant_id on legacy documents", "status": "todo", "priority": 2, "issueType": "task", "description": "Legacy documents predate tenant_id; backfill before enforcement can be turned on.", "createdAt": "2025-12-01", "createdBy": "act-ravi", "updatedAt": "2026-06-10", "updatedBy": "act-ravi"}}
+{"type": "Issue", "data": {"slug": "iss-auth-mfa", "title": "Add TOTP MFA to auth", "status": "backlog", "priority": 2, "issueType": "feature", "description": "Optional TOTP-based multi-factor auth for account owners.", "createdAt": "2026-01-15", "createdBy": "act-priya", "updatedAt": "2026-05-20", "updatedBy": "act-priya"}}
+{"type": "Issue", "data": {"slug": "iss-crdt-gc-guard", "title": "Add guard test for CRDT gc assumption", "status": "needs_review", "priority": 3, "issueType": "chore", "description": "Pin the assumption that the CRDT library reclaims tombstones within one gc cycle.", "createdAt": "2026-03-01", "createdBy": "act-ravi", "updatedAt": "2026-03-25", "updatedBy": "act-ravi"}}
+{"type": "Issue", "data": {"slug": "iss-flaky-sync-test", "title": "Flaky convergence test in CI", "status": "todo", "priority": 2, "issueType": "bug", "description": "convergence_test intermittently fails under load in CI; likely a timing assumption.", "createdAt": "2026-04-15", "createdBy": "act-nadia", "updatedAt": "2026-06-29", "updatedBy": "act-nadia"}}
+{"type": "Issue", "data": {"slug": "iss-webhook-idempotency", "title": "Idempotency keys for webhook delivery", "status": "done", "priority": 2, "issueType": "feature", "description": "Dedupe redelivered webhooks with an idempotency key.", "createdAt": "2025-09-25", "createdBy": "act-ravi", "updatedAt": "2025-12-15", "updatedBy": "act-ravi"}}
+{"type": "Issue", "data": {"slug": "iss-observability-dash", "title": "Grafana dashboards for sync latency", "status": "done", "priority": 3, "issueType": "task", "description": "Latency and convergence-lag dashboards for the sync path.", "createdAt": "2025-09-22", "createdBy": "act-tomas", "updatedAt": "2026-01-30", "updatedBy": "act-tomas"}}
+{"type": "Issue", "data": {"slug": "iss-rate-limit", "title": "Rate-limit presence updates", "status": "hold", "priority": 3, "issueType": "task", "description": "Parked pending the presence fan-out rework.", "createdAt": "2026-02-12", "createdBy": "act-mei", "updatedAt": "2026-02-20", "updatedBy": "act-mei"}}
+{"type": "Issue", "data": {"slug": "iss-safari-login", "title": "Login fails intermittently on Safari", "status": "todo", "priority": 2, "issueType": "bug", "description": "Session cookie dropped on Safari 17 under ITP.", "createdAt": "2026-06-01", "createdBy": "act-priya", "updatedAt": "2026-06-22", "updatedBy": "act-priya"}}
+{"type": "Issue", "data": {"slug": "iss-dup-login-bug", "title": "Login broken on Safari (can't sign in)", "status": "duplicate", "priority": 3, "issueType": "bug", "description": "Duplicate of the Safari login investigation.", "createdAt": "2026-06-02", "createdBy": "act-priya", "updatedAt": "2026-06-03", "updatedBy": "act-priya"}}
+{"type": "Issue", "data": {"slug": "iss-offline-replay-test", "title": "Property test for offline replay ordering", "status": "todo", "priority": 3, "issueType": "task", "description": "Property-based test that replay order does not affect converged state.", "createdAt": "2026-03-10", "createdBy": "act-ravi", "updatedAt": "2026-06-18", "updatedBy": "act-ravi"}}
+{"type": "SpecFile", "data": {"slug": "spc-offline-sync-rfc", "title": "RFC: Offline editing & sync", "status": "approved", "version": "2.1", "url": "https://docs.meridian.example/rfc/offline-sync", "createdAt": "2025-10-06", "createdBy": "act-nadia", "updatedAt": "2026-01-20", "updatedBy": "act-nadia"}}
+{"type": "SpecFile", "data": {"slug": "spc-tenant-isolation", "title": "Spec: Tenant isolation model", "status": "approved", "version": "1.3", "url": "https://docs.meridian.example/spec/tenant-isolation", "createdAt": "2025-11-10", "createdBy": "act-priya", "updatedAt": "2026-02-01", "updatedBy": "act-priya"}}
+{"type": "SpecFile", "data": {"slug": "spc-crdt-model", "title": "Spec: CRDT document model", "status": "approved", "version": "3.0", "url": "https://docs.meridian.example/spec/crdt-model", "createdAt": "2025-09-15", "createdBy": "act-ravi", "updatedAt": "2026-03-01", "updatedBy": "act-ravi"}}
+{"type": "SpecFile", "data": {"slug": "spc-crdt-model-v0", "title": "Spec: CRDT document model (draft)", "status": "superseded", "version": "0.9", "createdAt": "2025-09-05", "createdBy": "act-ravi", "updatedAt": "2025-09-15", "updatedBy": "act-ravi"}}
+{"type": "SpecFile", "data": {"slug": "spc-billing-v2", "title": "Spec: Usage-based billing v2", "status": "draft", "version": "0.4", "createdAt": "2026-05-01", "createdBy": "act-priya", "updatedAt": "2026-06-15", "updatedBy": "act-priya"}}
+{"type": "Decision", "data": {"slug": "dec-crdt-v0", "title": "Adopt a CRDT for concurrent editing", "context": "Needed a merge strategy for concurrent edits.", "decision": "Use a generic last-writer-wins CRDT.", "consequences": "Simple, but drops concurrent edits to the same field.", "status": "superseded", "createdAt": "2025-09-06", "createdBy": "act-nadia"}}
+{"type": "Decision", "data": {"slug": "dec-crdt-choice", "title": "Adopt an RGA-based CRDT for sync-core", "context": "LWW dropped concurrent edits; users noticed lost characters.", "decision": "Adopt a Replicated Growable Array (RGA) sequence CRDT backed by the automerge-rs library.", "consequences": "Character-level convergence; adds a tombstone-gc dependency on the upstream library.", "status": "accepted", "legacyRef": "LIN-482", "createdAt": "2025-09-14", "createdBy": "act-nadia"}}
+{"type": "Decision", "data": {"slug": "dec-tenant-boundary", "title": "Enforce tenant isolation at the storage layer", "context": "App-layer tenant checks were bypassable and hard to audit.", "decision": "Push tenant_id filtering into the storage query layer so no read can omit it.", "consequences": "One choke point to audit; requires backfilling tenant_id on legacy docs.", "status": "accepted", "createdAt": "2025-11-11", "createdBy": "act-priya"}}
+{"type": "Decision", "data": {"slug": "dec-no-custom-wal", "title": "Do not build a custom write-ahead log", "context": "A proposal suggested a bespoke WAL for durability.", "decision": "Forbid custom WALs; rely on the storage engine's durability primitives.", "consequences": "Less code to own; must respect the engine's fsync semantics.", "status": "accepted", "createdAt": "2025-12-02", "createdBy": "act-ravi"}}
+{"type": "Decision", "data": {"slug": "dec-presence-backpressure", "title": "Add backpressure to presence fan-out", "context": "A presence regression leaked memory under load in prod.", "decision": "Bound presence queues and shed load past a per-room threshold.", "consequences": "Bounded memory; presence updates may be coalesced under extreme load.", "status": "accepted", "createdAt": "2026-04-06", "createdBy": "act-tomas"}}
+{"type": "Decision", "data": {"slug": "dec-billing-provider", "title": "Use Stripe metered billing for usage v2", "context": "Evaluating billing providers for usage-based pricing.", "decision": "Use Stripe usage records for metered billing.", "consequences": "Fast to ship; couples billing to Stripe's usage-record API.", "status": "proposed", "createdAt": "2026-05-04", "createdBy": "act-priya"}}
+{"type": "Invariant", "data": {"slug": "inv-convergence", "statement": "Concurrent edits to a document converge to a single state on all replicas.", "status": "holds", "guardRef": "tests/sync/convergence_test.rs", "specRef": "spc-crdt-model", "createdAt": "2025-09-15", "createdBy": "act-ravi", "updatedAt": "2025-09-15", "updatedBy": "act-ravi"}}
+{"type": "Invariant", "data": {"slug": "inv-tenant-isolation", "statement": "No document data crosses a tenant boundary.", "status": "holds", "guardRef": "tests/auth/tenant_isolation_test.rs", "specRef": "spc-tenant-isolation", "createdAt": "2025-11-11", "createdBy": "act-priya", "updatedAt": "2025-11-11", "updatedBy": "act-priya"}}
+{"type": "Invariant", "data": {"slug": "inv-single-writer", "statement": "Each document has at most one authoritative writer at any instant.", "status": "violated", "guardRef": "tests/sync/single_writer_test.rs", "specRef": "spc-crdt-model", "createdAt": "2025-10-10", "createdBy": "act-ravi", "updatedAt": "2026-04-02", "updatedBy": "act-ravi"}}
+{"type": "Invariant", "data": {"slug": "inv-webhook-idempotent", "statement": "Redelivering a webhook produces no additional side effects.", "status": "holds", "guardRef": "tests/webhooks/idempotency_test.rs", "createdAt": "2025-09-25", "createdBy": "act-ravi", "updatedAt": "2025-09-25", "updatedBy": "act-ravi"}}
+{"type": "Principle", "data": {"slug": "prn-respect-substrate", "statement": "Respect the storage engine's transactional guarantees; do not reimplement them.", "rationale": "Reinventing durability/consistency is where subtle data-loss bugs live.", "polarity": "prescribes", "status": "active", "specRef": "spc-crdt-model", "createdAt": "2025-09-20", "createdBy": "act-nadia", "updatedAt": "2025-09-20", "updatedBy": "act-nadia"}}
+{"type": "Principle", "data": {"slug": "prn-no-custom-wal", "statement": "Do not build a custom write-ahead log.", "rationale": "The storage engine already provides durable, ordered writes.", "polarity": "forbids", "correctAlternative": "Use the storage engine's durability primitives.", "status": "active", "createdAt": "2025-12-02", "createdBy": "act-ravi", "updatedAt": "2025-12-02", "updatedBy": "act-ravi"}}
+{"type": "Principle", "data": {"slug": "prn-no-string-sql", "statement": "Never build queries by string concatenation.", "rationale": "String-built queries are an injection and correctness hazard.", "polarity": "forbids", "correctAlternative": "Use parameterized queries / the typed query builder.", "status": "active", "createdAt": "2025-09-20", "createdBy": "act-ravi", "updatedAt": "2025-09-20", "updatedBy": "act-ravi"}}
+{"type": "Gap", "data": {"slug": "gap-single-writer", "title": "Split-brain writer under network partition", "currentBehavior": "Under a partition, two replicas can each believe they are the authoritative writer.", "targetBehavior": "A partitioned replica steps down to read-only until it can re-establish a single writer.", "state": "widened", "createdAt": "2025-10-11", "createdBy": "act-ravi", "updatedAt": "2026-05-10", "updatedBy": "act-ravi"}}
+{"type": "Gap", "data": {"slug": "gap-presence-scale", "title": "Presence fan-out is O(n^2) in room size", "currentBehavior": "Every presence update is broadcast to every peer directly.", "targetBehavior": "Presence updates fan out through a tree in O(n log n).", "state": "narrowing", "createdAt": "2026-04-08", "createdBy": "act-mei", "updatedAt": "2026-06-30", "updatedBy": "act-mei"}}
+{"type": "ExternalBlocker", "data": {"slug": "blk-crdt-lib", "system": "automerge-rs", "upstreamUrl": "https://github.com/example/automerge-rs/issues/914", "status": "open", "pinnedVersion": "0.5.9", "residualWorkaround": "Run a manual tombstone gc pass nightly.", "createdAt": "2026-02-03", "createdBy": "act-ravi", "updatedAt": "2026-06-20", "updatedBy": "act-ravi"}}
+{"type": "ExternalBlocker", "data": {"slug": "blk-storage-engine", "system": "SlateDB", "upstreamUrl": "https://github.com/example/slatedb/releases/tag/0.3.0", "status": "shipped", "pinnedVersion": "0.2.0", "shippedInVersion": "0.3.0", "createdAt": "2025-11-20", "createdBy": "act-ravi", "updatedAt": "2026-01-15", "updatedBy": "act-ravi"}}
+{"type": "Assumption", "data": {"slug": "asm-crdt-gc", "statement": "automerge-rs reclaims tombstones within one gc cycle.", "status": "holds", "guardRef": "tests/sync/gc_guard_test.rs", "assumptionKind": "runtime", "createdAt": "2026-02-03", "createdBy": "act-ravi", "updatedAt": "2026-02-03", "updatedBy": "act-ravi"}}
+{"type": "Assumption", "data": {"slug": "asm-storage-ordering", "statement": "SlateDB range scans return keys in sorted order.", "status": "holds", "assumptionKind": "manual", "createdAt": "2025-11-20", "createdBy": "act-ravi", "updatedAt": "2025-11-20", "updatedBy": "act-ravi"}}
+{"type": "Capability", "data": {"slug": "cap-realtime-cursors", "name": "Real-time cursors", "summary": "Live cursor and selection presence for co-editors.", "tier": "owned", "status": "shipped", "createdAt": "2025-10-01", "createdBy": "act-mei", "updatedAt": "2025-10-01", "updatedBy": "act-mei"}}
+{"type": "Capability", "data": {"slug": "cap-offline-editing", "name": "Offline editing", "summary": "Edit while disconnected and replay on reconnect.", "tier": "owned", "status": "planned", "createdAt": "2026-02-01", "createdBy": "act-nadia", "updatedAt": "2026-02-01", "updatedBy": "act-nadia"}}
+{"type": "Capability", "data": {"slug": "cap-crdt-merge", "name": "Conflict-free merge", "summary": "Character-level convergence of concurrent edits.", "tier": "inherited", "status": "shipped", "createdAt": "2025-09-15", "createdBy": "act-ravi", "updatedAt": "2025-09-15", "updatedBy": "act-ravi"}}
+{"type": "Capability", "data": {"slug": "cap-audit-log", "name": "Tamper-evident audit log", "summary": "Append-only audit trail of document access.", "tier": "owned", "status": "shipped", "createdAt": "2025-12-10", "createdBy": "act-priya", "updatedAt": "2025-12-10", "updatedBy": "act-priya"}}
+{"type": "Release", "data": {"slug": "rel-v1-3-0", "versionTag": "v1.3.0", "status": "released", "releaseNotes": "Observability baseline: sync-latency dashboards and traces.", "githubRef": "meridian-labs/meridian/releases/v1.3.0", "createdAt": "2026-01-25", "createdBy": "act-tomas", "updatedAt": "2026-01-30", "updatedBy": "act-tomas"}}
+{"type": "Release", "data": {"slug": "rel-v1-4-0", "versionTag": "v1.4.0", "status": "released", "releaseNotes": "Tenant isolation enforcement and presence optimizations.", "breakingChanges": "- Storage reads now require tenant_id; clients pinned <1.4 must upgrade.", "githubRef": "meridian-labs/meridian/releases/v1.4.0", "createdAt": "2026-03-15", "createdBy": "act-tomas", "updatedAt": "2026-03-20", "updatedBy": "act-tomas"}}
+{"type": "Release", "data": {"slug": "rel-v1-5-0", "versionTag": "v1.5.0", "status": "cut", "releaseNotes": "Offline sync (beta) and the presence memory-leak hotfix.", "releaseNotesDoc": "https://docs.meridian.example/releases/v1.5.0", "artifactsChecklist": "[{\"path\":\"CHANGELOG.md\",\"done\":true},{\"path\":\"docs/releases/v1.5.0.md\",\"done\":true},{\"path\":\"clients/js/package.json\",\"done\":false}]", "createdAt": "2026-06-20", "createdBy": "act-nadia", "updatedAt": "2026-07-02", "updatedBy": "act-nadia"}}
+{"type": "PR", "data": {"slug": "pr-partition-guard", "title": "Guard against split-brain writes under partition", "body": "Partitioned replicas step down to read-only until a single writer is re-established.", "status": "merged", "sourceBranch": "fix/partition-guard", "targetBranch": "main", "invariantReviewDone": true, "githubRef": "meridian#241", "createdAt": "2026-03-20", "createdBy": "act-ravi", "updatedAt": "2026-04-02", "updatedBy": "act-ravi"}}
+{"type": "PR", "data": {"slug": "pr-tenant-check", "title": "Filter every storage read by tenant_id", "body": "Push tenant_id filtering into the storage query layer.", "status": "merged", "sourceBranch": "feat/tenant-check", "targetBranch": "main", "invariantReviewDone": true, "githubRef": "meridian#198", "createdAt": "2026-02-20", "createdBy": "act-ravi", "updatedAt": "2026-03-05", "updatedBy": "act-ravi"}}
+{"type": "PR", "data": {"slug": "pr-presence-optimize", "title": "Speed up presence broadcast", "body": "Cache peer lists per room to avoid recompute on each update.", "status": "merged", "sourceBranch": "perf/presence-cache", "targetBranch": "main", "invariantReviewDone": false, "githubRef": "meridian#205", "createdAt": "2026-03-10", "createdBy": "act-mei", "updatedAt": "2026-03-14", "updatedBy": "act-mei"}}
+{"type": "PR", "data": {"slug": "pr-presence-hotfix", "title": "Evict presence sessions on disconnect", "body": "Fix the leak introduced by the peer-list cache; add backpressure.", "status": "merged", "sourceBranch": "hotfix/presence-leak", "targetBranch": "main", "invariantReviewDone": true, "githubRef": "meridian#258", "createdAt": "2026-04-06", "createdBy": "act-tomas", "updatedAt": "2026-04-06", "updatedBy": "act-tomas"}}
+{"type": "PR", "data": {"slug": "pr-offline-queue", "title": "Offline edit queue + replay", "body": "Append-only op-log buffered offline and replayed through the CRDT.", "status": "open", "sourceBranch": "feat/offline-queue", "targetBranch": "main", "invariantReviewDone": false, "githubRef": "meridian#301", "createdAt": "2026-05-15", "createdBy": "act-ravi", "updatedAt": "2026-07-01", "updatedBy": "act-ravi"}}
+{"type": "PR", "data": {"slug": "pr-billing-webhooks", "title": "Stripe usage-record webhook handler (draft)", "body": "Idempotent handler for Stripe usage webhooks.", "status": "draft", "sourceBranch": "feat/billing-webhooks", "targetBranch": "main", "invariantReviewDone": false, "githubRef": "meridian#312", "createdAt": "2026-06-05", "createdBy": "act-ravi", "updatedAt": "2026-06-08", "updatedBy": "act-ravi"}}
+{"type": "PR", "data": {"slug": "pr-legacy-wal", "title": "Temporary WAL shim for storage migration", "body": "Short-lived WAL shim to bridge the storage-engine upgrade. Granted a one-time exception to the no-custom-WAL principle.", "status": "merged", "sourceBranch": "chore/wal-shim", "targetBranch": "main", "invariantReviewDone": true, "githubRef": "meridian#141", "createdAt": "2025-10-20", "createdBy": "act-ravi", "updatedAt": "2025-10-25", "updatedBy": "act-ravi"}}
+{"type": "Commit", "data": {"slug": "commit-a1b2", "sha": "a1b2c3d", "message": "sync: step down to read-only on partition", "githubRef": "meridian-labs/meridian@a1b2c3d", "authoredAt": "2026-03-31", "createdAt": "2026-03-31", "createdBy": "act-ravi"}}
+{"type": "Commit", "data": {"slug": "commit-c3d4", "sha": "c3d4e5f", "message": "storage: filter reads by tenant_id", "githubRef": "meridian-labs/meridian@c3d4e5f", "authoredAt": "2026-03-03", "createdAt": "2026-03-03", "createdBy": "act-ravi"}}
+{"type": "Commit", "data": {"slug": "commit-e5f6", "sha": "e5f6a7b", "message": "presence: cache peer list per room", "githubRef": "meridian-labs/meridian@e5f6a7b", "authoredAt": "2026-03-12", "createdAt": "2026-03-12", "createdBy": "act-mei"}}
+{"type": "Commit", "data": {"slug": "commit-g7h8", "sha": "g7h8i9j", "message": "presence: evict on disconnect + backpressure", "githubRef": "meridian-labs/meridian@g7h8i9j", "authoredAt": "2026-04-06", "createdAt": "2026-04-06", "createdBy": "act-tomas"}}
+{"type": "Commit", "data": {"slug": "commit-i9j0", "sha": "i9j0k1l", "message": "sync: buffer offline ops in an op-log", "githubRef": "meridian-labs/meridian@i9j0k1l", "authoredAt": "2026-05-20", "createdAt": "2026-05-20", "createdBy": "act-ravi"}}
+{"type": "Deployment", "data": {"slug": "dep-v1-3-prod", "env": "prod", "outcome": "success", "startedAt": "2026-01-30", "finishedAt": "2026-01-30", "createdAt": "2026-01-30", "createdBy": "act-tomas"}}
+{"type": "Deployment", "data": {"slug": "dep-v1-4-staging", "env": "staging", "outcome": "success", "startedAt": "2026-03-16", "finishedAt": "2026-03-16", "createdAt": "2026-03-16", "createdBy": "svc-ci"}}
+{"type": "Deployment", "data": {"slug": "dep-v1-4-prod", "env": "prod", "outcome": "success", "startedAt": "2026-03-20", "finishedAt": "2026-03-20", "createdAt": "2026-03-20", "createdBy": "act-tomas"}}
+{"type": "Deployment", "data": {"slug": "dep-v1-5-preview", "env": "preview", "outcome": "success", "startedAt": "2026-06-21", "finishedAt": "2026-06-21", "createdAt": "2026-06-21", "createdBy": "svc-ci"}}
+{"type": "Incident", "data": {"slug": "inc-presence-leak", "title": "Presence service OOM in production", "summary": "After v1.4.0, presence memory grew unbounded because sessions were never evicted on disconnect; api-gateway latency spiked as presence GC-thrashed.", "status": "resolved", "severity": "s2", "env": "prod", "startedAt": "2026-04-04", "mitigatedAt": "2026-04-05", "resolvedAt": "2026-04-06", "createdAt": "2026-04-04", "createdBy": "act-tomas", "updatedAt": "2026-04-06", "updatedBy": "act-tomas"}}
+{"type": "Learning", "data": {"slug": "lrn-presence-postmortem", "title": "Presence leak: cache without an eviction path", "body": "A per-room peer-list cache had no eviction on disconnect. Add backpressure and always pair a cache with an eviction path; require an invariant review on perf PRs touching long-lived state.", "learningKind": "incident_review", "createdAt": "2026-04-08", "createdBy": "act-tomas"}}
+{"type": "Learning", "data": {"slug": "lrn-crdt-gc-gotcha", "title": "automerge-rs gc needs a manual nightly pass at our scale", "body": "Tombstones are not reclaimed within one cycle under our write volume; the nightly manual gc pass is a required workaround until the upstream fix ships.", "learningKind": "gotcha", "createdAt": "2026-05-12", "createdBy": "act-ravi"}}
+{"type": "Learning", "data": {"slug": "lrn-observability-retro", "title": "Dashboards earlier would have caught the convergence-lag regression", "body": "Observability baseline landed after two lag regressions; instrument the sync path before, not after, shipping a new merge strategy.", "learningKind": "retro", "createdAt": "2026-02-10", "createdBy": "act-nadia"}}
+{"type": "Comment", "data": {"slug": "cmt-split-brain-1", "body": "Repro'd with a 3-way partition; the merge keeps the highest-actor-id write and drops the rest. We need a step-down.", "createdAt": "2026-01-15", "createdBy": "act-nadia"}}
+{"type": "Comment", "data": {"slug": "cmt-offline-1", "body": "Replay ordering is done; blocked on the automerge-rs gc fix for the tombstone growth under replay.", "createdAt": "2026-06-30", "createdBy": "act-ravi"}}
+{"type": "Comment", "data": {"slug": "cmt-presence-regress-1", "body": "This cache never evicts on disconnect — that's the leak. Rolling forward a hotfix.", "createdAt": "2026-04-04", "createdBy": "act-tomas"}}
+{"type": "Comment", "data": {"slug": "cmt-offline-epic-1", "body": "Beta gate: offline sync ships in v1.5.0 behind a flag; conflict UI can follow in v1.6.", "createdAt": "2026-06-28", "createdBy": "act-priya"}}
+{"type": "Comment", "data": {"slug": "cmt-incident-1", "body": "Mitigated by restarting presence pods hourly; permanent fix (eviction + backpressure) in #258.", "createdAt": "2026-04-05", "createdBy": "act-tomas"}}
+{"type": "Label", "data": {"slug": "lbl-security", "name": "security", "color": "#d64545", "scope": "cross-cutting", "createdAt": "2025-09-05", "createdBy": "act-nadia", "updatedAt": "2025-09-05", "updatedBy": "act-nadia"}}
+{"type": "Label", "data": {"slug": "lbl-perf", "name": "performance", "color": "#f2a900", "scope": "cross-cutting", "createdAt": "2025-09-05", "createdBy": "act-nadia", "updatedAt": "2025-09-05", "updatedBy": "act-nadia"}}
+{"type": "Label", "data": {"slug": "lbl-crdt", "name": "crdt", "color": "#3b82f6", "scope": "sync", "createdAt": "2025-09-05", "createdBy": "act-nadia", "updatedAt": "2025-09-05", "updatedBy": "act-nadia"}}
+{"type": "Label", "data": {"slug": "lbl-tech-debt", "name": "tech-debt", "color": "#8b8b8b", "scope": "cross-cutting", "createdAt": "2025-09-05", "createdBy": "act-nadia", "updatedAt": "2025-09-05", "updatedBy": "act-nadia"}}
+{"type": "Label", "data": {"slug": "lbl-good-first", "name": "good-first-issue", "color": "#22c55e", "scope": "onboarding", "createdAt": "2025-09-05", "createdBy": "act-nadia", "updatedAt": "2025-09-05", "updatedBy": "act-nadia"}}
+{"type": "Gate", "data": {"slug": "gate-ci-green", "kind": "ci_green", "status": "passed", "externalRef": "ci/meridian/run/48211", "createdAt": "2026-06-15", "createdBy": "svc-ci", "updatedAt": "2026-07-01", "updatedBy": "svc-ci"}}
+{"type": "Gate", "data": {"slug": "gate-security-review", "kind": "manual_approval", "status": "pending", "externalRef": "secreview/tenant-migration", "createdAt": "2026-06-05", "createdBy": "act-priya", "updatedAt": "2026-06-20", "updatedBy": "act-priya"}}
+{"edge": "RepoOwnedBy", "from": "repo-meridian", "to": "act-nadia", "data": {}}
+{"edge": "RepoOwnedBy", "from": "repo-infra", "to": "act-tomas", "data": {}}
+{"edge": "RepoHasComponent", "from": "repo-meridian", "to": "cmp-sync-core", "data": {}}
+{"edge": "ComponentOwnedBy", "from": "cmp-sync-core", "to": "act-ravi", "data": {}}
+{"edge": "RepoHasComponent", "from": "repo-meridian", "to": "cmp-api-gateway", "data": {}}
+{"edge": "ComponentOwnedBy", "from": "cmp-api-gateway", "to": "act-nadia", "data": {}}
+{"edge": "RepoHasComponent", "from": "repo-meridian", "to": "cmp-auth", "data": {}}
+{"edge": "ComponentOwnedBy", "from": "cmp-auth", "to": "act-ravi", "data": {}}
+{"edge": "RepoHasComponent", "from": "repo-meridian", "to": "cmp-presence", "data": {}}
+{"edge": "ComponentOwnedBy", "from": "cmp-presence", "to": "act-mei", "data": {}}
+{"edge": "RepoHasComponent", "from": "repo-meridian", "to": "cmp-web-client", "data": {}}
+{"edge": "ComponentOwnedBy", "from": "cmp-web-client", "to": "act-mei", "data": {}}
+{"edge": "RepoHasComponent", "from": "repo-meridian", "to": "cmp-storage", "data": {}}
+{"edge": "ComponentOwnedBy", "from": "cmp-storage", "to": "act-ravi", "data": {}}
+{"edge": "RepoHasComponent", "from": "repo-meridian", "to": "cmp-billing", "data": {}}
+{"edge": "ComponentOwnedBy", "from": "cmp-billing", "to": "act-priya", "data": {}}
+{"edge": "RepoHasComponent", "from": "repo-meridian", "to": "cmp-webhooks", "data": {}}
+{"edge": "ComponentOwnedBy", "from": "cmp-webhooks", "to": "act-ravi", "data": {}}
+{"edge": "ComponentHasSubcomponent", "from": "cmp-api-gateway", "to": "cmp-webhooks", "data": {}}
+{"edge": "ComponentDependsOn", "from": "cmp-api-gateway", "to": "cmp-auth", "data": {}}
+{"edge": "ComponentDependsOn", "from": "cmp-api-gateway", "to": "cmp-sync-core", "data": {}}
+{"edge": "ComponentDependsOn", "from": "cmp-presence", "to": "cmp-sync-core", "data": {}}
+{"edge": "ComponentDependsOn", "from": "cmp-web-client", "to": "cmp-api-gateway", "data": {}}
+{"edge": "ComponentDependsOn", "from": "cmp-sync-core", "to": "cmp-storage", "data": {}}
+{"edge": "ComponentDependsOn", "from": "cmp-billing", "to": "cmp-webhooks", "data": {}}
+{"edge": "EpicOwnedBy", "from": "epc-offline-sync", "to": "act-nadia", "data": {}}
+{"edge": "EpicOwnedBy", "from": "epc-tenant-isolation", "to": "act-priya", "data": {}}
+{"edge": "EpicOwnedBy", "from": "epc-billing-v2", "to": "act-priya", "data": {}}
+{"edge": "EpicOwnedBy", "from": "epc-observability", "to": "act-tomas", "data": {}}
+{"edge": "EpicTargetsComponent", "from": "epc-offline-sync", "to": "cmp-sync-core", "data": {}}
+{"edge": "EpicTargetsComponent", "from": "epc-tenant-isolation", "to": "cmp-auth", "data": {}}
+{"edge": "EpicTargetsComponent", "from": "epc-billing-v2", "to": "cmp-billing", "data": {}}
+{"edge": "EpicTargetsRelease", "from": "epc-offline-sync", "to": "rel-v1-5-0", "data": {}}
+{"edge": "EpicTargetsRelease", "from": "epc-tenant-isolation", "to": "rel-v1-4-0", "data": {}}
+{"edge": "EpicTargetsRelease", "from": "epc-observability", "to": "rel-v1-3-0", "data": {}}
+{"edge": "IssueOwnedBy", "from": "iss-split-brain", "to": "act-ravi", "data": {}}
+{"edge": "EpicContainsIssue", "from": "epc-offline-sync", "to": "iss-split-brain", "data": {}}
+{"edge": "IssueTargetsComponent", "from": "iss-split-brain", "to": "cmp-sync-core", "data": {}}
+{"edge": "IssueOwnedBy", "from": "iss-tenant-check", "to": "act-ravi", "data": {}}
+{"edge": "EpicContainsIssue", "from": "epc-tenant-isolation", "to": "iss-tenant-check", "data": {}}
+{"edge": "IssueTargetsComponent", "from": "iss-tenant-check", "to": "cmp-storage", "data": {}}
+{"edge": "IssueOwnedBy", "from": "iss-offline-queue", "to": "act-ravi", "data": {}}
+{"edge": "EpicContainsIssue", "from": "epc-offline-sync", "to": "iss-offline-queue", "data": {}}
+{"edge": "IssueTargetsComponent", "from": "iss-offline-queue", "to": "cmp-sync-core", "data": {}}
+{"edge": "IssueOwnedBy", "from": "iss-offline-conflict-ui", "to": "act-mei", "data": {}}
+{"edge": "EpicContainsIssue", "from": "epc-offline-sync", "to": "iss-offline-conflict-ui", "data": {}}
+{"edge": "IssueTargetsComponent", "from": "iss-offline-conflict-ui", "to": "cmp-web-client", "data": {}}
+{"edge": "IssueOwnedBy", "from": "iss-presence-leak-fix", "to": "act-tomas", "data": {}}
+{"edge": "IssueTargetsComponent", "from": "iss-presence-leak-fix", "to": "cmp-presence", "data": {}}
+{"edge": "IssueOwnedBy", "from": "iss-presence-scale", "to": "act-mei", "data": {}}
+{"edge": "IssueTargetsComponent", "from": "iss-presence-scale", "to": "cmp-presence", "data": {}}
+{"edge": "IssueOwnedBy", "from": "iss-billing-metering", "to": "act-priya", "data": {}}
+{"edge": "EpicContainsIssue", "from": "epc-billing-v2", "to": "iss-billing-metering", "data": {}}
+{"edge": "IssueTargetsComponent", "from": "iss-billing-metering", "to": "cmp-billing", "data": {}}
+{"edge": "IssueOwnedBy", "from": "iss-billing-webhooks", "to": "act-ravi", "data": {}}
+{"edge": "EpicContainsIssue", "from": "epc-billing-v2", "to": "iss-billing-webhooks", "data": {}}
+{"edge": "IssueTargetsComponent", "from": "iss-billing-webhooks", "to": "cmp-webhooks", "data": {}}
+{"edge": "IssueOwnedBy", "from": "iss-tenant-migration", "to": "act-ravi", "data": {}}
+{"edge": "EpicContainsIssue", "from": "epc-tenant-isolation", "to": "iss-tenant-migration", "data": {}}
+{"edge": "IssueTargetsComponent", "from": "iss-tenant-migration", "to": "cmp-storage", "data": {}}
+{"edge": "IssueOwnedBy", "from": "iss-auth-mfa", "to": "act-priya", "data": {}}
+{"edge": "IssueTargetsComponent", "from": "iss-auth-mfa", "to": "cmp-auth", "data": {}}
+{"edge": "IssueOwnedBy", "from": "iss-crdt-gc-guard", "to": "act-ravi", "data": {}}
+{"edge": "IssueTargetsComponent", "from": "iss-crdt-gc-guard", "to": "cmp-sync-core", "data": {}}
+{"edge": "IssueOwnedBy", "from": "iss-flaky-sync-test", "to": "act-nadia", "data": {}}
+{"edge": "IssueTargetsComponent", "from": "iss-flaky-sync-test", "to": "cmp-sync-core", "data": {}}
+{"edge": "IssueOwnedBy", "from": "iss-webhook-idempotency", "to": "act-ravi", "data": {}}
+{"edge": "IssueTargetsComponent", "from": "iss-webhook-idempotency", "to": "cmp-webhooks", "data": {}}
+{"edge": "IssueOwnedBy", "from": "iss-observability-dash", "to": "act-tomas", "data": {}}
+{"edge": "EpicContainsIssue", "from": "epc-observability", "to": "iss-observability-dash", "data": {}}
+{"edge": "IssueTargetsComponent", "from": "iss-observability-dash", "to": "cmp-api-gateway", "data": {}}
+{"edge": "IssueOwnedBy", "from": "iss-rate-limit", "to": "act-mei", "data": {}}
+{"edge": "IssueTargetsComponent", "from": "iss-rate-limit", "to": "cmp-presence", "data": {}}
+{"edge": "IssueOwnedBy", "from": "iss-safari-login", "to": "act-priya", "data": {}}
+{"edge": "IssueTargetsComponent", "from": "iss-safari-login", "to": "cmp-auth", "data": {}}
+{"edge": "IssueOwnedBy", "from": "iss-dup-login-bug", "to": "act-priya", "data": {}}
+{"edge": "IssueTargetsComponent", "from": "iss-dup-login-bug", "to": "cmp-auth", "data": {}}
+{"edge": "IssueOwnedBy", "from": "iss-offline-replay-test", "to": "act-ravi", "data": {}}
+{"edge": "EpicContainsIssue", "from": "epc-offline-sync", "to": "iss-offline-replay-test", "data": {}}
+{"edge": "IssueTargetsComponent", "from": "iss-offline-replay-test", "to": "cmp-sync-core", "data": {}}
+{"edge": "IssueBlocksIssue", "from": "iss-offline-queue", "to": "iss-offline-conflict-ui", "data": {}}
+{"edge": "IssueBlocksIssue", "from": "iss-billing-metering", "to": "iss-billing-webhooks", "data": {}}
+{"edge": "IssueParentChildIssue", "from": "iss-offline-queue", "to": "iss-offline-replay-test", "data": {}}
+{"edge": "EpicParentChildIssue", "from": "epc-tenant-isolation", "to": "iss-tenant-migration", "data": {}}
+{"edge": "IssueWaitsForBlocker", "from": "iss-offline-queue", "to": "blk-crdt-lib", "data": {}}
+{"edge": "IssueWaitsForGate", "from": "iss-tenant-migration", "to": "gate-security-review", "data": {}}
+{"edge": "IssueWaitsForIssue", "from": "iss-offline-conflict-ui", "to": "iss-offline-replay-test", "data": {}}
+{"edge": "IssueDiscoveredFrom", "from": "iss-flaky-sync-test", "to": "iss-split-brain", "data": {}}
+{"edge": "IssueRelated", "from": "iss-presence-leak-fix", "to": "iss-presence-scale", "data": {}}
+{"edge": "IssueRelated", "from": "iss-dup-login-bug", "to": "iss-safari-login", "data": {}}
+{"edge": "IssueTargetsRelease", "from": "iss-offline-queue", "to": "rel-v1-5-0", "data": {}}
+{"edge": "IssueTargetsRelease", "from": "iss-offline-conflict-ui", "to": "rel-v1-5-0", "data": {}}
+{"edge": "SpecSpecifies", "from": "spc-offline-sync-rfc", "to": "epc-offline-sync", "data": {}}
+{"edge": "SpecSpecifies", "from": "spc-tenant-isolation", "to": "epc-tenant-isolation", "data": {}}
+{"edge": "SpecSpecifies", "from": "spc-billing-v2", "to": "epc-billing-v2", "data": {}}
+{"edge": "SpecDescribes", "from": "spc-offline-sync-rfc", "to": "cmp-sync-core", "data": {}}
+{"edge": "SpecDescribes", "from": "spc-crdt-model", "to": "cmp-sync-core", "data": {}}
+{"edge": "SpecDescribes", "from": "spc-tenant-isolation", "to": "cmp-auth", "data": {}}
+{"edge": "SpecReferences", "from": "spc-offline-sync-rfc", "to": "spc-crdt-model", "data": {}}
+{"edge": "SpecSupersedes", "from": "spc-crdt-model", "to": "spc-crdt-model-v0", "data": {}}
+{"edge": "SpecAuthoredBy", "from": "spc-offline-sync-rfc", "to": "act-nadia", "data": {}}
+{"edge": "SpecAuthoredBy", "from": "spc-tenant-isolation", "to": "act-priya", "data": {}}
+{"edge": "SpecAuthoredBy", "from": "spc-crdt-model", "to": "act-ravi", "data": {}}
+{"edge": "SpecAuthoredBy", "from": "spc-crdt-model-v0", "to": "act-ravi", "data": {}}
+{"edge": "SpecAuthoredBy", "from": "spc-billing-v2", "to": "act-priya", "data": {}}
+{"edge": "DecisionSupersedes", "from": "dec-crdt-choice", "to": "dec-crdt-v0", "data": {}}
+{"edge": "DecisionAppliesToComponent", "from": "dec-crdt-choice", "to": "cmp-sync-core", "data": {}}
+{"edge": "DecisionAppliesToComponent", "from": "dec-tenant-boundary", "to": "cmp-storage", "data": {}}
+{"edge": "DecisionAppliesToComponent", "from": "dec-tenant-boundary", "to": "cmp-auth", "data": {}}
+{"edge": "DecisionAppliesToComponent", "from": "dec-no-custom-wal", "to": "cmp-storage", "data": {}}
+{"edge": "DecisionAppliesToSpec", "from": "dec-crdt-choice", "to": "spc-crdt-model", "data": {}}
+{"edge": "DecisionEmergedFromIssue", "from": "dec-billing-provider", "to": "iss-billing-metering", "data": {}}
+{"edge": "DecisionEmergedFromIncident", "from": "dec-presence-backpressure", "to": "inc-presence-leak", "data": {}}
+{"edge": "DecisionAuthoredBy", "from": "dec-crdt-v0", "to": "act-nadia", "data": {}}
+{"edge": "DecisionAuthoredBy", "from": "dec-crdt-choice", "to": "act-nadia", "data": {}}
+{"edge": "DecisionAuthoredBy", "from": "dec-tenant-boundary", "to": "act-priya", "data": {}}
+{"edge": "DecisionAuthoredBy", "from": "dec-no-custom-wal", "to": "act-ravi", "data": {}}
+{"edge": "DecisionAuthoredBy", "from": "dec-presence-backpressure", "to": "act-tomas", "data": {}}
+{"edge": "DecisionAuthoredBy", "from": "dec-billing-provider", "to": "act-priya", "data": {}}
+{"edge": "InvariantAboutComponent", "from": "inv-convergence", "to": "cmp-sync-core", "data": {}}
+{"edge": "InvariantAboutComponent", "from": "inv-tenant-isolation", "to": "cmp-auth", "data": {}}
+{"edge": "InvariantAboutComponent", "from": "inv-single-writer", "to": "cmp-sync-core", "data": {}}
+{"edge": "InvariantAboutComponent", "from": "inv-webhook-idempotent", "to": "cmp-webhooks", "data": {}}
+{"edge": "InvariantDescribedIn", "from": "inv-convergence", "to": "spc-crdt-model", "data": {}}
+{"edge": "InvariantDescribedIn", "from": "inv-tenant-isolation", "to": "spc-tenant-isolation", "data": {}}
+{"edge": "InvariantDescribedIn", "from": "inv-single-writer", "to": "spc-crdt-model", "data": {}}
+{"edge": "PrincipleDescribedIn", "from": "prn-respect-substrate", "to": "spc-crdt-model", "data": {}}
+{"edge": "GapUnderminesInvariant", "from": "gap-single-writer", "to": "inv-single-writer", "data": {}}
+{"edge": "GapDescribedIn", "from": "gap-single-writer", "to": "spc-crdt-model", "data": {}}
+{"edge": "IssueNarrowsGap", "from": "iss-split-brain", "to": "gap-single-writer", "data": {}}
+{"edge": "IssueNarrowsGap", "from": "iss-presence-scale", "to": "gap-presence-scale", "data": {}}
+{"edge": "AssumptionCoversBlocker", "from": "asm-crdt-gc", "to": "blk-crdt-lib", "data": {}}
+{"edge": "AssumptionCoversBlocker", "from": "asm-storage-ordering", "to": "blk-storage-engine", "data": {}}
+{"edge": "AssumptionAboutComponent", "from": "asm-crdt-gc", "to": "cmp-sync-core", "data": {}}
+{"edge": "AssumptionAboutComponent", "from": "asm-storage-ordering", "to": "cmp-storage", "data": {}}
+{"edge": "CapabilityImplementedBy", "from": "cap-realtime-cursors", "to": "cmp-presence", "data": {}}
+{"edge": "CapabilityImplementedBy", "from": "cap-crdt-merge", "to": "cmp-sync-core", "data": {}}
+{"edge": "CapabilityImplementedBy", "from": "cap-audit-log", "to": "cmp-storage", "data": {}}
+{"edge": "CapabilityTrackedBy", "from": "cap-offline-editing", "to": "epc-offline-sync", "data": {}}
+{"edge": "CapabilityDescribedIn", "from": "cap-crdt-merge", "to": "spc-crdt-model", "data": {}}
+{"edge": "ReleaseInRepo", "from": "rel-v1-3-0", "to": "repo-meridian", "data": {}}
+{"edge": "ReleaseInRepo", "from": "rel-v1-4-0", "to": "repo-meridian", "data": {}}
+{"edge": "ReleaseInRepo", "from": "rel-v1-5-0", "to": "repo-meridian", "data": {}}
+{"edge": "ReleaseSupersedes", "from": "rel-v1-4-0", "to": "rel-v1-3-0", "data": {}}
+{"edge": "ReleaseSupersedes", "from": "rel-v1-5-0", "to": "rel-v1-4-0", "data": {}}
+{"edge": "PrAuthoredBy", "from": "pr-partition-guard", "to": "act-ravi", "data": {}}
+{"edge": "PrAuthoredBy", "from": "pr-tenant-check", "to": "act-ravi", "data": {}}
+{"edge": "PrAuthoredBy", "from": "pr-presence-optimize", "to": "act-mei", "data": {}}
+{"edge": "PrAuthoredBy", "from": "pr-presence-hotfix", "to": "act-tomas", "data": {}}
+{"edge": "PrAuthoredBy", "from": "pr-offline-queue", "to": "act-ravi", "data": {}}
+{"edge": "PrAuthoredBy", "from": "pr-billing-webhooks", "to": "act-ravi", "data": {}}
+{"edge": "PrAuthoredBy", "from": "pr-legacy-wal", "to": "act-ravi", "data": {}}
+{"edge": "PrReviewedBy", "from": "pr-partition-guard", "to": "act-nadia", "data": {}}
+{"edge": "PrReviewedBy", "from": "pr-tenant-check", "to": "act-nadia", "data": {}}
+{"edge": "PrReviewedBy", "from": "pr-presence-optimize", "to": "act-tomas", "data": {}}
+{"edge": "PrReviewedBy", "from": "pr-presence-hotfix", "to": "act-nadia", "data": {}}
+{"edge": "PrReviewedBy", "from": "pr-legacy-wal", "to": "act-nadia", "data": {}}
+{"edge": "IssueImplementedBy", "from": "iss-split-brain", "to": "pr-partition-guard", "data": {}}
+{"edge": "IssueImplementedBy", "from": "iss-tenant-check", "to": "pr-tenant-check", "data": {}}
+{"edge": "IssueImplementedBy", "from": "iss-presence-leak-fix", "to": "pr-presence-hotfix", "data": {}}
+{"edge": "IssueImplementedBy", "from": "iss-offline-queue", "to": "pr-offline-queue", "data": {}}
+{"edge": "IssueImplementedBy", "from": "iss-billing-webhooks", "to": "pr-billing-webhooks", "data": {}}
+{"edge": "PrClosesIssue", "from": "pr-partition-guard", "to": "iss-split-brain", "data": {}}
+{"edge": "PrClosesIssue", "from": "pr-tenant-check", "to": "iss-tenant-check", "data": {}}
+{"edge": "PrClosesIssue", "from": "pr-presence-hotfix", "to": "iss-presence-leak-fix", "data": {}}
+{"edge": "PrTouchesComponent", "from": "pr-partition-guard", "to": "cmp-sync-core", "data": {}}
+{"edge": "PrTouchesComponent", "from": "pr-tenant-check", "to": "cmp-storage", "data": {}}
+{"edge": "PrTouchesComponent", "from": "pr-tenant-check", "to": "cmp-auth", "data": {}}
+{"edge": "PrTouchesComponent", "from": "pr-presence-optimize", "to": "cmp-presence", "data": {}}
+{"edge": "PrTouchesComponent", "from": "pr-presence-hotfix", "to": "cmp-presence", "data": {}}
+{"edge": "PrTouchesComponent", "from": "pr-offline-queue", "to": "cmp-sync-core", "data": {}}
+{"edge": "PrTouchesComponent", "from": "pr-billing-webhooks", "to": "cmp-webhooks", "data": {}}
+{"edge": "PrTouchesComponent", "from": "pr-billing-webhooks", "to": "cmp-billing", "data": {}}
+{"edge": "PrTouchesComponent", "from": "pr-legacy-wal", "to": "cmp-storage", "data": {}}
+{"edge": "PrBlocksPr", "from": "pr-partition-guard", "to": "pr-offline-queue", "data": {}}
+{"edge": "PrWaitsForBlocker", "from": "pr-offline-queue", "to": "blk-crdt-lib", "data": {}}
+{"edge": "PrWaitsForGate", "from": "pr-offline-queue", "to": "gate-ci-green", "data": {}}
+{"edge": "PrNarrowsGap", "from": "pr-partition-guard", "to": "gap-single-writer", "data": {}}
+{"edge": "PrWidensGap", "from": "pr-presence-optimize", "to": "gap-presence-scale", "data": {}}
+{"edge": "PrExceptionToPrinciple", "from": "prn-no-custom-wal", "to": "pr-legacy-wal", "data": {}}
+{"edge": "PrIncludesCommit", "from": "pr-partition-guard", "to": "commit-a1b2", "data": {}}
+{"edge": "CommitAuthoredBy", "from": "commit-a1b2", "to": "act-ravi", "data": {}}
+{"edge": "PrIncludesCommit", "from": "pr-tenant-check", "to": "commit-c3d4", "data": {}}
+{"edge": "CommitAuthoredBy", "from": "commit-c3d4", "to": "act-ravi", "data": {}}
+{"edge": "PrIncludesCommit", "from": "pr-presence-optimize", "to": "commit-e5f6", "data": {}}
+{"edge": "CommitAuthoredBy", "from": "commit-e5f6", "to": "act-mei", "data": {}}
+{"edge": "PrIncludesCommit", "from": "pr-presence-hotfix", "to": "commit-g7h8", "data": {}}
+{"edge": "CommitAuthoredBy", "from": "commit-g7h8", "to": "act-tomas", "data": {}}
+{"edge": "PrIncludesCommit", "from": "pr-offline-queue", "to": "commit-i9j0", "data": {}}
+{"edge": "CommitAuthoredBy", "from": "commit-i9j0", "to": "act-ravi", "data": {}}
+{"edge": "ReleaseIncludesPr", "from": "rel-v1-3-0", "to": "pr-legacy-wal", "data": {}}
+{"edge": "ReleaseIncludesPr", "from": "rel-v1-4-0", "to": "pr-tenant-check", "data": {}}
+{"edge": "ReleaseIncludesPr", "from": "rel-v1-4-0", "to": "pr-presence-optimize", "data": {}}
+{"edge": "ReleaseIncludesPr", "from": "rel-v1-5-0", "to": "pr-partition-guard", "data": {}}
+{"edge": "ReleaseIncludesPr", "from": "rel-v1-5-0", "to": "pr-presence-hotfix", "data": {}}
+{"edge": "DeploymentOfRelease", "from": "dep-v1-3-prod", "to": "rel-v1-3-0", "data": {}}
+{"edge": "DeploymentTriggeredBy", "from": "dep-v1-3-prod", "to": "act-tomas", "data": {}}
+{"edge": "DeploymentOfRelease", "from": "dep-v1-4-staging", "to": "rel-v1-4-0", "data": {}}
+{"edge": "DeploymentTriggeredBy", "from": "dep-v1-4-staging", "to": "svc-ci", "data": {}}
+{"edge": "DeploymentOfRelease", "from": "dep-v1-4-prod", "to": "rel-v1-4-0", "data": {}}
+{"edge": "DeploymentTriggeredBy", "from": "dep-v1-4-prod", "to": "act-tomas", "data": {}}
+{"edge": "DeploymentOfRelease", "from": "dep-v1-5-preview", "to": "rel-v1-5-0", "data": {}}
+{"edge": "DeploymentTriggeredBy", "from": "dep-v1-5-preview", "to": "svc-ci", "data": {}}
+{"edge": "IncidentAffectsComponent", "from": "inc-presence-leak", "to": "cmp-presence", "data": {}}
+{"edge": "IncidentAffectsComponent", "from": "inc-presence-leak", "to": "cmp-api-gateway", "data": {}}
+{"edge": "IncidentCausedByPr", "from": "inc-presence-leak", "to": "pr-presence-optimize", "data": {}}
+{"edge": "IncidentCausedByCommit", "from": "inc-presence-leak", "to": "commit-e5f6", "data": {}}
+{"edge": "IncidentCausedByDeployment", "from": "inc-presence-leak", "to": "dep-v1-4-prod", "data": {}}
+{"edge": "IncidentCommandedBy", "from": "inc-presence-leak", "to": "act-tomas", "data": {}}
+{"edge": "LearningAnalyzesIncident", "from": "lrn-presence-postmortem", "to": "inc-presence-leak", "data": {}}
+{"edge": "LearningAboutComponent", "from": "lrn-presence-postmortem", "to": "cmp-presence", "data": {}}
+{"edge": "LearningReferencesDecision", "from": "lrn-presence-postmortem", "to": "dec-presence-backpressure", "data": {}}
+{"edge": "LearningAboutBlocker", "from": "lrn-crdt-gc-gotcha", "to": "blk-crdt-lib", "data": {}}
+{"edge": "LearningAboutAssumption", "from": "lrn-crdt-gc-gotcha", "to": "asm-crdt-gc", "data": {}}
+{"edge": "LearningFromEpic", "from": "lrn-observability-retro", "to": "epc-observability", "data": {}}
+{"edge": "CommentOnIssue", "from": "cmt-split-brain-1", "to": "iss-split-brain", "data": {}}
+{"edge": "CommentPostedBy", "from": "cmt-split-brain-1", "to": "act-nadia", "data": {}}
+{"edge": "CommentOnIssue", "from": "cmt-offline-1", "to": "iss-offline-queue", "data": {}}
+{"edge": "CommentPostedBy", "from": "cmt-offline-1", "to": "act-ravi", "data": {}}
+{"edge": "CommentOnPr", "from": "cmt-presence-regress-1", "to": "pr-presence-optimize", "data": {}}
+{"edge": "CommentPostedBy", "from": "cmt-presence-regress-1", "to": "act-tomas", "data": {}}
+{"edge": "CommentOnEpic", "from": "cmt-offline-epic-1", "to": "epc-offline-sync", "data": {}}
+{"edge": "CommentPostedBy", "from": "cmt-offline-epic-1", "to": "act-priya", "data": {}}
+{"edge": "CommentOnIncident", "from": "cmt-incident-1", "to": "inc-presence-leak", "data": {}}
+{"edge": "CommentPostedBy", "from": "cmt-incident-1", "to": "act-tomas", "data": {}}
+{"edge": "IssueTagged", "from": "iss-split-brain", "to": "lbl-crdt", "data": {}}
+{"edge": "IssueTagged", "from": "iss-offline-queue", "to": "lbl-crdt", "data": {}}
+{"edge": "IssueTagged", "from": "iss-tenant-check", "to": "lbl-security", "data": {}}
+{"edge": "IssueTagged", "from": "iss-tenant-migration", "to": "lbl-security", "data": {}}
+{"edge": "IssueTagged", "from": "iss-presence-scale", "to": "lbl-perf", "data": {}}
+{"edge": "IssueTagged", "from": "iss-presence-leak-fix", "to": "lbl-perf", "data": {}}
+{"edge": "IssueTagged", "from": "iss-flaky-sync-test", "to": "lbl-tech-debt", "data": {}}
+{"edge": "IssueTagged", "from": "iss-auth-mfa", "to": "lbl-good-first", "data": {}}
+{"edge": "EpicTagged", "from": "epc-offline-sync", "to": "lbl-crdt", "data": {}}
+{"edge": "PrTagged", "from": "pr-partition-guard", "to": "lbl-crdt", "data": {}}
+{"edge": "ComponentTagged", "from": "cmp-sync-core", "to": "lbl-crdt", "data": {}}
+{"edge": "IncidentTagged", "from": "inc-presence-leak", "to": "lbl-perf", "data": {}}
+{"edge": "LearningTagged", "from": "lrn-presence-postmortem", "to": "lbl-perf", "data": {}}
+{"edge": "SpecTagged", "from": "spc-crdt-model", "to": "lbl-crdt", "data": {}}

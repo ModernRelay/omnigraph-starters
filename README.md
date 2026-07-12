@@ -10,6 +10,7 @@ Opinionated, ready-to-run graph cookbooks built on [Omnigraph](https://github.co
 | [`pharma-intel/`](pharma-intel) | ✅ ready | Pharma competitive intelligence |
 | [`second-brain/`](second-brain) | ✅ ready | Personal life automation graph |
 | [`vc-os/`](vc-os) | ✅ ready | Venture-capital operating system |
+| [`dev-graph/`](dev-graph) | ✅ ready | Software-development work: planning, code, release, ops + governance |
 | `company-context/` | 🚧 planned | Internal decisions, traces, actors, artifacts |
 | `biomed-research/` | 🚧 planned | Biotech & medical research tracking |
 | `competitor-intel/` | 🚧 planned | Competitor launches, pricing, positioning |
@@ -38,7 +39,7 @@ Typical flow: use the bootstrap skill once to set up a new graph, then the `omni
 omnigraph-cookbooks/
 ├── README.md  CLAUDE.md  LICENSE
 ├── railway.toml  deploy/railway/   ← container deploy (Dockerfile, config)
-└── <cookbook>/                     ← industry-intel, pharma-intel, second-brain, vc-os
+└── <cookbook>/                     ← industry-intel, pharma-intel, second-brain, vc-os, dev-graph
     ├── README.md
     ├── CLAUDE.md
     ├── schema.pg

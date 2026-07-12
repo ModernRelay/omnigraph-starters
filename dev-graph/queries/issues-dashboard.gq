@@ -1,0 +1,192 @@
+// Issue-triage dashboard queries (dash-book "Dev · issues by epic").
+// Registered via cluster.yaml `queries: queries/`. Apply with `omnigraph cluster
+// apply` + reload the served `dev` graph for these to go live.
+// Edge verb = schema edge name, lowercased first letter (IssueOwnedBy → issueOwnedBy).
+
+// ═══════════════════════════ EPIC ═══════════════════════════════
+
+query open_epics()
+    @description("Open epics (shaping or active), most-recently-updated first")
+{
+    match {
+        $e: Epic
+        $e.status != "done"
+        $e.status != "abandoned"
+    }
+    return { $e.slug, $e.title, $e.status }
+    order { $e.updatedAt desc }
+}
+
+query epic_issue_counts($epic: String)
+    @description("Issue count by status within an epic (completion at a glance)")
+{
+    match {
+        $e: Epic { slug: $epic }
+        $e epicContainsIssue $i
+    }
+    return { $i.status, count($i) as issues }
+    order { issues desc }
+}
+
+query epic_spec($epic: String)
+    @description("The spec file(s) that specify an epic")
+{
+    match {
+        $e: Epic { slug: $epic }
+        $s specSpecifies $e
+    }
+    return { $s.slug, $s.title, $s.status, $s.version }
+}
+
+query epic_release($epic: String)
+    @description("Release(s) an epic targets")
+{
+    match {
+        $e: Epic { slug: $epic }
+        $e epicTargetsRelease $rel
+    }
+    return { $rel.slug, $rel.status }
+}
+
+query epic_owner($epic: String)
+    @description("Actor that owns an epic")
+{
+    match {
+        $e: Epic { slug: $epic }
+        $e epicOwnedBy $a
+    }
+    return { $a.slug, $a.name, $a.actorKind }
+}
+
+// ═══════════════════════════ ISSUE ══════════════════════════════
+
+query issue_detail($issue: String)
+    @description("Full issue detail incl. acceptance criteria + design notes")
+{
+    match { $i: Issue { slug: $issue } }
+    return {
+        $i.slug, $i.title, $i.description, $i.acceptanceCriteria, $i.designNotes,
+        $i.status, $i.priority, $i.issueType, $i.legacyRef
+    }
+}
+
+query issue_owner($issue: String)
+    @description("Actor that owns an issue")
+{
+    match {
+        $i: Issue { slug: $issue }
+        $i issueOwnedBy $a
+    }
+    return { $a.slug, $a.name, $a.actorKind, $a.handle }
+}
+
+query issue_labels($issue: String)
+    @description("Labels tagged on an issue")
+{
+    match {
+        $i: Issue { slug: $issue }
+        $i issueTagged $l
+    }
+    return { $l.slug, $l.name, $l.color }
+}
+
+query issue_blockers($issue: String)
+    @description("Issues blocking this one via incoming IssueBlocksIssue, with status. This is only the hard issue-blocks-issue dimension — for parent/gate/upstream blocks see issue_parents, issue_parent_epic, issue_gates, issue_waits_on.")
+{
+    match {
+        $i: Issue { slug: $issue }
+        $b issueBlocksIssue $i
+    }
+    return { $b.slug, $b.title, $b.status }
+}
+
+query issue_parents($issue: String)
+    @description("Parent issues of this one (incoming IssueParentChildIssue) — this issue is blocked when a parent is. The inverse of issue_children.")
+{
+    match {
+        $i: Issue { slug: $issue }
+        $p issueParentChildIssue $i
+    }
+    return { $p.slug, $p.title, $p.status }
+}
+
+query issue_parent_epic($issue: String)
+    @description("Parent epic gating this issue via EpicParentChildIssue (the blocking parent-child edge, distinct from EpicContainsIssue membership)")
+{
+    match {
+        $i: Issue { slug: $issue }
+        $e epicParentChildIssue $i
+    }
+    return { $e.slug, $e.title, $e.status }
+}
+
+query issue_related($issue: String)
+    @description("Issues explicitly related to this one (IssueRelated)")
+{
+    match {
+        $i: Issue { slug: $issue }
+        $i issueRelated $r
+    }
+    return { $r.slug, $r.title, $r.status }
+}
+
+query issue_children($issue: String)
+    @description("Sub-issues of this one (IssueParentChildIssue)")
+{
+    match {
+        $i: Issue { slug: $issue }
+        $i issueParentChildIssue $c
+    }
+    return { $c.slug, $c.title, $c.status }
+}
+
+query issue_waits_on($issue: String)
+    @description("External blockers this issue waits for (IssueWaitsForBlocker)")
+{
+    match {
+        $i: Issue { slug: $issue }
+        $i issueWaitsForBlocker $x
+    }
+    return { $x.slug, $x.status, $x.shippedInVersion, $x.residualWorkaround, $x.upstreamUrl }
+}
+
+query issue_gates($issue: String)
+    @description("Gates this issue waits for (IssueWaitsForGate)")
+{
+    match {
+        $i: Issue { slug: $issue }
+        $i issueWaitsForGate $g
+    }
+    return { $g.slug, $g.kind, $g.status }
+}
+
+query issue_decisions($issue: String)
+    @description("Decisions that emerged from this issue (DecisionEmergedFromIssue)")
+{
+    match {
+        $i: Issue { slug: $issue }
+        $d decisionEmergedFromIssue $i
+    }
+    return { $d.slug, $d.title, $d.status }
+}
+
+query issue_components($issue: String)
+    @description("Components an issue targets (IssueTargetsComponent)")
+{
+    match {
+        $i: Issue { slug: $issue }
+        $i issueTargetsComponent $cmp
+    }
+    return { $cmp.slug, $cmp.name, $cmp.criticality }
+}
+
+query issue_comments($issue: String)
+    @description("Comments on this issue, oldest first; createdBy is the author actor slug")
+{
+    match {
+        $i: Issue { slug: $issue }
+        $c commentOnIssue $i
+    }
+    return { $c.body, $c.createdBy, $c.createdAt }
+    order { $c.createdAt }
+}
