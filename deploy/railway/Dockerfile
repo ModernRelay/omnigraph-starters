@@ -13,7 +13,7 @@
 # railway.toml so Railway picks this file up while keeping the cookbook
 # directories visible to COPY at the repo root.
 
-ARG OMNIGRAPH_REF=v0.8.0
+ARG OMNIGRAPH_REF=v0.8.1
 # The release publishes linux-x86_64 and (since v0.8.0) linux-arm64.
 # Railway runs amd64, so we pin the platform and the x86_64 asset for
 # determinism (and so the binary matches the image arch even when built
