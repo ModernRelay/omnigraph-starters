@@ -344,7 +344,7 @@ docker run --rm \
 ## Pinning + maintenance
 
 The Dockerfile pins the omnigraph engine to a specific tag via
-`ARG OMNIGRAPH_REF=v0.8.0`. Bump that on every omnigraph release that
+`ARG OMNIGRAPH_REF=v0.8.1`. Bump that on every omnigraph release that
 changes server behavior, the policy schema, or the CLI surface — and if
 the release changes the storage format, follow
 [Upgrading the engine](#upgrading-the-engine-omnigraph_ref-bumps) above:
