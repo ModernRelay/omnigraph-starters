@@ -2,7 +2,7 @@
 name: omnigraph-intel-bootstrap
 description: 'Bootstrap a new Omnigraph-based SPIKE industry intelligence graph from scratch. Use this skill whenever a user wants to set up a new SPIKE graph — either with the existing AI industry demo data or for a new domain (biotech, fintech, crypto, geopolitics, macroeconomics, SaaS, climate tech, etc.). The flow presents a demo-vs-custom decision, then for custom setups asks about domain scope, actors, cadence, and sources, adapts schema and enums for the target domain, runs initial web research to generate real seed content, and converges the cluster (apply creates the graph) + loads seed data. Apply aggressively when the user says any of: set up Omnigraph, bootstrap a new graph, create a new SPIKE cookbook, I want to track X industry, initialize intel for Y, new graph for Z domain, start a new context graph, or similar phrasing. This skill takes a user from zero to a populated, queryable graph.'
 license: MIT (see LICENSE at repo root)
-compatibility: Requires omnigraph CLI >= 0.8.0 (cluster control plane; storage format v4 — graphs are format-locked to the binary that creates them). Docker only for the optional RustFS/S3 path.
+compatibility: Requires omnigraph CLI >= 0.9.0 (cluster control plane; storage format v6 — graphs are format-locked to the binary that creates them). Docker only for the optional RustFS/S3 path.
 metadata:
   author: ModernRelay
   version: "0.4.1"
@@ -42,7 +42,7 @@ Before either path, run these checks (and act on the results):
 # Ensure omnigraph is on PATH
 command -v omnigraph >/dev/null || { echo "omnigraph not found — install via homebrew or the install script"; exit 1; }
 
-# Require omnigraph >= 0.8.0 (cluster control plane + storage format v4 —
+# Require omnigraph >= 0.9.0 (cluster control plane + storage format v6 —
 # a graph created here can only be opened by binaries of the same format)
 omnigraph version
 ```
