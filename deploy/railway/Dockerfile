@@ -2,9 +2,10 @@
 #
 # Pulls the prebuilt omnigraph CLI + server binaries from the pinned
 # GitHub release (no Rust toolchain, no source build) onto a
-# debian:trixie-slim runtime, alongside a default omnigraph.yaml, a
-# Cedar-via-YAML policy file, and an idempotent init script that runs as
-# Railway's preDeployCommand.
+# debian:trixie-slim runtime, alongside the bundled cookbook cluster
+# configs, the template policy bundles, and an idempotent cluster-apply
+# init script that runs as Railway's preDeployCommand (omnigraph >= 0.9
+# is cluster-only — RFC-011).
 #
 # Base is trixie (Debian 13, glibc 2.41), not bookworm (2.36): the release
 # binaries are linked against glibc >= 2.39 and won't run on bookworm.
@@ -13,7 +14,7 @@
 # railway.toml so Railway picks this file up while keeping the cookbook
 # directories visible to COPY at the repo root.
 
-ARG OMNIGRAPH_REF=v0.8.0
+ARG OMNIGRAPH_REF=v0.9.0
 # The release publishes linux-x86_64 and (since v0.8.0) linux-arm64.
 # Railway runs amd64, so we pin the platform and the x86_64 asset for
 # determinism (and so the binary matches the image arch even when built
@@ -54,15 +55,23 @@ RUN groupadd --system omnigraph \
     && useradd --system --gid omnigraph --create-home \
        --home-dir /var/lib/omnigraph --shell /bin/sh omnigraph
 
-# Cookbooks are not bundled in the image — init.sh fetches the schema
-# at deploy time via $OMNIGRAPH_SCHEMA_URL. This keeps the image small
-# and lets any schema (not just the bundled cookbooks) be used.
+# Since 0.9 a graph is declared by a cluster config DIRECTORY (cluster.yaml
+# + schema + stored queries + policies), not a single schema file, so the
+# cookbook configs are bundled — they are a few KiB each. init.sh selects
+# one via $OMNIGRAPH_COOKBOOK and points its storage at the Bucket.
+COPY industry-intel /opt/cookbooks/industry-intel
+COPY pharma-intel   /opt/cookbooks/pharma-intel
+COPY second-brain   /opt/cookbooks/second-brain
+COPY vc-os          /opt/cookbooks/vc-os
+COPY dev-graph      /opt/cookbooks/dev-graph
 
-# Server-side config: where the Cedar-via-YAML policy file lives.
-COPY deploy/railway/config/omnigraph.yaml /etc/omnigraph/omnigraph.yaml
-COPY deploy/railway/config/policy.yaml    /etc/omnigraph/policy.yaml
+# Template policy bundles, injected by init.sh for cookbooks that do not
+# declare their own `policies:` in cluster.yaml.
+COPY deploy/railway/config/policy.railway.yaml        /opt/railway-config/policy.railway.yaml
+COPY deploy/railway/config/server.policy.railway.yaml /opt/railway-config/server.policy.railway.yaml
 
-# Idempotent init runs via railway.toml's preDeployCommand.
+# Idempotent cluster validate/import/apply runs via railway.toml's
+# preDeployCommand.
 COPY deploy/railway/scripts/init.sh /usr/local/bin/omnigraph-railway-init.sh
 RUN chmod 0755 /usr/local/bin/omnigraph-railway-init.sh
 
@@ -82,4 +91,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
 # Default command — Railway overrides via startCommand in railway.toml,
 # but this lets `docker run` work standalone for local smoke tests.
 # `exec` so the server (not the shell) is PID 1 and receives SIGTERM.
-CMD ["sh", "-c", "exec omnigraph-server \"$OMNIGRAPH_TARGET_URI\" --config /etc/omnigraph/omnigraph.yaml --bind ${OMNIGRAPH_BIND}"]
+CMD ["sh", "-c", "exec omnigraph-server --cluster \"$OMNIGRAPH_CLUSTER_URI\" --bind ${OMNIGRAPH_BIND}"]

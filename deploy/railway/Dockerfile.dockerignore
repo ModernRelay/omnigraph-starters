@@ -13,8 +13,8 @@ docs/
 **/README.md
 **/CLAUDE.md
 
-# Per-cookbook prose seed (`seed.jsonl` is the data, `seed.md` is the
-# write-up; only the former is loaded at deploy time)
+# Per-cookbook prose seed write-ups (the deploy is schema-only; seed.jsonl
+# stays in the image so operators can seed from inside the container)
 **/seed.md
 
 # Local dev credentials — never bake into an image
@@ -23,6 +23,7 @@ docs/
 
 # Agent skill packaging — installed via `npx skills`, not deploy artifact
 skills/
+**/skill/
 
 # Build / editor noise
 **/.DS_Store
