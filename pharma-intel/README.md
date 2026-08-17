@@ -168,6 +168,7 @@ omnigraph cluster apply  --config . --as <you>
 
 # Load the seed through the data plane (one-time)
 omnigraph load --data seed.jsonl --mode overwrite graphs/pharma.omni
+omnigraph optimize graphs/pharma.omni   # build declared indexes (traversals full-scan without it)
 
 # Serve the applied state (keep running — separate terminal or background)
 omnigraph-server --cluster . --bind 127.0.0.1:8080 --unauthenticated   # local dev
@@ -200,6 +201,7 @@ cp .env.omni.example .env.omni
 set -a && source .env.omni && set +a
 omnigraph cluster apply --config . --as <you>
 omnigraph load --data seed.jsonl --mode overwrite s3://omnigraph-local/clusters/pharma/graphs/pharma.omni
+omnigraph optimize s3://omnigraph-local/clusters/pharma/graphs/pharma.omni   # build declared indexes (traversals full-scan without it)
 omnigraph-server --cluster s3://omnigraph-local/clusters/pharma --unauthenticated
 ```
 

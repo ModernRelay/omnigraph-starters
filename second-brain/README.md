@@ -179,6 +179,7 @@ omnigraph cluster import --config .   # one-time: create the state ledger
 omnigraph cluster plan   --config .
 omnigraph cluster apply  --config .   # creates graphs/brain.omni, applies schema, publishes queries
 omnigraph load --data seed.jsonl --mode overwrite graphs/brain.omni   # one-time seed
+omnigraph optimize graphs/brain.omni   # build declared indexes (traversals full-scan without it)
 omnigraph-server --cluster . --bind 127.0.0.1:8080 --unauthenticated  # serve (local dev)
 ```
 
