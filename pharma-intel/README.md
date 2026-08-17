@@ -201,6 +201,7 @@ cp .env.omni.example .env.omni
 set -a && source .env.omni && set +a
 omnigraph cluster apply --config . --as <you>
 omnigraph load --data seed.jsonl --mode overwrite s3://omnigraph-local/clusters/pharma/graphs/pharma.omni
+omnigraph optimize s3://omnigraph-local/clusters/pharma/graphs/pharma.omni   # build declared indexes (traversals full-scan without it)
 omnigraph-server --cluster s3://omnigraph-local/clusters/pharma --unauthenticated
 ```
 

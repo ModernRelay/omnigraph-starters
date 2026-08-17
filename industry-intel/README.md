@@ -159,6 +159,7 @@ serve config-free from the bucket:
 set -a && source .env.omni && set +a
 omnigraph cluster apply --config . --as <you>
 omnigraph load --data seed.jsonl --mode overwrite s3://omnigraph-local/clusters/spike/graphs/spike.omni
+omnigraph optimize s3://omnigraph-local/clusters/spike/graphs/spike.omni   # build declared indexes (traversals full-scan without it)
 omnigraph-server --cluster s3://omnigraph-local/clusters/spike --unauthenticated
 ```
 
