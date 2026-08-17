@@ -109,6 +109,7 @@ omnigraph cluster apply  --config . --as <you>
 
 # Load the seed through the data plane (one-time)
 omnigraph load --data seed.jsonl --mode overwrite graphs/spike.omni
+omnigraph optimize graphs/spike.omni   # build declared indexes (traversals full-scan without it)
 
 # Serve the applied state (keep running — separate terminal or background)
 omnigraph-server --cluster . --bind 127.0.0.1:8080 --unauthenticated   # local dev

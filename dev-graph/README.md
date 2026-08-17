@@ -209,6 +209,7 @@ omnigraph cluster apply  --config . --as act-you
 #    (see "Loading" below — merge/append trip a case-sensitivity check on the
 #    camelCase `versionTag @unique` column in the current engine build).
 omnigraph load --data seed.jsonl --mode overwrite graphs/dev.omni
+omnigraph optimize graphs/dev.omni   # build declared indexes (traversals full-scan without it)
 
 # 3. Serve it (leave running in its own terminal).
 omnigraph-server --cluster . --unauthenticated      # binds 127.0.0.1:8080
