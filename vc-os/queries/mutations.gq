@@ -145,8 +145,8 @@ query link_deal_participant($deal: String, $organization: String) {
 }
 
 // Knows is symmetric — this mutation inserts both directions in one call so
-// callers can't accidentally create a one-way relationship. The schema can't
-// enforce pair uniqueness in 0.4.x; this mutation is the convention.
+// callers can't accidentally create a one-way relationship. Knows does not
+// declare @unique(src, dst), so this mutation remains the convention.
 query link_knows($from: String, $to: String) {
     insert Knows { from: $from, to: $to }
     insert Knows { from: $to, to: $from }
@@ -164,8 +164,8 @@ query link_board_member_at($person: String, $organization: String) {
     insert BoardMemberAt { from: $person, to: $organization }
 }
 
-query link_role_in_deal($person: String, $deal: String) {
-    insert RoleInDeal { from: $person, to: $deal }
+query link_role_in_deal($person: String, $deal: String, $role: String) {
+    insert RoleInDeal { from: $person, to: $deal, role: $role }
 }
 
 query link_decision_maker_at($person: String, $organization: String) {

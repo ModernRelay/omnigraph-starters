@@ -265,7 +265,7 @@ aliases:
   markdown-documents-lesson: { server: local, graph: vcos, query: markdown_documents_lesson, args: [slug] }
   markdown-documents-pattern: { server: local, graph: vcos, query: markdown_documents_pattern, args: [slug] }
   # Drift JTBD = set-diff on the caller side: active-for-review minus with-docs
-  # = the set that needs partner attention. Omnigraph 0.4 has no NOT-EXISTS.
+  # = the set that needs partner attention. The pair also exposes both totals.
   theses-active-for-doc-review: { server: local, graph: vcos, query: theses_active_for_doc_review }
   theses-with-docs: { server: local, graph: vcos, query: theses_with_docs }
   lessons-active-for-doc-review: { server: local, graph: vcos, query: lessons_active_for_doc_review }
@@ -276,7 +276,7 @@ aliases:
   # ══════════════════════════════════════════════════════════════════
   # Sources are Organizations with kind in (publisher, database, expert-network)
   # and a `reliability` rating. Reliability drops trigger downstream-signal revalidation.
-  # 0.4 has no enum-IN filter, so "all sources" is the union of publishers + databases + expert-networks.
+  # There is no enum-IN filter, so "all sources" is the union of publishers + databases + expert-networks.
   source: { server: local, graph: vcos, query: get_source, args: [slug], format: kv }
   publishers: { server: local, graph: vcos, query: publishers }
   databases: { server: local, graph: vcos, query: databases }
@@ -325,7 +325,7 @@ aliases:
   link-works-at: { server: local, graph: vcos, query: link_works_at, args: [from, to] }
   link-founder-of: { server: local, graph: vcos, query: link_founder_of, args: [person, organization] }
   link-board-member-at: { server: local, graph: vcos, query: link_board_member_at, args: [person, organization] }
-  link-role-in-deal: { server: local, graph: vcos, query: link_role_in_deal, args: [person, deal] }
+  link-role-in-deal: { server: local, graph: vcos, query: link_role_in_deal, args: [person, deal, role] }
   link-decision-maker-at: { server: local, graph: vcos, query: link_decision_maker_at, args: [person, organization] }
   link-would-acquire: { server: local, graph: vcos, query: link_would_acquire, args: [from, to] }
   link-lp-in-fund: { server: local, graph: vcos, query: link_lp_in_fund, args: [organization, fund] }

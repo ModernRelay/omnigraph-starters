@@ -357,8 +357,9 @@ node Insight {
 
 // Chunk — IMPLEMENTATION DETAIL for hybrid search. Indexed slices of Artifact
 // content. Not an ontological commitment; if the storage stack changed, this
-// would change shape. v1 of this cookbook ships no Chunks in the seed —
-// populate via `omnigraph embed --reembed_all` after attaching real Artifacts.
+// would change shape. v1 of this cookbook ships no Chunks in the seed. Prepare
+// raw Chunk JSONL with `omnigraph embed --input ... --output ... --spec ...
+// --reembed-all`, then load the generated file.
 node Chunk {
     slug: String @key
     text: String
@@ -612,9 +613,9 @@ edge MeetingAboutThesis: Meeting -> Thesis
 edge MeetingAboutMarket: Meeting -> Market
 
 // Meeting attendance. The `role` discriminates host/attendee/optional/declined
-// so the same edge type covers invites and acceptances. Note: edge-property
-// projection isn't supported in 0.4.x reads (see CLAUDE.md "Known gaps") —
-// filter by role at write time and surface via dedicated read-side helpers.
+// so the same edge type covers invites and acceptances. Bind the edge in a
+// v0.10 query (`$meeting $attendance:meetingAttendedBy $person`) to project or
+// filter on `$attendance.role`.
 edge MeetingAttendedBy: Meeting -> Person {
     role: enum(host, attendee, optional, declined)?
 }

@@ -245,21 +245,36 @@ The prose-bearing nodes (`Issue`, `Epic`, `SpecFile`, `Decision`, `Learning`,
 `Invariant`, `Principle`, `Gap`, `Capability`, `Incident`, `PR`, `Assumption`,
 `Comment`) declare an embedding column with its source and index:
 `embedding: Vector(3072)? @embed("title"|"statement"|"name"|"body") @index`. The
-column stays **null until an embedding provider is configured** — so the seed
-loads with zero dependencies (no API key) and the `search_*` stored queries /
+column stays **null until vectors are supplied in input data** — so the seed
+loads with zero dependencies and the `search_*` stored queries /
 `sem-*` aliases simply return nothing.
 
 To turn semantic search on:
 
 1. Uncomment the `providers:` block **and** the `embedding_provider: default`
    line under `graphs.dev` in `cluster.yaml`, then `omnigraph cluster apply --config .`.
-2. `export GEMINI_API_KEY=…` (the embedder + the server's query-time embedding
-   both use `gemini-embedding-2-preview`, keeping stored and query vectors in the
-   same 3072-dim space — a dimension mismatch returns garbage).
-3. Re-embed the data. Either re-load the seed — `omnigraph load --data seed.jsonl
-   --mode overwrite graphs/dev.omni` re-triggers embedding at load because the
-   columns carry `@embed(...)` — or run `omnigraph embed --reembed_all`.
-4. Restart `omnigraph-server --cluster .`.
+2. Export the configured provider's secret and select the same provider/model
+   for the offline pipeline:
+
+   ```bash
+   export GEMINI_API_KEY='<key>'
+   export OMNIGRAPH_EMBED_PROVIDER=gemini
+   export OMNIGRAPH_EMBED_MODEL=gemini-embedding-2
+   ```
+3. Prepare an embedding spec for the declared source/target fields, then run
+   the offline file pipeline and load its complete output:
+
+   ```bash
+   omnigraph embed --input seed.jsonl --output seed.embedded.jsonl \
+     --spec /path/to/embeddings.json --reembed-all
+   omnigraph load --data seed.embedded.jsonl --mode overwrite graphs/dev.omni
+   ```
+
+   `omnigraph embed` never opens or mutates the graph, and ordinary load does
+   not synthesize `@embed` fields. The engine's
+   [embedding guide](https://github.com/ModernRelay/omnigraph/blob/v0.10.0/docs/user/search/embeddings.md#offline-file-pipeline)
+   defines the spec shape.
+4. Restart `omnigraph-server --cluster .` with the provider secret.
 
 Now `omnigraph alias sem-issue "tenant isolation"` (etc.) ranks by
 `nearest($x.embedding, $q)`. Everything structural works without any of this.

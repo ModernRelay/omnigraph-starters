@@ -65,6 +65,9 @@ The firm: **Quito Capital**, Berlin-based, AI-infra focused. Two funds: Fund II 
 **Experts (3):** Jordan (on-prem), Malik (GTM), Cora (security CISO).
 **Acquirer DMs (3):** Rajiv (AWS), Priti (Microsoft), Leo (Snowflake).
 
+Deal-specific roles are explicit on `RoleInDeal`: Elena, Yuki, and Marcus are
+`founder`; Jordan, Cora, and Malik are `expert` on their respective deals.
+
 ## Non-startup Companies (16)
 
 All `Organization` rows; the `kind` enum distinguishes them. Includes `org-quito` (Quito itself, kind=vc-firm), `org-grace-tan-fo` (Grace Tan's family-office LP, kind=family-office), and 4 source-provenance orgs (collapsed from the old `SourceEntity` node).

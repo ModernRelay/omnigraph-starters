@@ -275,12 +275,12 @@
 {"edge": "BoardMemberAt", "from": "per-flo", "to": "org-saltline-ai", "data": {}}
 {"edge": "BoardMemberAt", "from": "per-flo", "to": "org-bramble-data", "data": {}}
 {"edge": "BoardMemberAt", "from": "per-louis", "to": "org-quirebench", "data": {}}
-{"edge": "RoleInDeal", "from": "per-helix-elena", "to": "deal-helix-series-a", "data": {}}
-{"edge": "RoleInDeal", "from": "per-helix-yuki", "to": "deal-helix-series-a", "data": {}}
-{"edge": "RoleInDeal", "from": "per-axon-marcus", "to": "deal-axon-seed", "data": {}}
-{"edge": "RoleInDeal", "from": "per-expert-jordan", "to": "deal-helix-series-a", "data": {}}
-{"edge": "RoleInDeal", "from": "per-expert-cora", "to": "deal-sigil-seed", "data": {}}
-{"edge": "RoleInDeal", "from": "per-expert-malik", "to": "deal-mintlayer-seed", "data": {}}
+{"edge": "RoleInDeal", "from": "per-helix-elena", "to": "deal-helix-series-a", "data": {"role": "founder"}}
+{"edge": "RoleInDeal", "from": "per-helix-yuki", "to": "deal-helix-series-a", "data": {"role": "founder"}}
+{"edge": "RoleInDeal", "from": "per-axon-marcus", "to": "deal-axon-seed", "data": {"role": "founder"}}
+{"edge": "RoleInDeal", "from": "per-expert-jordan", "to": "deal-helix-series-a", "data": {"role": "expert"}}
+{"edge": "RoleInDeal", "from": "per-expert-cora", "to": "deal-sigil-seed", "data": {"role": "expert"}}
+{"edge": "RoleInDeal", "from": "per-expert-malik", "to": "deal-mintlayer-seed", "data": {"role": "expert"}}
 {"edge": "DecisionMakerAt", "from": "per-acq-aws-rajiv", "to": "org-aws", "data": {}}
 {"edge": "DecisionMakerAt", "from": "per-acq-microsoft-priti", "to": "org-microsoft", "data": {}}
 {"edge": "DecisionMakerAt", "from": "per-acq-snowflake-leo", "to": "org-snowflake", "data": {}}

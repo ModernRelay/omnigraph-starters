@@ -1,7 +1,7 @@
 // ── Hybrid retrieval over chunk embeddings ──
 // Requires embeddings (see README "Enable embeddings"): query-time text
-// embedding needs an embedding API key (e.g. GEMINI_API_KEY) and the
-// Chunk.embedding column populated. Without the key, invocation fails with
+// embedding needs a graph-bound provider and the Chunk.embedding column
+// populated by the offline file pipeline. Without the provider, invocation fails with
 // a clear error naming it; the queries type-check and serve regardless.
 
 // Semantic neighbors: embed the question at query time, k-NN over chunks.

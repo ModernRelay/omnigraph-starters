@@ -1,5 +1,5 @@
 #!/bin/sh
-# First-deploy bootstrap for the Omnigraph Railway template (0.9 cluster mode).
+# First-deploy bootstrap for the OmniGraph Railway template (0.10 cluster mode).
 #
 # Runs as Railway's preDeployCommand. Assembles a cluster config directory
 # from the bundled cookbook, points its storage at the Railway Bucket, and
@@ -36,7 +36,7 @@ fi
 
 # Cookbooks without their own `policies:` get the template bundles (three
 # roles wired to the template's bearer tokens). A cookbook that declares
-# policies keeps them — 0.9 validates strictly and one bundle owns each
+# policies keeps them — the schema validates strictly and one bundle owns each
 # scope, so injecting a second one would be refused.
 if ! grep -q '^policies:' "${CONFIG_DIR}/cluster.yaml"; then
   mkdir -p "${CONFIG_DIR}/policies"

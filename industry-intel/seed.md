@@ -75,9 +75,9 @@ Seed data for five-patterns, mapped to `schema.pg`. Updated: 2026-04-14.
 
 ---
 
-## Elements (26)
+## Elements (24)
 
-*(includes 5 elements with minimal metadata: `el-claude-cowork`, `el-sap-ai`, `el-salesforce-crm`, `el-meta-internal-agents`, `el-openclaw`, `el-headless-saas`)*
+*(includes 6 elements with minimal metadata: `el-claude-cowork`, `el-sap-ai`, `el-salesforce-crm`, `el-meta-internal-agents`, `el-openclaw`, `el-headless-saas`)*
 
 | slug | name | kind | brief | category |
 |------|------|------|-------|----------|
@@ -200,7 +200,7 @@ Seed data for five-patterns, mapped to `schema.pg`. Updated: 2026-04-14.
 
 ---
 
-## Companies (14 + 3 for experts = 17 total)
+## Companies (13 + 3 for experts = 16 total)
 
 | slug | name | type | brief |
 |------|------|------|-------|

@@ -81,15 +81,13 @@ query acquirer_decision_makers() {
 }
 
 // Persons playing any role on a deal (founder, customer-ref, expert, co-investor, …).
-// 0.4.x can't project/filter on the RoleInDeal.role edge property, so we can't
-// narrow to "experts only" at the query layer — the seed-side and the agent-side
-// have to read the edge data directly if they need to distinguish.
+// v0.10 binds the traversed edge so its role can be projected and filtered.
 query deal_role_participants() {
     match {
         $p: Person
-        $p roleInDeal $d
+        $p $role:roleInDeal $d
     }
-    return { $p.slug, $p.name, $d.slug, $d.name, $p.bio }
+    return { $p.slug, $p.name, $d.slug, $d.name, $role.role, $p.bio }
 }
 
 

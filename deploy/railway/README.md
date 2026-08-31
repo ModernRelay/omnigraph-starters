@@ -12,7 +12,7 @@ converges the cookbook's cluster config on first boot.
 | `omnigraph-server`     | Single Railway service (this repo's `deploy/railway/Dockerfile`)         |
 | Storage                | Railway Bucket — first-party S3, unlimited free S3 ops + bucket egress   |
 | Cluster config         | The bundled cookbook's directory (`cluster.yaml` + schema + stored queries + policies), selected via `OMNIGRAPH_COOKBOOK` and converged by `omnigraph cluster apply` at deploy time |
-| Auth (3 actors)        | `act-admin` / `act-writer` / `act-reader` bearer tokens auto-generated at deploy (industry-intel: `act-analyst` instead of `act-writer` — see Authorization model) |
+| Auth (3 actors)        | `act-admin` / `act-writer` / `act-reader` bearer tokens auto-generated at deploy |
 | Authz                  | Cedar policy bundles applied as cluster state (template bundles injected for cookbooks without their own) |
 | Public HTTPS endpoint  | Railway-managed `*.up.railway.app` domain with auto-SSL                  |
 
@@ -72,8 +72,6 @@ Railway service at the fork.
 >   "AWS_SECRET_ACCESS_KEY=\${{graph-storage.SECRET_ACCESS_KEY}}" \
 >   "AWS_REGION=\${{graph-storage.REGION}}" \
 >   "OMNIGRAPH_SERVER_BEARER_TOKENS_JSON={\"act-admin\":\"$ADMIN\",\"act-writer\":\"$WRITER\",\"act-reader\":\"$READER\"}"
-> # industry-intel ships its own policy with act-analyst instead of act-writer:
-> #   …TOKENS_JSON={"act-admin":"$ADMIN","act-analyst":"$WRITER","act-reader":"$READER"}
 > # Make sure the service's region matches the Bucket region (railway scale)
 > railway up --service omnigraph
 > ```
@@ -143,33 +141,25 @@ what each does (and to make manual deploys reproducible).
 | `AWS_ACCESS_KEY_ID`                   | `${{Bucket.ACCESS_KEY_ID}}`                                                              |
 | `AWS_SECRET_ACCESS_KEY`               | `${{Bucket.SECRET_ACCESS_KEY}}`                                                          |
 | `AWS_REGION`                          | `${{Bucket.REGION}}`                                                                     |
-| `OMNIGRAPH_SERVER_BEARER_TOKENS_JSON` | `{"act-admin":"${{secret(48)}}","act-writer":"${{secret(48)}}","act-reader":"${{secret(48)}}"}` — keys are ACTOR IDS the policy bundles reference (industry-intel: use `act-analyst` in place of `act-writer`) |
-| `GEMINI_API_KEY` (optional)           | Empty by default; supply yours at deploy time to unlock text-input vector search         |
+| `OMNIGRAPH_SERVER_BEARER_TOKENS_JSON` | `{"act-admin":"${{secret(48)}}","act-writer":"${{secret(48)}}","act-reader":"${{secret(48)}}"}` — keys are actor ids referenced by every bundled policy |
 
-### Embeddings + Gemini
+### Embeddings
 
 Four of the five cookbooks (`industry-intel`, `second-brain`, `vc-os`,
 `dev-graph`) have schemas with `Vector(...) @embed("...")` fields. The
-deploy does **not** populate those vectors — they stay null unless you run
-`omnigraph embed` against the deployed graph.
+template does not configure an embedding provider or populate those vectors.
 
 Practical consequences:
 
-- Without `GEMINI_API_KEY`, the deploy still works for every query type
-  we ship in the cookbook (`get_*`, `recent_*`, traversals like
-  `pattern_signals`, FTS via `search(...)`). Only `nearest(field, "text",
-  k)` queries that need to embed a *text* input at query time return 500
-  with `"GEMINI_API_KEY is required when nearest() needs a string
-  embedding"`.
-- With `GEMINI_API_KEY` set, the same vector queries work once you've
-  populated the embedding columns via `omnigraph embed` (workstation-
-  initiated; runs against the running server).
+- Structural queries and full-text search work without an embedding provider.
+- To enable vector queries, fork the cookbook, declare one named provider and
+  bind it to the graph in `cluster.yaml`, then supply that provider's secret to
+  the server. Its model must match the model used for stored vectors.
+- `omnigraph embed` is an offline file-to-file pipeline; it never connects to
+  or mutates the deployed graph. Prepare embedded JSONL locally, then load it
+  through the authenticated server. `--reembed-all` replaces matching vectors
+  in the output file, not in a live graph.
 - `pharma-intel` has no `@embed` fields and never needs the key.
-
-The Railway template marks `GEMINI_API_KEY` as an **optional user-input
-variable** — the deploy UI shows a blank field with the description
-above. Leave it blank to skip; set it to a Gemini API key to enable
-text-input vector search later.
 
 `${{Bucket.*}}` and `${{secret(N)}}` are Railway's reference-variable
 and template-function syntax — they resolve at deploy time without
@@ -199,7 +189,7 @@ curl -fsS -H "Authorization: Bearer $TOKEN" \
 
 ## Authorization model
 
-Policy is **applied cluster state** (omnigraph ≥ 0.9), not a server flag.
+Policy is **applied cluster state** in OmniGraph 0.10, not a server flag.
 Cookbooks without their own `policies:` get the template bundles
 (`deploy/railway/config/*.railway.yaml`), which define three roles wired
 to the token JSON's actor ids:
@@ -215,10 +205,9 @@ to the token JSON's actor ids:
 anywhere. `GET /graphs` (registry enumeration) is a server-scoped action
 granted to admins by the cluster-bound bundle.
 
-**industry-intel ships its own policy bundles** with its own roles:
-`act-admin` (graph list), `act-analyst` (stored mutations + data-plane
-writes), `act-reader` (stored read queries + reads). Generate the token
-JSON with those actor ids for that cookbook.
+`industry-intel` ships its own policy bundles but accepts the same three
+generated actors: admin and writer can write, while reader is read-only.
+Existing `act-analyst` tokens remain a backwards-compatible writer alias.
 
 Bearer tokens are SHA-256 hashed on server startup; the plaintext lives
 only in the Railway-encrypted env var, not in process memory. Constant-
@@ -243,7 +232,7 @@ deploy. For a different role/group structure:
    (for the template bundles, run a local init simulation or validate the
    assembled config).
 4. Push the fork and point your Railway service at it; the next deploy's
-   `cluster apply` converges the change. Since 0.9 policy YAML validates
+   `cluster apply` converges the change. Policy YAML validates
    strictly — unknown fields are errors, one bundle owns each scope, and
    server-scoped actions (`graph_list`) cannot carry branch scopes.
 
@@ -268,51 +257,57 @@ cluster config is the single owner of the schema.
 
 ## Upgrading the engine (`OMNIGRAPH_REF` bumps)
 
-Omnigraph storage is **strict-single-version**: when a release changes the
-storage format (v0.9.0 did — internal schema v6; v0.8.0's v4 before it),
-the new binary refuses to open a graph created by the old one, and vice
-versa. There is no in-place migration.
+The image is pinned to v0.10.0. Upgrade the CLI, server, and client
+integrations together; never run mixed release fleets against one graph.
 
-That means bumping `OMNIGRAPH_REF` across a format-changing release with an
-existing graph in the Bucket **breaks the next deploy — loudly, by
-design**: `cluster apply` refuses the old-format graph rather than
-touching it. Nothing is corrupted; the deploy just fails until you rebuild.
+The v0.9→v0.10 upgrade keeps graph format v6, so entities, branches, and
+history do not need export/import. It does move from Lance 9 to Lance 11 and
+changes the full-text analyzer:
 
-Rebuild as part of the bump:
+1. Stop application traffic and inventory every live branch that uses
+   full-text search.
+2. Preserve a verified backup of the entire cluster root, deployment bundle,
+   and configuration. A branch export is not a rollback backup.
+3. Stop all old servers, writers, and maintenance jobs. Build or pull the
+   v0.10 image and use its CLI in an in-region one-off maintenance run; keep
+   the serving service stopped.
+4. Rebuild each live search branch directly against its derived graph root:
 
-1. **With the old binary** (matching the currently deployed REF):
-   `omnigraph export` the graph to local files (data, vectors, and blobs
-   are preserved; commit history and branches are not — export each branch
-   you need separately).
-2. Empty the cluster's storage: `railway bucket -b graph-storage delete`
-   and recreate it (same region), or delete the cluster prefix's objects.
-3. Deploy the new REF; first-boot `init.sh` re-creates the cluster and
-   graph from the bundled cookbook config.
-4. **With the new binary**, reload the data — an in-region
-   `load --mode overwrite` against the graph URI, or `mutate` through the
-   server in batches.
+   ```bash
+   omnigraph rebuild-full-text-indexes \
+     s3://<bucket>/<cluster>/graphs/<graph-id>.omni \
+     --branch main --as operator --json
+   ```
 
-Verify with `GET /healthz`, which reports the storage-format version the
-server is serving. Releases that do **not** change the storage format
-(check the release notes) redeploy cleanly with no rebuild.
+5. Verify representative searches and entity counts on every rebuilt branch,
+   then deploy/start only the v0.10 fleet. Historical snapshots are retained
+   but are not rewritten and may refuse full-text search.
 
-Also pre-flight your data against 0.9's stricter write validation (see the
-engine's upgrade guide): `load --mode append` now refuses duplicate ids
-(use `--mode merge` for upserts), and one keyed `load`/`mutate` stages at
-most 8,192 rows / 32 MiB per table (`--mode overwrite` is uncapped). A
-failed load publishes no commit.
+Rollback means restoring the whole pre-upgrade backup with the old fleet, not
+pointing v0.9 at the upgraded store. If v0.10 has persisted `external_blobs`
+cluster state, follow the engine's cluster rollback procedure as well.
+
+For a future graph-format change, follow that release's engine upgrade guide;
+do not infer an export/rebuild procedure from this v0.9→v0.10 case.
+The complete v0.10 procedure and refusal cases live in the engine's
+[upgrade guide](https://github.com/ModernRelay/omnigraph/blob/v0.10.0/docs/user/operations/upgrade.md#v09-to-v010).
+
+Write preflight remains strict: keyed `append`/`merge` operations admit at
+most 8,192 rows and 32 MiB of Arrow data per table. `overwrite` escapes the row
+ceiling, but **not** the 32 MiB strict-input preflight, so chunk a larger
+replacement. A failed load publishes no commit.
 
 ## Loading data
 
 The deploy is schema-only; you fill the graph yourself. Two paths:
 
 - **Through the server: `omnigraph load` or `mutate` over HTTPS** with a
-  writer/admin bearer token. Since 0.9, `load` works against a served
+  writer/admin bearer token. `load` works against a served
   remote too (`--server` + `--graph`); the server performs the writes in
   its own region, so it's version-safe and avoids cross-network S3. Keyed
   loads (`--mode merge`/`append`) are capped at 8,192 rows / 32 MiB per
-  table per request — chunk bigger imports, or use `--mode overwrite` for
-  a whole-table seed.
+  table per request. `overwrite` removes the row ceiling but still has the
+  32 MiB per-table preflight, so chunk larger imports.
 - **Direct to the Bucket (`omnigraph load s3://…/graphs/<id>.omni`):
   version-pinned and in-region only.** Two hazards:
   1. **Version skew fails the load.** Your local CLI must match the
@@ -363,8 +358,8 @@ docker run --rm \
 
 ## Pinning + maintenance
 
-The Dockerfile pins the omnigraph engine to a specific tag via
-`ARG OMNIGRAPH_REF=v0.9.0`. Bump that on every omnigraph release that
+The Dockerfile pins the OmniGraph engine to a specific tag via
+`ARG OMNIGRAPH_REF=v0.10.0`. Bump that on every OmniGraph release that
 changes server behavior, the policy schema, or the CLI surface — and if
 the release changes the storage format, follow
 [Upgrading the engine](#upgrading-the-engine-omnigraph_ref-bumps) above:

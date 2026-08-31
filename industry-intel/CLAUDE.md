@@ -37,7 +37,7 @@ Omnigraph CLI/schema reference: [ModernRelay/omnigraph](https://github.com/Moder
 - PatternKind: `challenge, disruption, dynamic`
 - Domain is an enum property on Signal/Element, not a node
 - Edges follow `VerbTargetType` naming (e.g. `FormsPattern`, `DevelopedByCompany`)
-- Embeddings only on Chunk: `Vector(3072) @embed("text")` — produced at ingest by the engine's configured embedding model (default `gemini-embedding-2-preview`, 3072-dim)
+- Embeddings only on Chunk: `Vector(3072) @embed("text")`. OmniGraph 0.10 does not populate `@embed` fields during load; prepare vectors with the offline JSONL-to-JSONL `omnigraph embed` pipeline, then load that output. The query-time provider must use the same model and dimension.
 - Chunk is immutable (no `updatedAt`)
 
 ## Validation

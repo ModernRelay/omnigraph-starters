@@ -37,7 +37,7 @@ query portco_rounds($slug: String) {
 }
 
 // Operating updates across the portfolio, time-sorted (most recent first).
-// 0.4.x can't easily express "latest per organization" without window functions; the
+// There is no window-function form of "latest per organization" here; the
 // agent or UI can take the first row per organization from this ordered stream.
 query portfolio_updates_recent() {
     match {
