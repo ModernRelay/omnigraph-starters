@@ -353,9 +353,9 @@ query capabilities_without_component()
 }
 
 // ═══════════════════════════════════════════════════════════════
-// SEMANTIC SEARCH — nearest() over the gemini-embedding-2-preview vectors
-// Requires GEMINI_API_KEY (the engine embeds $q at query time). Run
-// `omnigraph embed` first so the embedding columns are populated.
+// SEMANTIC SEARCH — nearest() over the gemini-embedding-2 vectors
+// Requires the graph's embedding provider for $q. Populate stored vectors via
+// the offline `omnigraph embed --input ... --output ... --spec ...` pipeline.
 // ═══════════════════════════════════════════════════════════════
 
 query search_issues($q: String)

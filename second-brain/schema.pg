@@ -31,10 +31,10 @@
 // "Me" is the Person with slug "per-self" and relation = self.
 //
 // `cadence_days` is the desired contact frequency *from me to them*. Semantically
-// it belongs on a Knows edge or a per-relationship intent node, but the current
-// query language doesn't expose edge properties to projections — so it lives on
-// Person as a pragmatic shortcut. Re-evaluate if the cookbook ever serves more
-// than one user.
+// it belongs on a Knows edge or a per-relationship intent node. v0.10 can bind
+// and project edge properties, but cadence stays on Person as a pragmatic
+// single-user shortcut. Re-evaluate if the cookbook ever serves more than one
+// user.
 node Person {
     slug: String @key
     name: String @index

@@ -6,24 +6,24 @@ Repo-wide guidance. Each cookbook also has its own `CLAUDE.md` — read both whe
 
 ## What This Repo Is
 
-A collection of Omnigraph graph cookbooks. Each cookbook is self-contained in its folder (schema, seed, queries, cluster config — no application code). Four cookbooks ship today: `industry-intel/` (AI/ML intel on the SPIKE framework — Signal, Pattern, Insight, KnowHow, Element), `pharma-intel/` (pharma competitive intelligence), `second-brain/` (personal-life automation graph), and `vc-os/` (venture-capital operating system). See `README.md` for the full list and planned cookbooks.
+A collection of Omnigraph graph cookbooks. Each cookbook is self-contained in its folder (schema, seed, queries, cluster config — no application code). Five cookbooks ship today: `industry-intel/` (AI/ML intel on the SPIKE framework — Signal, Pattern, Insight, KnowHow, Element), `pharma-intel/` (pharma competitive intelligence), `second-brain/` (personal-life automation graph), `vc-os/` (venture-capital operating system), and `dev-graph/` (software-development knowledge graph). See `README.md` for the full list and planned cookbooks.
 
 ## Architecture
 
-- **Storage**: all four cookbooks are **filesystem-backed cluster** deployments — `cluster apply` creates the derived root `graphs/<id>.omni`; **no object store / RustFS needed**. (S3-compatible storage, `s3://bucket/prefix`, is supported for production; the SPIKE cookbooks document an optional S3 path.) `init` and `load` write storage directly — one-time setup ops that bypass the server.
+- **Storage**: all five cookbooks are **filesystem-backed cluster** deployments — `cluster apply` creates the derived root `graphs/<id>.omni`; **no object store / RustFS needed**. (S3-compatible storage, `s3://bucket/prefix`, is supported for production; the SPIKE cookbooks document an optional S3 path.) `init` and direct-store `load` write storage directly — one-time setup ops that bypass the server.
 - **Runtime**: `omnigraph-server` reads from storage at startup and exposes HTTP on `127.0.0.1:8080`. Day-to-day CLI calls (`query`, `mutate`) go through the server.
-- **CLI config**: Per-operator settings (identity, named servers, defaults, **aliases**) live in `~/.omnigraph/config.yaml` (per-user, never committed). Each cookbook ships an `omnigraph-config.example.yaml` whose `aliases:` you merge in — short names binding to the graph's stored queries, invoked with `omnigraph alias <name> [args]` (e.g. `omnigraph alias pattern-signals pat-sovereign-ai`). Alias arg values are JSON-parsed first, then fall back to string — `29` is an integer, `"29"` is a string. Cookbooks ship no `omnigraph.yaml` (it is not read in 0.7+).
+- **CLI config**: Per-operator settings (identity, named servers, defaults, **aliases**) live in `~/.omnigraph/config.yaml` (per-user, never committed). Each cookbook ships an `omnigraph-config.example.yaml` whose `aliases:` you merge in — short names binding to the graph's stored queries, invoked with `omnigraph alias <name> [args]` (e.g. `omnigraph alias pattern-signals pat-sovereign-ai`). Alias arg values are JSON-parsed first, then fall back to string — `29` is an integer, `"29"` is a string. Cookbooks ship no `omnigraph.yaml`; v0.10 does not read it.
 - **Auth**: filesystem clusters need no credentials. For an optional S3 backend, `.env.omni` (git-ignored) holds the `AWS_*` creds; source it before CLI commands: `set -a && source .env.omni && set +a`.
-- **Versioning**: omnigraph storage is strict single-version (0.8.0 = internal schema v4) — a binary refuses a graph created by a different-format release, in both directions, at open. For these cookbooks the fix is trivial because seeds are the source of truth: delete the local `graphs/` and `__cluster/` dirs, then re-run `cluster apply` + `load` the seed. The export/import rebuild recipe (engine upgrade guide) is only needed for graphs holding data you added yourself. `omnigraph version` prints the binary's format version; `snapshot` and `/healthz` report a graph's.
+- **Versioning**: these cookbooks target OmniGraph 0.10.0 (graph format v6, Lance 11). A 0.9 graph stays on format v6, but the 0.9→0.10 boundary still requires a coordinated CLI/server upgrade and a full-text-index rebuild on every live branch that uses search. Never mix Lance 9/10 and Lance 11 processes against one graph. Follow the engine upgrade guide and keep a verified whole-root backup; don't replace a real graph from seed unless the seed is intentionally its source of truth.
 
 **Prerequisite**: just the `omnigraph`/`omnigraph-server` binaries — no object store. `lint` works with nothing running; once a server is up, verify with `curl http://127.0.0.1:8080/healthz`.
 
 ## Canonical Workflow
 
 1. **Edit** `schema.pg` or `queries/*.gq`. Comments in both use `//` not `#`.
-2. **Lint** — `omnigraph lint --schema schema.pg --query queries/<file>.gq` validates queries against the schema. Run after any edit. This is a pure file check: no server, no storage needed — use it as the tight inner loop while editing. Everything below requires the server running.
+2. **Lint** — `omnigraph lint --schema schema.pg --query queries/<file>.gq` validates queries against the schema. Run after any edit. This is a pure file check: no server or storage needed.
 3. **Schema changes** — plan before apply, always. Every cookbook is a cluster directory: edit the `.pg`, then `omnigraph cluster plan --config .` (shows real migration steps) and `omnigraph cluster apply --config . --as <you>`, then restart the `--cluster` server. Use `@rename_from(...)` for property/type renames.
-4. **Data changes** — pick the right write command: `mutate` for edits; `load` for bulk JSONL with a **required** `--mode` (`merge` upsert · `append` strict-insert · `overwrite` clean-slate, destructive). `load --from main --branch <name>` forks a review branch in one shot. `load` works local **and** remote. Review bulk loads on a branch, then merge.
+4. **Data changes** — pick the right write command: `mutate` for served edits; `load` for bulk JSONL with a **required** `--mode` (`merge` upsert · `append` strict-insert · `overwrite` clean-slate, destructive). `load --from main --branch <name>` forks a review branch in one shot. `load` works against local storage or a server. Review bulk loads on a branch, then merge.
 5. **Never string-interpolate** into `.gq` bodies or `--params` — parameterize everything.
 
 **Cluster deployment model.** Every cookbook is a cluster directory: its
@@ -45,14 +45,14 @@ cd industry-intel
 omnigraph lint --schema schema.pg --query queries/signals.gq
 ```
 
-Start the server once per session from inside the cookbook folder — `query`, `mutate`, and `snapshot` all go through it:
+Cluster validate/import/plan/apply, offline lint/embed, and direct-store load do not need a server. Start one for served queries, mutations, aliases, and HTTP. Four cookbooks can use the explicit local-development bypass:
 
 ```bash
-omnigraph-server --cluster . --unauthenticated   # every cookbook is a cluster directory
+omnigraph-server --cluster . --unauthenticated
 # binds 127.0.0.1:8080; local dev — the server refuses to start without auth/policy or this flag
 ```
 
-Leave it running in a separate terminal or background process.
+`industry-intel` ships a policy, so use its authenticated README quick start instead of `--unauthenticated`. Leave the server running in a separate terminal or background process.
 
 ## Skills and Docs
 
@@ -63,12 +63,12 @@ When working on schema or ops questions, consult the engine repo's docs rather t
 
 ## Railway Deploy
 
-`railway.toml` (repo root — Railway requires it there) + `deploy/railway/` deploy any cookbook's schema as a managed cloud service backed by a Railway Bucket (S3-compatible). Key facts, all detailed in `deploy/railway/README.md`:
+`railway.toml` (repo root — Railway requires it there) + `deploy/railway/` deploy any cookbook as a managed cloud service backed by a Railway Bucket (S3-compatible). Key facts, all detailed in `deploy/railway/README.md`:
 
-- **Schema-only**: `init.sh` fetches `OMNIGRAPH_SCHEMA_URL` (any HTTPS `.pg`) and runs `omnigraph init` on first boot; seed data is not auto-loaded. Idempotent across re-deploys.
-- The Dockerfile pins the engine via `ARG OMNIGRAPH_REF` — bump it on engine releases. Schemas are fetched at deploy time, so new cookbooks need no image rebuild.
-- Sharp edges documented there: service region **must** match the Bucket region (cross-region makes writes unusable), keep a **single replica** (single-writer store — replicas corrupt the graph), and direct `load` to the Bucket requires a version-matched CLI run in-region (prefer `mutate` through the server).
-- Auth is admin/writer/reader bearer tokens with a Cedar policy baked in at `deploy/railway/config/policy.yaml`; the `omnigraph.yaml` there is the deploy image's server config, not the deprecated cookbook-level file.
+- **Schema-only, cluster-mode (OmniGraph 0.10.0)**: the cookbook cluster configs are bundled in the image; `init.sh` selects one via `OMNIGRAPH_COOKBOOK`, points its `storage:` at the Bucket, and converges it with `cluster validate` → `import` (fresh Bucket only) → `apply`. Seed data is not auto-loaded. Idempotent across re-deploys; the server boots config-free via `--cluster $OMNIGRAPH_CLUSTER_URI`.
+- The Dockerfile pins the engine via `ARG OMNIGRAPH_REF` — bump it on engine releases; a format-changing release requires the export/rebuild recipe in the deploy README. Cookbook config changes ship with the image (Railway rebuilds on every repo deploy).
+- Sharp edges documented there: service region **must** match the Bucket region (cross-region makes writes unusable), keep a **single replica** (single-writer store — replicas corrupt the graph), and direct `load` to the Bucket requires a version-matched CLI run in-region (or go through the server).
+- Auth is `act-admin`/`act-writer`/`act-reader` bearer tokens via `OMNIGRAPH_SERVER_BEARER_TOKENS_JSON`; policy is applied **cluster state**. Template bundles at `deploy/railway/config/*.railway.yaml` are injected for cookbooks without their own `policies:`; industry-intel's own policy accepts the same generated actors.
 
 ## When Adding a New Cookbook
 

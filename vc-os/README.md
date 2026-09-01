@@ -51,7 +51,7 @@ Built on top of the core. These can be added to or refined without touching the 
 | Action | `Decision` · `Commitment` | What we do. `Decision` is one-shot (`decided_at`); `Commitment` is deferred-action with a deadline. Intros, follow-ups, *schedule-another-meeting*, and *flag-at-next-board* are `Commitment`s, not `Decision`s. |
 | Reflexive | `Pattern` · `Lesson` | What we learn. `Pattern` aggregates across many subjects; `Insight` interprets one. `Lesson` is operational (changes future behavior); `Insight` is descriptive. |
 
-**17 node types total** (`Chunk` should be populated via `omnigraph embed --reembed_all`). Source-provenance entities (TechCrunch, PitchBook, Tegus, anon blog) live as `Organization` rows with `kind` in `(publisher, database, expert-network)` and a `reliability` rating - no separate `SourceEntity` node.
+**17 node types total** (`Chunk` data is prepared with the offline `omnigraph embed --input ... --output ... --spec ... --reembed-all` file pipeline, then loaded). Source-provenance entities (TechCrunch, PitchBook, Tegus, anon blog) live as `Organization` rows with `kind` in `(publisher, database, expert-network)` and a `reliability` rating - no separate `SourceEntity` node.
 
 Slug prefixes: `org- per- mkt- deal- fund- art- mtg- thesis- asmp- q- sig- ins- chk- dec- cmt- pat- lsn-`.
 
@@ -502,11 +502,11 @@ For each agent below: the natural-language **prompt** you'd send it, concrete **
 **Ships:**
 - Full 17-node schema with native `Blob` on `Artifact` and `Vector(3072) @embed("text")` on `Chunk`
 - Reference seed: 207 nodes, 460 edges across 65 edge types, no embeddings, no blob payloads
-- 294 aliases covering reads + mutations for every node/edge type (289 named queries across 12 `.gq` files)
+- 294 aliases covering reads + mutations for every node/edge type (291 named queries across 12 `.gq` files)
 - Example queries enumerated above
 
 **Deferred (extensions, not blockers):**
-- **Real blob + embedding examples in seed.** Schema declares the capability. Attach real PDFs/transcripts as `Artifact.blob`, populate `Chunk` rows, then `omnigraph embed --reembed_all` followed by hybrid queries combining `nearest()` / `bm25()` / `rrf()` with graph traversal.
+- **Real blob + embedding examples in seed.** Schema declares the capability. Attach real PDFs/transcripts as `Artifact.blob`; prepare raw `Chunk` JSONL, pass it through offline `omnigraph embed --reembed-all`, then load the output before running hybrid `nearest()` / `bm25()` / `rrf()` queries.
 - **Cedar policies** (`policies/`) - per-role access control (team / lp / read-only-portfolio) collapses application-layer permission code into the graph server.
 - **Sector-specialist Pattern/Lesson packs.** AI-infra Patterns ship with the reference seed; talent-tech / climate / B2B-SaaS variants are sibling cookbooks.
 - **`Measurement` node** for time-series KPIs/cash/runway (currently captured loosely via `Signal{kind=portfolio-update}`).
@@ -537,7 +537,7 @@ vc-os/
     └── wiki.gq           # 14 reads (markdown artifacts pinned to git commits)
 ```
 
-Total: 289 named queries, 294 aliases.
+Total: 291 named queries, 294 aliases.
 
 ## Quick Start
 

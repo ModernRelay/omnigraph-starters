@@ -110,8 +110,8 @@ query markdown_documents_pattern($slug: String) {
 // Coverage queries — feed the wiki-drift JTBD
 // ──────────────────────────────────────────────
 //
-// Omnigraph 0.4 doesn't support NOT-EXISTS / anti-joins, so the "which theses
-// lack a doc?" question is answered by *set diff* on the caller side:
+// These paired queries expose both coverage totals. The "which theses lack a
+// doc?" view is answered by *set diff* on the caller side:
 // diff `theses_active_for_doc_review` (everything) against
 // `theses_with_docs` (the subset that has a wiki page) — the difference is
 // the drift set. Same pattern for lessons.

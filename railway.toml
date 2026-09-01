@@ -6,20 +6,23 @@ builder        = "DOCKERFILE"
 dockerfilePath = "deploy/railway/Dockerfile"
 
 [deploy]
-# Positional URI overrides the config's `server.graph` lookup, so the
-# bundled /etc/omnigraph/omnigraph.yaml only contributes its `policy.file`
-# pointer; the target itself is driven by Railway Bucket env wiring.
+# Cluster-only boot (OmniGraph 0.10, RFC-011): the server's single boot
+# source is `--cluster`, here the Bucket storage root itself — config-free
+# serving of the state that preDeploy's `cluster apply` converged. Bearer
+# tokens arrive via OMNIGRAPH_SERVER_BEARER_TOKENS_JSON; policy is applied
+# cluster state, not a server flag.
 #
 # `exec` is load-bearing: a Dockerfile/image start command is run in exec
 # form, so the shell wrapper (needed for $PORT expansion) becomes PID 1.
 # Without `exec`, that shell — not omnigraph-server — receives Railway's
 # SIGTERM on redeploy/teardown, so the server never drains and gets
 # SIGKILLed. Railway's own docs use `/bin/sh -c "exec ..."` for this.
-startCommand = "sh -c 'exec omnigraph-server \"$OMNIGRAPH_TARGET_URI\" --config /etc/omnigraph/omnigraph.yaml --bind \"0.0.0.0:$PORT\"'"
+startCommand = "sh -c 'exec omnigraph-server --cluster \"$OMNIGRAPH_CLUSTER_URI\" --bind \"0.0.0.0:$PORT\"'"
 
-# Runs between build and start. The script is idempotent — it skips when
-# the graph at $OMNIGRAPH_TARGET_URI already has a manifest, so re-deploys
-# are no-ops. First deploy runs `omnigraph init` (+ optional seed load).
+# Runs between build and start. Assembles the bundled cookbook's cluster
+# config, points storage at $OMNIGRAPH_CLUSTER_URI, and runs the idempotent
+# validate → import → apply sequence — re-deploys converge to a no-op and
+# never touch existing graph data.
 preDeployCommand = ["/usr/local/bin/omnigraph-railway-init.sh"]
 
 healthcheckPath         = "/healthz"

@@ -55,7 +55,7 @@ Schema-language reference (node/edge syntax, `@key`/`@index`/`@unique`/`@embed`,
 | Action | `Decision`, `Commitment` | What we do. Decisions are one-shot (`decided_at`); Commitments are deferred actions with deadlines. Schedule-another-meeting and flag-at-next-board are Commitments, not Decisions. |
 | Reflexive | `Pattern`, `Lesson` | What we learn |
 
-v1 seed ships `Chunk` zero (populate via `omnigraph embed --reembed_all`). All other 16 node types active.
+v1 seed ships `Chunk` zero. Create raw Chunk JSONL, run the offline `omnigraph embed --input ... --output ... --spec ... --reembed-all` file pipeline, then load the output. All other 16 node types are active.
 
 **Core analytical loops:**
 
@@ -97,8 +97,8 @@ v1 seed ships `Chunk` zero (populate via `omnigraph embed --reembed_all`). All o
 
 ## Known gaps
 
-- **Edge-property projections aren't supported in queries** — `Knows.strength`, `WorksAt.role`, `RoleInDeal.role`, `BoardMemberAt.role`, etc. are stored but cannot be returned in `read` results. Filter in the writer; surface via dedicated read-side helpers if needed.
-- **`Chunk` is declared but the seed has zero.** Embeddings come from a separate ingest pipeline (`omnigraph embed --reembed_all`); the static seed can't generate them. Hybrid search is a v1-deferred capability.
+- **Edge-property projections use a bound edge variable in v0.10** — for example, `$p $r:roleInDeal $d` and `return { $r.role }`. `deal_role_participants` demonstrates the syntax.
+- **`Chunk` is declared but the seed has zero.** Embeddings come from an offline JSONL-to-JSONL pipeline; the static seed cannot generate them and `omnigraph embed` does not mutate a graph. Hybrid search is a v1-deferred capability.
 - **Alias args bind to query parameters by *name*, not position.** An alias `args: [slug]` only binds to a query that declares `$slug`. Renaming the alias arg to `[deal_slug]` without also renaming `$slug → $deal_slug` in the query silently drops the filter — the query then matches every row instead of one. If you want clearer arg names, rename in *both* places; otherwise add a comment block above the alias group explaining the input semantics.
 - **Adding values to an existing enum is a destructive type change.** `cluster apply` / `schema apply` reject in-place enum extensions, so widening an enum means rebuilding the graph: stop the server, delete `graphs/vcos.omni`, re-run `omnigraph cluster apply --config .`, then `omnigraph load --data seed.jsonl --mode overwrite graphs/vcos.omni`. Batch multiple enum/property-type changes into one rebuild — single-change rebuilds aren't worth the cost. (General migration mechanics live in the **omnigraph** skill.)
 - **`Artifact.blob` is declared but the seed uses none.** Same status as Chunks — populate via separate ingest.

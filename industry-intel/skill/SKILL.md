@@ -2,10 +2,10 @@
 name: omnigraph-intel-bootstrap
 description: 'Bootstrap a new Omnigraph-based SPIKE industry intelligence graph from scratch. Use this skill whenever a user wants to set up a new SPIKE graph — either with the existing AI industry demo data or for a new domain (biotech, fintech, crypto, geopolitics, macroeconomics, SaaS, climate tech, etc.). The flow presents a demo-vs-custom decision, then for custom setups asks about domain scope, actors, cadence, and sources, adapts schema and enums for the target domain, runs initial web research to generate real seed content, and converges the cluster (apply creates the graph) + loads seed data. Apply aggressively when the user says any of: set up Omnigraph, bootstrap a new graph, create a new SPIKE cookbook, I want to track X industry, initialize intel for Y, new graph for Z domain, start a new context graph, or similar phrasing. This skill takes a user from zero to a populated, queryable graph.'
 license: MIT (see LICENSE at repo root)
-compatibility: Requires omnigraph CLI >= 0.8.0 (cluster control plane; storage format v4 — graphs are format-locked to the binary that creates them). Docker only for the optional RustFS/S3 path.
+compatibility: Validated with OmniGraph CLI and server v0.10.0 (graph format v6, Lance 11). Docker is needed only for the optional RustFS/S3 path.
 metadata:
   author: ModernRelay
-  version: "0.4.1"
+  version: "0.5.0"
   repository: https://github.com/ModernRelay/omnigraph-cookbooks
 ---
 
@@ -18,14 +18,7 @@ This skill takes a user from zero to a populated, queryable SPIKE graph. Two pat
 
 **Prerequisites:**
 
-1. RustFS running on `127.0.0.1:9000`. If not, start one — as a native binary (macOS: `brew install rustfs/tap/rustfs`, then `rustfs server --address 127.0.0.1:9000 --access-key rustfsadmin --secret-key rustfsadmin ./data`) or in Docker:
-   ```bash
-   docker run -d --name omnigraph-s3 -p 9000:9000 \
-     -e RUSTFS_ACCESS_KEY=rustfsadmin -e RUSTFS_SECRET_KEY=rustfsadmin \
-     -e RUSTFS_ALLOW_INSECURE_DEFAULT_CREDENTIALS=true rustfs/rustfs:latest /data
-   aws --endpoint-url http://127.0.0.1:9000 s3 mb s3://omnigraph-local   # create the bucket once
-   ```
-   See the omnigraph repo's `docs/user/deployment.md` → *Testing against S3 locally* for the full `AWS_*` contract.
+1. OmniGraph CLI and server v0.10.0.
 
 2. The `omnigraph-cookbooks` repo cloned somewhere on disk. Ask the user where (or default to the current directory):
    ```bash
@@ -38,35 +31,25 @@ This skill takes a user from zero to a populated, queryable SPIKE graph. Two pat
 Before either path, run these checks (and act on the results):
 
 ```bash
-# Are RustFS and any existing server reachable?
-# Ensure omnigraph is on PATH
+# Ensure the exact supported CLI is on PATH
 command -v omnigraph >/dev/null || { echo "omnigraph not found — install via homebrew or the install script"; exit 1; }
 
-# Require omnigraph >= 0.8.0 (cluster control plane + storage format v4 —
-# a graph created here can only be opened by binaries of the same format)
+# Require v0.10.0; upgrade CLI and server together.
+test "$(omnigraph --version)" = "omnigraph 0.10.0" || { echo "this skill requires omnigraph 0.10.0"; exit 1; }
 omnigraph version
 ```
 
 The default (cluster-first) path needs **no RustFS, no credentials, no
 .env.omni** — graphs live at local derived roots created by `cluster apply`.
-RustFS checks and `.env.omni` only matter for the optional S3 alternative
-(see the cookbook READMEs).
+RustFS checks and `.env.omni` only matter for the optional S3 alternative (see
+the cookbook READMEs). A 0.9 graph needs the engine's coordinated 0.9→0.10
+upgrade procedure and full-text-index rebuild before this skill operates it.
 
 **If `:8080` returns `200` from a server pointed at a different repo** (the bootstrap script auto-starts one), stop it before starting yours, or rebind to a free port via `omnigraph-server --bind 127.0.0.1:8090`.
 
-The `.env.omni` file (created from the example above) contains the 7 mandatory AWS env vars:
-
-```bash
-AWS_ACCESS_KEY_ID=rustfsadmin
-AWS_SECRET_ACCESS_KEY=rustfsadmin
-AWS_REGION=us-east-1
-AWS_ENDPOINT_URL=http://127.0.0.1:9000
-AWS_ENDPOINT_URL_S3=http://127.0.0.1:9000
-AWS_ALLOW_HTTP=true
-AWS_S3_FORCE_PATH_STYLE=true
-```
-
-`AWS_ALLOW_HTTP` and `AWS_S3_FORCE_PATH_STYLE` are mandatory — omitting either gives a cryptic `builder error from lance-io` at init/load time.
+For the optional local S3 path only, follow the engine deployment guide and
+source all seven `AWS_*` variables from the gitignored `.env.omni`; the default
+filesystem path ignores that file.
 
 ## Step 1: Ask the user which path
 
@@ -87,11 +70,15 @@ See [`references/demo-setup.md`](references/demo-setup.md) for the full command 
 
 ```bash
 cd <path-to-clone>/omnigraph-cookbooks/industry-intel
+# First merge omnigraph-config.example.yaml's servers/defaults/aliases into
+# ~/.omnigraph/config.yaml; login stores the token separately.
 omnigraph cluster import --config .
 omnigraph cluster apply  --config . --as <you>     # creates graphs/spike.omni + publishes queries
 omnigraph load --data seed.jsonl --mode overwrite graphs/spike.omni
-# Serve the applied state (keep running), then query through it:
-omnigraph-server --cluster . --bind 127.0.0.1:8080 --unauthenticated &   # local dev
+# Serve with the cookbook policy, then authenticate the CLI:
+OMNIGRAPH_SERVER_BEARER_TOKENS_JSON='{"act-admin":"local-admin-token","act-writer":"local-writer-token","act-reader":"local-reader-token"}' \
+  omnigraph-server --cluster . --bind 127.0.0.1:8080 &
+printf '%s' 'local-reader-token' | omnigraph login local
 omnigraph alias patterns disruption    # CLI alias sugar
 ```
 
@@ -173,7 +160,11 @@ Update in `<slug>/cluster.yaml`:
 
 - `metadata.name` → domain-appropriate name
 - the `graphs:` entry id → `<slug>` (its derived root becomes `graphs/<slug>.omni`)
-- Optionally adjust aliases if query names change
+
+Update `<slug>/omnigraph-config.example.yaml` too: change `default_graph` and
+every alias `graph:` from `spike` to `<slug>`, and adjust aliases if query names
+changed. Before verification, merge its `servers`, `defaults`, and `aliases`
+into `~/.omnigraph/config.yaml`.
 
 **Pattern.kind** (`challenge`, `disruption`, `dynamic`) is usually domain-agnostic. Don't change it unless the user has strong reasons.
 
@@ -212,7 +203,9 @@ omnigraph cluster import --config .
 omnigraph cluster plan   --config .                # review what apply will do
 omnigraph cluster apply  --config . --as <you>     # creates graphs/<slug>.omni
 omnigraph load --data seed.jsonl --mode overwrite graphs/<slug>.omni
-omnigraph-server --cluster . --bind 127.0.0.1:8080 --unauthenticated &   # local dev
+OMNIGRAPH_SERVER_BEARER_TOKENS_JSON='{"act-admin":"local-admin-token","act-writer":"local-writer-token","act-reader":"local-reader-token"}' \
+  omnigraph-server --cluster . --bind 127.0.0.1:8080 &
+printf '%s' 'local-reader-token' | omnigraph login local
 ```
 
 8. Verify with a sample query (goes through the server):

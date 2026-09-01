@@ -57,11 +57,19 @@ self-contained — `cd` in and follow its README.
 ## Getting Started
 
 1. Pick a cookbook.
-2. Make sure you have a running Omnigraph instance — see the [Omnigraph repo](https://github.com/ModernRelay/omnigraph).
-3. Follow the cookbook's Quick Start. The SPIKE cookbooks are **cluster
-   directories** (omnigraph >= 0.8.0): `omnigraph cluster apply` creates the
-   graph and publishes the stored queries; `omnigraph-server --cluster .`
-   serves them — no object store needed to get started.
+2. Install the OmniGraph v0.10.0 CLI and server — see the [OmniGraph repo](https://github.com/ModernRelay/omnigraph). No server or object store is needed for the initial cluster apply and seed load.
+3. Follow the cookbook's Quick Start. Every cookbook is a **cluster
+   directory** (aligned to OmniGraph 0.10.0): `omnigraph cluster apply`
+   creates the graph and publishes the stored queries;
+   `omnigraph-server --cluster .` serves them — no object store needed to
+   get started.
+
+Upgrading an existing v0.9 graph to v0.10 keeps graph format v6, but moves
+from Lance 9 to Lance 11. Stop traffic, back up the whole graph root, upgrade
+CLI/server/client integrations together, and rebuild full-text indexes on every
+live branch that uses search. Follow the engine's
+[v0.10 upgrade guide](https://github.com/ModernRelay/omnigraph/blob/v0.10.0/docs/user/operations/upgrade.md#v09-to-v010);
+never run mixed old/new processes against one graph.
 
 ## SPIKE Framework
 

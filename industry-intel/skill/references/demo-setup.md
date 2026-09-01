@@ -4,24 +4,9 @@ The quickest path to a populated SPIKE graph. Uses the existing `industry-intel`
 
 ## Prerequisites
 
-### RustFS + binaries
-
-RustFS must be running locally on `127.0.0.1:9000`. Verify with:
-
-```bash
-curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:9000/
-```
-
-If you get `000` (no connection), start a RustFS — as a native binary (macOS: `brew install rustfs/tap/rustfs`, then `rustfs server --address 127.0.0.1:9000 --access-key rustfsadmin --secret-key rustfsadmin ./data`) or in Docker ([install](https://docs.docker.com/get-docker/)):
-
-```bash
-docker run -d --name omnigraph-s3 -p 9000:9000 \
-  -e RUSTFS_ACCESS_KEY=rustfsadmin -e RUSTFS_SECRET_KEY=rustfsadmin \
-  -e RUSTFS_ALLOW_INSECURE_DEFAULT_CREDENTIALS=true rustfs/rustfs:latest /data
-aws --endpoint-url http://127.0.0.1:9000 s3 mb s3://omnigraph-local   # create the bucket once
-```
-
-See the omnigraph repo's `docs/user/deployment.md` → *Testing against S3 locally* for the full `AWS_*` contract.
+Install the OmniGraph CLI and server v0.10.0. The default filesystem-backed
+demo needs no object store, credentials, or Docker. RustFS is optional and is
+covered by the S3 alternative in the cookbook README.
 
 ### Existing server on :8080
 
@@ -45,20 +30,18 @@ Then move into the cookbook folder:
 
 ```bash
 cd omnigraph-cookbooks/industry-intel
-[ -f .env.omni ] || cp .env.omni.example .env.omni
-set -a && source .env.omni && set +a
 ```
-
-`.env.omni` is gitignored (it's just credentials). The repo ships `.env.omni.example` with the 7 required AWS vars — copy it on first run.
 
 All commands below run from `industry-intel/`. If the clone is somewhere else, substitute the absolute path.
 
-### First-time bucket creation
+Merge `omnigraph-config.example.yaml`'s `servers`, `defaults`, and `aliases`
+into `~/.omnigraph/config.yaml`. Bearer tokens do not belong in that file;
+`omnigraph login local` stores one separately later.
 
 ### Converge the cluster + load
 
 The cookbook ships a `cluster.yaml` declaring the graph (`spike`), the
-schema, and all 66 stored queries. One-time setup:
+schema, and all 73 stored queries. One-time setup:
 
 ```bash
 omnigraph cluster import --config .                # create the state ledger
@@ -73,20 +56,26 @@ RustFS, bucket, or credentials are involved on this path.
 Expected output from load:
 
 ```
-loaded graphs/spike.omni on branch main with overwrite: 109 nodes across 9 node types, 154 edges across 17 edge types
+loaded graphs/spike.omni on branch main with overwrite: 263 entities across 9 node types and 17 edge types
 ```
 
 ### Start the server
 
 ```bash
-omnigraph-server --cluster . --bind 127.0.0.1:8080 --unauthenticated
+export OMNIGRAPH_SERVER_BEARER_TOKENS_JSON='{"act-admin":"local-admin-token","act-writer":"local-writer-token","act-reader":"local-reader-token"}'
+omnigraph-server --cluster . --bind 127.0.0.1:8080
 ```
 
-`--cluster` serves the applied revision (the exclusive boot source).
-`--unauthenticated` is for local dev — the server
-refuses to start without bearer tokens, a policy, or this flag. Keep it
-running (separate terminal or background). Every declared query is also a
-direct HTTP endpoint: `POST /graphs/spike/queries/<name>`.
+`--cluster` serves the applied revision (the exclusive boot source). The
+cookbook policy requires an authenticated actor, so keep the server running
+and log the CLI into its named `local` server from a second terminal:
+
+```bash
+printf '%s' 'local-reader-token' | omnigraph login local
+```
+
+Every declared query is also a direct HTTP endpoint:
+`POST /graphs/spike/queries/<name>`.
 
 ### Verify
 
@@ -110,15 +99,15 @@ Should return 3 signals.
 |------|-------|
 | Pattern | 5 (Sovereign AI, SaaSpocalypse, Context Graphs, New Cyber Threats, Accelerated Research) |
 | Signal | 15 (each with real dates and source URLs) |
-| Element | 26 (products, frameworks, concepts across AI/ML) |
-| Company | 17 |
+| Element | 24 (products, frameworks, concepts across AI/ML) |
+| Company | 16 |
 | Expert | 7 |
 | SourceEntity | 16 |
 | InformationArtifact | 20 |
-| Insight | 3 |
+| Insight | 4 |
 | KnowHow | 2 |
 
-Plus 148 edges wiring the graph together.
+That is 109 nodes plus 154 edges, or 263 entities total.
 
 ## Next Steps
 

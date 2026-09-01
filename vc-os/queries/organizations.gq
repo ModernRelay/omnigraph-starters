@@ -169,7 +169,7 @@ query co_investor_participants() {
 }
 
 // Given an Organization we invested in, which other VCs LED the round.
-// Split into two queries because Omnigraph 0.4 has no OR primitive — callers
+// Split into two queries because the query language has no OR primitive — callers
 // (or aliases) union the leads + participants for the full co-investor view.
 query organization_co_investor_leads($slug: String) {
     match {
